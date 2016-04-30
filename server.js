@@ -1,7 +1,7 @@
 /*TODO LIST
-1. integrate dates into everything
-2. write socket, get, and post request functions --do next`
-3. use decrypt and encrypt functions
+1. fill in socket data
+2. make editing workout possible?
+3. start writing mustahce files?
 */
 
 
@@ -73,7 +73,69 @@ app.get('/logout', function (req, res) {
 });
 
 io.on('connection', function(socket) {
+    socket.on('getWorkout',function(workout,email){
 
+    });
+    socket.on('getGroupWorkouts',function(group){
+
+    });
+    socket.on('getWorkoutGroups',function(workout){
+
+    });
+    socket.on('getGroupUsers',function(group){
+
+    });
+    socket.on('submitMax',function(email,exercise,max){
+
+    });
+    socket.on('changeWorkout',function(email,workout,set,exercise,type,value){
+
+    });
+    socket.on('submitWorkout',function(email,workout,array){
+
+    });
+    socket.on('createExercise',function(name,url){
+
+    });
+    socket.on('editExercise',function(name,url){
+
+    });
+    socket.on('createGroup',function(name,users){
+
+    });
+    socket.on('editGroupadd',function(name,user){
+
+    });
+    socket.on('editGroupdelete',function(name,user){
+
+    });
+    socket.on('assignWorkout',function(group,workout){
+
+    });
+    socket.on('createFullWorkout',function(name,cyclenum,cyclelen){
+
+    });
+    socket.on('createWorkout',function(workout,array){
+
+    });
+    socket.on('deleteWorkout',function(workout){
+
+    });
+    socket.on('getBlankWorkout'function(workout){
+
+    });
+    socket.on('createUser',function(name,user){
+
+    });
+    socket.on('getGroupExerciseData',function(group,exercise){
+
+    });
+    socket.on('getUserData',function(email){
+
+    });
+    socket.on('getWorkoutData',function(workout){
+
+    });
 });
 
 function ensureAuthenticated(req, res, next) { //next runs the next function in the arguement line "app.get('/datapage', ensureAuthenticated, function(req, res)" would move to function(req, res)
@@ -84,21 +146,46 @@ function ensureAuthenticated(req, res, next) { //next runs the next function in 
             res.redirect('/auth/google');
         }
 }
-app.get('/page1', function(request, response){
-    response.render('.html');
-    
+app.get('/', function(request, response){
+    //how do i get email from user? post request where email is grabbed from cookie? can i do this on server?
+    var email = ???;
+    if(email == admin){
+        //respond with create workout page
+        var groups = get_all_groups();//done
+        var workouts = get_all_full(); //done
+        var exercises = get_all_exercises();//done
+        var users = get_all_users();//done
+        response.render('create-workout.html',/*mustache in above data*/);
+    }
+    else if(email == user){
+        //respond with next workout
+        var workout = get_next_wo(email);
+        var allworkouts = get_all_false(email);
+        response.render('workout.html',/*mustahce in workout and allworkouts*/);
+    }
+    else{
+        //respond with create account page ---we will direct them to ask o'donnell for access
+        response.render('request-account.html');
+    }
 });
-app.get('/page2', function(request, response){
-    response.render('.html');
-    
-});
-app.get('/page3', function(request, response){
-    response.render('.html');
-    
-});
-app.get('/page4', function(request, response){
-    response.render('.html');
-    
+app.get('/progress', function(request, response){
+    var email = ???;
+    if(email == admin){
+        var groups = get_all_groups();
+        var workouts = get_all_full();
+        var exercises = get_all_exercises();
+        var users = get_all_users();
+        response.render('school-progress.html',/*mustache in above data*/);
+    }
+    else if(email == user){
+        var data = get_all_userdata(email);
+        var exercises = get_all_exercises();
+        response.render('user-progress.html',/*mustache in above data*/);
+    }
+    else{
+        //respond with create account page ---we will direct them to ask o'donnell for access
+        response.render('request-account.html');
+    }    
 });
 server.listen(8080);
 ///////////////////////////////////////////////////////////CONVERSION FUNCTIONS////////////////////////////////
@@ -144,7 +231,7 @@ function newUser(profile){
         conn.query('ALTER TABLE ($1) ADD '+exercises[0]+' FLOAT',[email]);
     }
 }
-function getUserList(){
+function get_all_users(){
     var users = [];
     conn.query('SELECT name FROM users')
     .on('data',function(row){
@@ -155,13 +242,50 @@ function getUserList(){
         return users;
     });
 }
+function get_next_wo(email){
+    //////////////////////////////////get todays date
+    var newdate = 100000000000000000;
+    var workout = null;
+    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[email,false,date])
+    .on('data',function(row){
+        if(row.date< newdate){
+            row.date = newdate;
+            workout = row.workout;
+        }
+    })
+    .on('end',function(){
+        if(workout == null){
+            return null;
+        }
+        else{
+            return table_to_array(workout,email);
+        }
+    });
+}
+function get_all_false(email){
+    var list = []
+    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2)',[email,false])
+    .on('data',function(row){
+        var obj = new Object()
+        obj.date = row.date;
+        obj.workout = row.workout;
+        var full = workout.slice(0,workout.indexOf("-"));
+        conn.query('SELECT cycle,day FROM ($1) WHERE "workout"=($2)',[full,row.workout])
+        .on('data',function(row){
+            obj.string = getRealDate(obj.date)+ " Cycle:"+row.cycle.toString()+", Day:"+row.day.toString();
+        })
+        .on('end'function(){
+            list.push(obj);
+        })
+    })
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////EXERCISES/////////////////////////////////////////////
-function getExerciseList(){
+function get_all_exercises(){
     var exercises = [];
     conn.query('SELECT exercise FROM exercises')
     .on('data',function(row){
-        exercises.push(row.exercise);
+        exercises.push(decrypt(row.exercise);
     })
     .on('end',function(){
         return exercises;
@@ -179,7 +303,7 @@ function getExerciseURL(exercise){
 }
 function newExercise(name,url){
     name = encrypt(name)
-    conn.query('INSERT INTO exercises (exercise,url) VALUES ($1,$2)', [name,url])
+    conn.query('INSERT INTO exercises (exercise,url) VALUES ($1,$2)', [name,url]) //if the exercise does not exist already?
     .on('error', function(){
         return false;
     });
@@ -201,7 +325,7 @@ function newGroup(array, name){
         conn.query('INSERT INTO groups (group) VALUES ($1)', [name])
         .on('end',function(){
             for(var i =0;i<array.length;i++){
-                conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[0].name,array[0].email]);
+                conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email]);
             }
             var str = name+"-assigned";
             conn.query('CREATE TABLE ($1) ("full" TEXT)',[str])
@@ -258,14 +382,46 @@ function push_group(user,group){
 }
 function pop_group(email,group){
     conn.query('DELETE FROM ($1) WHERE "email"=($2)',[group,email]);
-    var ass = group.toString()+"-assigned";
-    conn.query('SELECT full FROM ($1)',[ass])
+    var assigned = group.toString()+"-assigned";
+    conn.query('SELECT full FROM ($1)',[assigned])
     .on('data',function(row){
         conn.query('SELECT workout FROM ($1) WHERE "completed"=($2)',[row.full,true])
         .on('data',function(row){
             conn.query('DELETE FROM ($1) WHERE "workout"=($2),"completed"=($3)',[email,row.workout,false]);
             conn.query('DELETE FROM ($1) WHERE "email"=($2),"completed"=($3)',[row.workout,email,false]);
         });
+    });
+}
+function get_all_groups(){
+    var list = [];
+    conn.query('SELECT group FROM groups')
+    .on('data',function(row){
+        list.push(row);
+    })
+    .on('end'function(){
+        return list;
+    })
+}
+function get_assigned_gro(workout){
+    var list = [];
+    var str = workout+ "-groups";
+    conn.query('SELECT group FROM ($1)',[str])
+    .on('data',function(row){
+        list.push(row);
+    })
+    .on('end',function(){
+        return list;
+    });
+}
+function get_assigned_wo(group){
+    var list = [];
+    var str = group+ "-assigned";
+    conn.query('SELECT workout FROM ($1)',[str])
+    .on('data',function(row){
+        list.push(row);
+    })
+    .on('end',function(){
+        return list;
     });
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +467,7 @@ function build_workout(array, full){
         build_workout(array);
     })
     .on('end',function(){
-        array_to_table(array,workout_name,full)
+        array_to_table_init(array,workout_name,full)
         return workout_name;
     });
 }
@@ -349,7 +505,7 @@ function insert_wo_row(name,email,setnum,table,array){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////DATA CONVERSION FUNCTIONS//////////////////////////////////////////////
-function array_to_table(array, table,full){
+function array_to_table_init(array, table,full){
     var setnum = array.length;
     for(var i=0;i<setnum;i++){
         var num = i+1
@@ -362,7 +518,7 @@ function array_to_table(array, table,full){
             var num2 = j+1;
             var exnumstr = setnumstr + "-" + num2.toString();
             create_column(table,exnumstr,"BOOL");
-            var name = exercises[j].name;
+            var name = encrypt(exercises[j].name);
             var namestr = exnumstr + "#" + name;
             create_column(table,namestr, "TEXT");
             var rounds = exercises[j].rounds;
@@ -394,7 +550,7 @@ function populate_table_full(array,table,setnum,email){
             var ex = j+1;
             var exstr = setstr +"-" +ex.toString();
             update_col(table,exstr,true,"email",email);
-            var name = exercises[j].name
+            var name = encrypt(exercises[j].name);
             var namestr = exnumstr + "#" + name;
             update_col(table,namestr,name,"email",email);
             var rounds = exercises[j].rounds;
@@ -436,14 +592,7 @@ function table_to_array(workout,email){
                 var rdlen = values[keys.indexOf(rdlenstr)];
                 var newex = new Object();
                 newex[ex] = true;
-                var namestr= exstr+"#";
-                var namestrlen = namestr.length;
-                for (var k = 0; k < keys.length; k++) {
-                    if(keys[k].slice(0,namestrlen) == namestr){
-                        newex.name = keys[k].slice(namestrlen);
-                        break;
-                    }
-                }
+                var name = decrypt(get_name_from_key(email,workout,extstr));
                 newex.rounds = {};
                 for(var l=0;l<rdlen;l++){
                     var rd = l+1;
@@ -524,7 +673,8 @@ function submmit_ex(email,workout,str){
         }
     }
 }
-function update_workout(column, value, completed, user, workout){ //just change a value
+function update_workout(column, value, completed, user, workout){ 
+    column = encrypt(column);
     update_col(workout,column,value,"email",user);
     if(completed == true){
         var dashes = column.split("?").length-1;
@@ -622,6 +772,16 @@ function update_col(table,column,value,cona,conb){
     var str = 'UPDATE ($1) SET ' + column +  '= ($2) WHERE ($3) = ($4)';
     conn.query(str,[table,value,cona,conb]);
 }
+function get_all_full(){
+    list = [];
+    conn.query('SELECT workout,ident,cyclenum,cyclelen FROM workouts')
+    .on('data'function(row){
+        list.push(row);
+    })
+    .on('end',function(){
+        return list;
+    })
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////WEIGHTLIFTING MATH CALCULATIONS////////////////////////////
 function get_max_from_lift(email,workout,str){
@@ -661,33 +821,3 @@ function rounder(num,diff){
     return (math.floor((num+(diff/2)/diff))*diff)
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////SELECT CALLS ON USER//////////////////////////////////////////////
-function get_next_wo(email){
-    //////////////////////////////////get todays date
-    var newdate = 100000000000000000;
-    var workout = null;
-    conn.query('SELECT workout,date FROM ($1) WHERE completed =($2), date>($3)',[email,false,date])
-    .on('data',function(row){
-        if(row.date< newdate){
-            row.date = newdate;
-            workout = row.workout;
-        }
-    })
-    .on('end',function(){
-        if(workout == null){
-            return null;
-        }
-        else{
-            return table_to_array(workout,email);
-        }
-    });
-}
-function get_all_false(email){
-    var list = []
-    conn.query('SELECT workout,date FROM ($1) WHERE completed=($2)',[email,false])
-    .on('data',function(row){
-        var obj = new Object()
-        obj.date = row.date;
-        obj.workout = row.workout;
-    })
-}
