@@ -2,12 +2,10 @@
 2. make editing workout possible!
 3. start writing mustahce files!
 7. Make asynchronous adjustments!!!
-7a) is the tree in newUser correct? 
-7b) do .then functions need parameters? -i hope not
-7c) will the encrypt function fuck me over in data conversion functions?
-7d) in submit_workout function embedded in if statement? -what about pushing functions to arrays?
-7e) do i even need q for .then functions?
+7a) is get_max_from_list correct
+7b) check over everything
 */
+
 
 var Q = require('q');//new code
 
@@ -79,31 +77,19 @@ app.get('/logout', function (req, res) {
 
 io.on('connection', function(socket) {
     socket.on('getNextWorkout',function(workout,email){ //all
-        var array = table_to_array(workout,email);
-        array.then(function(){
-            socket.emit('nextWorkout',array);
-        });
+        table_to_array(workout,email, function(array){socket.emit('nextWorkout',array);});
     });
     socket.on('getGroupWorkouts',function(group){ //admin
-        var wolist = get_assigned_wo(group);
-        wolist.then(function(){
-            socket.emit('groupWorkouts',wolist);
-        });
+        get_assigned_wo(group,function(list){socket.emit('groupWorkouts',list);});
     });
     socket.on('getWorkoutGroups',function(workout){ //admin
-        var grolist = get_assigned_gro(workout);
-        grolist.then(function(){
-            socket.emit('workoutGroups',grolist);
-        });
+        get_assigned_gro(workout,function(list){socket.emit('workoutGroups',list);});
     });
     socket.on('getGroupUsers',function(group){ //admin
-        var ulist = get_group(group);
-        ulist.then(function(){
-            socket.emit('groupUsers',ulist);
-        });
+        get_group(group,function(list){socket.emit('groupUsers',list);});
     });
     socket.on('submitMax',function(email,exercise,max){ //all
-        update_col("users",encrypt(exercise),max,"email",email);
+        update_col("users",exercise.split(' ').join('_'),max,"email",email);
     });
     socket.on('changeWorkout',function(email,workout,set,exercise,type,value,completed){ //all 
         update_workout(set.toString()+"-"+exercise.toString()+"-"+type,value,completed,email,workout);
@@ -112,25 +98,17 @@ io.on('connection', function(socket) {
         submit_workout(email,workout,date);
     });
     socket.on('createExercise',function(name,url){ //admin
-        var name = encrypt(name);
-        var success = name.then(function(){
-            new_exercise(name,url)
-        });
-        success.then(function(){
-            if(success != null){
-                socket.emit('newExercise',success);
-            }
+        var name = name.split(' ').join('_');
+        new_exercise(name,url,function(name){
+            socket.emit('newExercise',name);
         });
     });
     socket.on('editExerciseUrl',function(name,url){ //admin
-        update_col("exercises","url",url,"name",encrypt(name));
+        update_col("exercises","url",url,"name",name.split(' ').join('_'));
     });
     socket.on('createGroup',function(name,array){ //admin
-        var success = new_group(array,name);
-        success.then(function(){
-            if(success != null){
-                socket.emit('newGroup',success);
-            }
+        new_group(array,name,function(name){
+            socket.emit('newGroup',name);
         });
     });
     socket.on('editGroupadd',function(name,user){ //admin
@@ -152,8 +130,7 @@ io.on('connection', function(socket) {
         create_fullworkout(cyclenum,cyclelen,name);
     });
     socket.on('createWorkout',function(full,array,date,cycle,day){ //admin 
-        create_workout(array,date,cycle,day,full);
-        create_workout.then(function(){
+        create_workout(array,date,cycle,day,full,function(workout){
             update_col(workout,"completed",true,"email","email");
         });
     });
@@ -161,40 +138,42 @@ io.on('connection', function(socket) {
         delete_workout(workout);
     });
     socket.on('getFullWorkout',function(full){ //admin
-        var list = wo_in_full(full);
-        list.then(function(){
+        wo_in_full(full,function(list){
             socket.emit('fullWorkout',list);
         });
     });
     socket.on('getBlankWorkout'function(workout){ //admin
-        var array = table_to_array(workout,"email");
-        array.then(function(){
-            socket.emit('blankWorkout',array);
-        });
+        table_to_array(workout,"email",function(array){socket.emit('blankWorkout',array);});
     });
     socket.on('createUser',function(name,email){ //admin
-        var success = new_user(name,email);
-        if(success != null){
-            socket.emit('newUser',success)
-        }
+        new_user(name,email,function(obj){
+            socket.emit('newUser',obj);
+        });
     });
     socket.on('getGroupExerciseData',function(group){ //admin
-        var array = get_group_data(group);
-        array.then(function(){
-            socket.emit('groupExerciseData',array);
+        get_group_data(group,function(obj){
+            socket.emit('groupExerciseData',obj);
         });
     });
     socket.on('getUserData',function(email){ //all
-        var object = get_user_data(email);
-        object.then(function(){
-            socket.emit('userData',object);
+        get_user_data(email,function(obj){
+            socket.emit('userData',obj);
         });
     });
 });
-function get_email(req){
+function get_email(req,callback){
+    var email = null;
+    var domain;
     conn.query('SELECT email FROM backfill WHERE "digits"=($1)',[req])
     .on('data',function(row){
-        return row.email;
+        email= row.email;
+        domain = email.slice(email.indexOf('@'));
+        callback(email,domain);
+    })
+    .on('end',function(){
+        if(email == null){
+            callback(null,null);
+        }
     });
 }
 function ensureAuthenticated(req, res, next) { //next runs the next function in the arguement line "app.get('/datapage', ensureAuthenticated, function(req, res)" would move to function(req, res)
@@ -206,61 +185,104 @@ function ensureAuthenticated(req, res, next) { //next runs the next function in 
         }
 }
 app.get('/', function(request, response){//
-    var email = get_email(request.user);
-    if(email == admin){
-        //respond with create workout page
-        var groups = get_all_groups();//done
-        var workouts = get_all_full(); //done
-        var exercises = get_all_exercises();//done
-        var users = get_all_users();//done
-        response.render('create-workout.html',/*mustache in above data*/);
-    }
-    else if(email == user){
-        //respond with next workout
-        var workout = get_next_wo(email);
-        var allworkouts = get_all_false(email);
-        response.render('workout.html',/*mustahce in workout and allworkouts*/);
-    }
-    else{
-        //respond with create account page ---we will direct them to ask o'donnell for access
-        response.render('request-account.html');
-    }
+    get_email(request.user,function(email,domain){
+        if(email == null){
+            response.render('request-account.html');
+        }
+        else{
+            get_next_wo(email,function(email,workout){
+                table_to_array_2(workout,email,email,null,function(array,workout,email,null){
+                    get_all_false(email,workout,array,function(email,workout,array,allworkouts){
+                        response.render('workout.html',/*mustahce in workout and allworkouts*/);
+                    });
+                });
+            });
+        }
+    });
+});
+app.get('/create',function(request,response){
+    get_email(request.user,function(email,domain){
+        if(email == null){
+            response.render('request-account.html');
+        }
+        else{
+            if(domain == "stab.org"){
+                get_all_groups(function(groups){
+                    get_all_full(groups,function(groups,workouts){
+                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
+                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
+                                response.render('create-workout.html',/*mustache in above data*/);
+                            });
+                        });
+                    });
+                });
+            }
+            else{
+                response.redirect('/');
+            }
+        }
+    });
+});
+app.get('/assign',function(request,response){
+    get_email(request.user,function(email,domain){
+        if(email == null){
+            response.render('request-account.html');
+        }
+        else{
+            if(domain == "stab.org"){
+                get_all_groups(function(groups){
+                    get_all_full(groups,function(groups,workouts){
+                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
+                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
+                                response.render('create-workout.html',/*mustache in above data without exercises*/);
+                            });
+                        });
+                    });
+                });
+            }
+            else{
+                response.redirect('/');
+            }
+        }
+    });
 });
 app.get('/progress', function(request, response){
-    var email = get_email(request.user);
-    if(email == admin){
-        var groups = get_all_groups();
-        var workouts = get_all_full();
-        var exercises = get_all_exercises();
-        var users = get_all_users();
-        response.render('school-progress.html',/*mustache in above data*/);
-    }
-    else if(email == user){
-        var data = get_all_userdata(email);
-        var exercises = get_all_exercises();
-        response.render('user-progress.html',/*mustache in above data*/);
-    }
-    else{
-        //respond with create account page ---we will direct them to ask o'donnell for access
-        response.render('request-account.html');
-    }    
+    get_email(request.user,function(email,domain){
+        if(email == null){
+            response.render('request-account.html');
+        }
+        else{
+            if(domain == "stab.org"){
+                get_all_groups(function(groups){
+                    get_all_full(groups,function(groups,workouts){
+                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
+                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
+                                response.render('create-workout.html',/*mustache in above data*/);
+                            });
+                        });
+                    });
+                });
+            }
+            else{
+                get_user_data(email,function(data){
+                    get_all_exercises(data,null,function(groups,workouts,exercises){
+                        var data = groups;
+                        response.render('user-progress.html',/*mustache in above data-data&exercises*/);
+                    });
+                });
+            }
+        }
+    });   
 });
+
 server.listen(8080);
-///////////////////////////////////////////////////////////CONVERSION FUNCTIONS////////////////////////////////
-function encrypt(string){
-    return string.split(' ').join('_');
-}
-function decrypt(string){
-    return string.split('_').join(' ');
-}
 function getRealDate(number){
     var d = new Date(number);
     var date = d.toJSON().substring(0,10);
     return date; 
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////USERS////////////////////////////////////////////////
-function new_user(name,email){
+function new_user(name,email,callback){
     conn.query('INSERT INTO users (name,email) VALUES ($1,$2)',[name,email])
     .on('error',function(){
         return null;
@@ -271,20 +293,21 @@ function new_user(name,email){
             return null;
         })
         .on('end',function(){
-            var exercises = get_all_exercises();
-            exercises
-                .then(function(){
-                    for(var i = 0;i<exercises.length;i++){
-                        conn.query('ALTER TABLE ($1) ADD '+exercises[0]+' FLOAT',[email]);
-                    }
-                })
-                .then(function(){
-                    return {name:name, email:email};
-                });
+            var exercises = [];
+            conn.query('SELECT exercise FROM exercises')
+            .on('data',function(row){
+                exercises.push(row.exercise.split('_').join(' '));
+            })
+            .on('end',function(){
+                for(var i = 0;i<exercises.length;i++){
+                    conn.query('ALTER TABLE ($1) ADD '+exercises[0]+' FLOAT',[email]);
+                }
+                callback({name:name, email:email});
+            });
         });
     });
 }
-function get_all_users(){
+function get_all_users(groups,workouts,exercises,callback){
     var users = [];
     conn.query('SELECT name FROM users')
     .on('data',function(row){
@@ -292,11 +315,10 @@ function get_all_users(){
         users.push(user);
     })
     .on('end',function(){
-        return users;
+        callback(groups,workouts,exercises,users);
     });
 }
-function get_next_wo(email){
-    //////////////////////////////////get todays date
+function get_next_wo(email,workout,array,callback){
     var date = new Date();
     var d= date.UTC();
     var newest = d;
@@ -313,14 +335,14 @@ function get_next_wo(email){
     })
     .on('end',function(){
         if(workout == null){
-            return [];
+            callback(email,[]);
         }
         else{
-            return table_to_array(workout,email);
+            callback(email,workout);
         }
     });
 }
-function get_all_false(email){
+function get_all_false(email,workout,array,callback){
     var list = []
     conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2)',[email,false])
     .on('data',function(row){
@@ -334,19 +356,22 @@ function get_all_false(email){
         })
         .on('end'function(){
             list.push(obj);
-        })
+        });
     })
+    .on('end',function(){
+        callback(email,workout,array,list);
+    });
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////EXERCISES/////////////////////////////////////////////
-function get_all_exercises(){
+function get_all_exercises(groups,workouts,callback){
     var exercises = [];
     conn.query('SELECT exercise FROM exercises')
     .on('data',function(row){
-        exercises.push(decrypt(row.exercise);
+        exercises.push(row.exercise.split('_').join(' '));
     })
     .on('end',function(){
-        return exercises;
+        callback(groups,workouts,exercises);
     });
 }
 function get_exercise_url(exercise){
@@ -359,24 +384,24 @@ function get_exercise_url(exercise){
         return url;
     });
 }
-function new_exercise(name,url){
+function new_exercise(name,url,callback){
     conn.query('INSERT INTO exercises (exercise,url) VALUES ($1,$2)', [name,url]) //if the exercise does not exist already?
     .on('error', function(){
-        return null;
+        return;
     });
     conn.query('ALTER TABLE users ADD '+name+' FLOAT');
     var users = getUserList();
     for(var i=0;i<users.length;i++){
         conn.query('ALTER TABLE ($1) ADD '+name' FLOAT', [users[0].email]);
     }
-    return name;
+    callback(name,url);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////GROUPS///////////////////////////////////////////////
-function new_group(array, name){
+function new_group(array, name,callback){
     conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT)',[name])
     .on('error',function(){
-        return null;
+        return;
     })
     .on('end',function(){
         conn.query('INSERT INTO groups (group) VALUES ($1)', [name])
@@ -386,7 +411,7 @@ function new_group(array, name){
             }
             conn.query('CREATE TABLE ($1) ("full" TEXT)',[name+"-assigned"])
             .on('end',function(){
-                return name;
+                callback(name);
             });
         });
     });
@@ -396,13 +421,10 @@ function assign_full_workout(group,full){
     conn.query('INSERT INTO ($1) (full) VALUES ($2)',[group.toString()+"-assigned",full]);
     var date = new Date();
     var d = date.UTC()-172800000;
-    d.then(function(){
-        conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[full,true,d])
-        .on('data',function(row){
-            var array = table_to_array(row.workout,"email");
-            array.then(function(){
-                populate_table_init(array,row.workout,full,row.date);
-            });
+    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[full,true,d])
+    .on('data',function(row){
+        table_to_array_2(row.workout,"email",full,row.date,function(array,workout,a,b){
+            populate_table_init(array,workout,a,b);
         });
     });
 }
@@ -428,19 +450,14 @@ function unassign_workout(group,full){
 function push_group(user,group){
     var date = new Date();
     var d = date.UTC()-172800000;
-    d.then(function(){
-        conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[group,user.name,user.email]);
-        conn.query('SELECT full FROM ($1)',[group.toString()+"-assigned"])
+    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[group,user.name,user.email]);
+    conn.query('SELECT full FROM ($1)',[group.toString()+"-assigned"])
+    .on('data',function(row){
+        conn.query('SELECT workout FROM ($1) WHERE "completed"=($2), "date">($3)',[row.full,true,d])
         .on('data',function(row){
-            conn.query('SELECT workout FROM ($1) WHERE "completed"=($2), "date">($3)',[row.full,true,d])
-            .on('data',function(row){
-                var array = table_to_array(row.workout,email);
-                .then(function(){
-                    var setnum = array.length;
-                })
-                .then(function(){
-                    insert_wo_row(user.name,user.email,setnum,row.workout,array);
-                });
+            table_to_array_2(row.workout,email,user.name,user.email,function(array,workout,a,b){
+                var setnum = array.length;
+                insert_wo_row(a,b,setnum,row.workout,array);
             });
         });
     });
@@ -456,45 +473,55 @@ function pop_group(email,group){
         });
     });
 }
-function get_all_groups(){
+function get_all_groups(callback){
     var list = [];
     conn.query('SELECT group FROM groups')
     .on('data',function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(list);
     });
 }
-function get_group(group){
+function get_group(group,callback){
     var list = [];
     conn.query('SELECT name,email FROM ($1)',[group])
     .on('data',function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(list);
     });
 }
 }
-function get_assigned_gro(workout){
+function get_assigned_gro(workout,callback){
     var list = [];
     conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
     .on('data',function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(list);
     });
 }
-function get_assigned_wo(group){
+function get_assigned_gro_1(workout,a,callback){
+    var list = [];
+    conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
+    .on('data',function(row){
+        list.push(row);
+    })
+    .on('end',function(){
+        callback(list,a);
+    });
+}
+function get_assigned_wo(group,callback){
     var list = [];
     conn.query('SELECT workout FROM ($1)',[group+ "-assigned"])
     .on('data',function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(list);
     });
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -523,30 +550,24 @@ function create_blank_full_workout(full,cyclenum,cyclelen){
         }
     });
 }
-function create_workout(array, date, cycle, day, full){
-    var workout = create_wo_name(array,full);
-    workout
-    .then(function(){
-        array_to_table_init(array,workout_name,full,date);
-    })
-    .then(function(){
-        populate_table_init(array, table,full);
-    })
-    .then(function(){
-        conn.query('UPDATE ($1) SET date=($2),skip=($3),workout=($4) WHERE "cycle"=($5),"day"=($6)',[full,date,false,workout,cycle,day]);
-    })
-    .then(function(){
-        return workout;
+function create_workout(array, date, cycle, day, full,callback){
+    create_wo_name(array, date,cycle,day,full,function(array,workout,date,cycle,day,full,callback){
+        array_to_table_init(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
+            populate_table_init_2(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
+                conn.query('UPDATE ($1) SET date=($2),skip=($3),workout=($4) WHERE "cycle"=($5),"day"=($6)',[full,date,false,workout,cycle,day]);
+                callback(workout);
+            });
+        });
     });
 }
-function create_wo_name(array, full){
-    var workout_name = full.toString()+'-'+(Math.floor(Math.random()*100000000)).toString();
+function create_wo_name(array, date,cycle,day,full,callback){
+    var workout = full.toString()+'-'+(Math.floor(Math.random()*100000000)).toString();
     conn.query('CREATE TABLE IF NOT EXISTS ($1) ("email" TEXT, "name" TEXT,"date" INTEGER, "completed" BOOL, "sets" INTEGER) ', [workout_name])
     .on('error',function(){
-        create_wo_name(array,full);
+        create_wo_name(array, date,cycle,day,full,callback);
     })
     .on('end',function(){
-        return workout_name;
+        callback(array,date,cycle,day,full,callback);
     });
 }
 function populate_table_init(array,table,full,date){
@@ -559,6 +580,19 @@ function populate_table_init(array,table,full,date){
     })
     .on('end'function(){
         insert_wo_row("name","email",array.length,table,array,date);
+    });
+}
+function populate_table_init_2(array,table,date,cycle,day,full,callback){
+    conn.query('SELECT group FROM ($1)',[full.toString() + "-groups"])
+    .on("data",function(row){
+        conn.query('SELECT name,email FROM ($1)',[row.group])
+        .on('data',function(row){
+            insert_wo_row(row.name,row.email,array.length,table,array,date);
+        });
+    })
+    .on('end'function(){
+        insert_wo_row("name","email",array.length,table,array,date);
+        callback(array,workout,date,cycle,day,full);
     });
 }
 function insert_wo_row(name,email,setnum,table,array,date){
@@ -582,11 +616,9 @@ function delete_workout(workout){
     var full = workout.slice(0,workout.indexOf("-"));
     conn.query('UPDATE ($1) SET "completed"=($2) WHERE "workout"=($3)',[full,false,workout]);
     conn.query('DELETE FROM ($1) WHERE "completed"=($2)',[workout,false]);
-    var list = get_assigned_gro(full);
-    list.then(function(){
+    get_assigned_gro_1(full,workout,function(list,a){
         for(var i=0;i<list.length;i++){
-            var list2 = get_group(list[i]);
-            list2.then(function(){
+            get_group(list[i],function(list){
                 for(var j=0;j<list.length;j++){
                     conn.query('DELETE FROM ($1) WHERE "completed"=($2),"workout"=($3)',[list2[j].email,false,workout]);
                 }
@@ -596,7 +628,7 @@ function delete_workout(workout){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////DATA CONVERSION FUNCTIONS//////////////////////////////////////////////
-function array_to_table_init(array, table,full,date){
+function array_to_table_init(array,workout,date,cycle,day,full,callback){
     var setnum = array.length;
     for(var i=0;i<setnum;i++){
         var num = i+1
@@ -609,7 +641,7 @@ function array_to_table_init(array, table,full,date){
             var num2 = j+1;
             var exnumstr = setnumstr + "-" + num2.toString();
             create_column(table,exnumstr,"BOOL");
-            var name = encrypt(exercises[j].name);
+            var name = exercises[j].name.split(' ').join('_');
             var namestr = exnumstr + "#" + name;
             create_column(table,namestr, "TEXT");
             var rounds = exercises[j].rounds;
@@ -640,7 +672,7 @@ function populate_table_full(array,table,setnum,email){
             var ex = j+1;
             var exstr = setstr +"-" +ex.toString();
             update_col(table,exstr,true,"email",email);
-            var name = encrypt(exercises[j].name);
+            var name = exercises[j].name.split(' ').join('_');
             var namestr = exnumstr + "#" + name;
             update_col(table,namestr,name,"email",email);
             var rounds = exercises[j].rounds;
@@ -661,7 +693,7 @@ function populate_table_full(array,table,setnum,email){
         }
     }
 }
-function table_to_array(workout,email){
+function table_to_array(workout,email,callback){
     var array = [];
     conn.query('SELECT * FROM ($1) WHERE email=($2)',[workout,email])
     .on('data',function(row){
@@ -680,7 +712,18 @@ function table_to_array(workout,email){
                 var rdlen = values[keys.indexOf(rdlenstr)];
                 var newex = new Object();
                 newex[j] = true;
-                var name = decrypt(get_name_from_key(email,workout,extstr));
+                var s = exstr+"#";
+                var len = s.length;
+                conn.query('SELECT * FROM ($1) WHERE "email"=($2)',[workout,email])
+                .on("data",funcion(row){
+                    var cols = Object.keys(row);
+                    for(var k=0;k<cols.length;k++){
+                        if(cols[k].slice(0,len) == s){
+                            newex.name = cols[k].slice(len).split('_').join(' ');
+                            break;
+                        }
+                    }
+                });
                 newex.rounds = {};
                 for(var l=1;l<=rdlen;l++){
                     var round = new Object();
@@ -698,7 +741,65 @@ function table_to_array(workout,email){
             }
             array.push(newset);
         }
-        return array;
+    })
+    .on('end',function(){
+        callback(array);
+    });
+}
+function table_to_array_2(workout,email,a,b,callback){
+    var array = [];
+    conn.query('SELECT * FROM ($1) WHERE email=($2)',[workout,email])
+    .on('data',function(row){
+        var keys = Object.keys(row);
+        var values = Object.values(row);
+        var sets = row.sets;
+        for (var i = 1; i <= sets; i++) {
+            var exlenstr=i.toString()+"-length"; 
+            var exlen = values[keys.indexOf(exlenstr)];
+            var newset = new Object();
+            newset[i] == false;
+            newset.exercises == {};
+            for(var j=1;j<=exlen;j++){
+                var exstr = set.toString()+"-"+j.toString();
+                var rdlenstr = exstr+"-length";
+                var rdlen = values[keys.indexOf(rdlenstr)];
+                var newex = new Object();
+                newex[j] = true;
+                var s = exstr+"#";
+                var len = s.length;
+                conn.query('SELECT * FROM ($1) WHERE "email"=($2)',[workout,email])
+                .on("data",funcion(row){
+                    var cols = Object.keys(row);
+                    for(var k=0;k<cols.length;k++){
+                        if(cols[k].slice(0,len) == s){
+                            newex.name = cols[k].slice(len).split('_').join(' ');
+                            break;
+                        }
+                    }
+                });
+                newex.rounds = {};
+                for(var l=1;l<=rdlen;l++){
+                    var round = new Object();
+                    round[l] = true;
+                    var rdstr = exstr+"-"+l.toString();
+                    var ws = exstr + "-weight";
+                    var rs = exstr + "-reps";
+                    var w = values[keys.indexOf(ws)];
+                    var r = values[keys.indexOf(rs)];
+                    round.weight = w;
+                    round.reps = r;
+                    newex.rounds.push(round);
+                }
+                newset.exercises.push(newex);
+            }
+            array.push(newset);
+        }
+    })
+    .on('error',function(){
+        callback(array,workout,a,b);
+    })
+    .on('end',function(){
+        callback(array,workout,a,b);
     });
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -707,180 +808,199 @@ function submit_workout(email,workout,date){
     conn.query('UPDATE ($1) SET completed=($2),date=($3) WHERE "email"=($4)',[workout,true,date,email]);
     conn.query('UPDATE ($1) SET completed=($2),date=($3) WHERE "workout"=($4)',[email,true,date,workout])
     .on('end',function(){
-        var sets = get_wo_val(workout, "sets",email);
-        sets.then(function(){
-            for(var i=1;i<=sets;i++){
-                if(get_wo_val(workout,i.toString(),email)==true){
-                    submit_set(email,workout,thissetstr);
-                }
-            }
-        })
-    });
-}
-function submit_set(email,workout,str){
-    var exs = get_wo_val(workout,str+"-length",email);
-    exs.then(function(){
-        for(var j=1;j<=exs;j++){
-            if(get_wo_val(workout,str+"-"+j.toString(),email)==true){
-                submit_ex(email,workout,str+"-"+j.toString());
-            }
-        }
-    });
-}
-function unsubmit_set(email,workout,str){
-    var exs = get_wo_val(workout,str+"-length",email);
-    exs.then(function(){
-        for(var j=1;j<=exs;j++){
-            if(get_wo_val(workout,str+"-"+j.toString(),email)==true){
-                unsubmit_ex(email,workout,str+"-"+j.toString());
-            }
-        }
-    });
-}
-function unsubmmit_ex(email,workout,str){
-    var exname = get_name_from_key(email,workout,str);
-    exname.then(function(){
-        update_col(email,exname,null,"workout",workout);
-        if(latest(email,workout,exname) == true){
-            var max = other_latest(email,workout,exname);
-            max.then(function(){
-                update_col("users",exname,max,"email",email);
-            });
-        }
-    });
-}
-function submmit_ex(email,workout,str){
-    var exname = get_name_from_key(email,workout,str);
-    exname
-    .then(function(){
-        var max= get_max_from_lift(email,workout,str);
-    })
-    .then(function(){
-        if(max != NaN){
-            update_col(email,exname,max,"workout",workout);
-            if(latest(email,workout,exname) == true){
-                update_col("users",exname,max,"email",email);
-            }
-        }
-    });
-}
-function update_workout(str, value, completed, user, workout){ 
-    update_col(workout,str,value,"email",user);
-    if(completed == true){
-        var dashes = str.split("-").length-1;
-        if(dashes == 0){
-            if(value == true){
-                submit_set(user,workout,str);
-            }
-            else if(value == false){
-                unsubmit_set(user,workout,str);
-            }
-            return;
-        }
-        else if(get_wo_val(workout,str.split("-")[0],user) == true){
-            if(dashes == 1){
-                if(value == true){
-                    submit_ex(user,workout,str);
-                }
-                else if(value == false){
-                    unsubmit_ex(user,workout,str);
-                }
-                return;
-            }
-            else if(get_wo_val(workout,(str.split("-")[0]+"-"+str.split("-")[1]),user) == true){
-                if(dashes == 2){
-                    submit_ex(user,workout,(str.split("-")[0]+"-"+str.split("-")[1]));
-                    return;
-                }
-                else if(dashes == 3 && get_wo_val(workout,(str.split("-")[0]+"-"+str.split("-")[1]+"-"+str.split("-")[2]),user) == true){
-                    submit_ex(user,workout,(str.split("-")[0]+"-"+str.split("-")[1]));
-                }
-            }
-        }
-    }
-}
-function change_date(workout,date){
-    var full = workout.split("-")[0];
-    var groups = get_assigned_gro(full);
-    groups.then(function(){
-        var users =[];
-        for(var i=0;i<groups.length();i++){
-            var l = get_group(groups[i]);
-            l.then(function(){
-                for(var j=0;j<l.length();j++){
-                    users.push(l[j].email);
-                }
-            });
-        }
-        conn.query('SELECT date FROM ($1) WHERE "workout"=($2)',[users[0],workout])
-        .on('data',function(row){
-            if(row.date > date){
-                for(var i=0;i<users.length();i++){
-                    conn.query('UPDATE ($1) SET "date"=($2) WHERE "workout"=($3)',[users[i],date,workout]);
-                }
-            }
-            else if(row.date < date){
-                for(var i=0;i<users.length();i++){
-                    conn.query('UPDATE ($1) SET "date"=($2),"skipped"=($3) WHERE "workout"=($4)',[users[i],date,true,workout]);
-                }
+        get_wo_val(workout, "sets",email,{},function(workout,column,email,list,val){
+            for(var i=1;i<=val;i++){
+                get_wo_val(workout,i.toString(),email,{},function(workout,column,email,list,val){
+                    if(val == true){
+                        submit_set(email,workout,column);
+                    }
+                });
             }
         });
     });
 }
+function submit_set(email,workout,str){
+    get_wo_val(workout,str+"-length",email,{},function(workout,column,email,list,val){
+        for(var j=1;j<=val;j++){
+            get_wo_val(workout,str+"-"+j.toString(),email,{},function(workout,column,email,list,val){
+                if(val == true){
+                    submit_ex(email,workout,column);
+                }
+            });
+        }
+    });
+}
+function unsubmit_set(email,workout,str){
+    get_wo_val(workout,str+"-length",email,{},function(workout,column,email,list,val){
+        for(var j=1;j<=val;j++){
+            get_wo_val(workout,str+"-"+j.toString(),email,{},function(workout,column,email,list,val){
+                if(val == true){
+                    unsubmit_ex(email,workout,str+"-"+j.toString());
+                }
+            });
+        }
+    });
+}
+function unsubmmit_ex(email,workout,str){
+    get_name_from_key(email,workout,str,function(email,workout,str,name){
+        var stry = 'UPDATE ($1) SET ' + name +  '= ($2) WHERE ($3) = ($4)';
+        conn.query(stry,[email,null,"workout",workout])
+        .on('end'function(){
+            latest(email,workout,name,null,function(email,workout,name,max,bool){
+                if(bool){
+                    other_latest(email,workout,name,function(email,name,max){
+                        update_col("users",name,max,"email",email);
+                    });
+                }
+            });
+        });
+    });
+}
+function submmit_ex(email,workout,str){
+    get_name_from_key(email,workout,str,function(email,workout,str,name){
+        get_max_from_lift(email,workout,str,function(email,workout,str,val){
+            if(val != NaN){
+                var stry = 'UPDATE ($1) SET ' + str +  '= ($2) WHERE ($3) = ($4)';
+                conn.query(stry,[email,val,"workout",workout])
+                .on('end'function(){
+                    latest(email,workout,str,val,function(email,workout,name,max,bool){
+                        if(bool){
+                            update_col("users",name,max,"email",email);
+                        }
+                    });
+                });
+            }
+        });
+    });
+}
+function update_workout(str, value, completed, user, workout){
+    var stry = 'UPDATE ($1) SET ' + str +  '= ($2) WHERE ($3) = ($4)';
+    conn.query(stry,[workout,value,"email",user])
+    .on('end',function(){
+        if(completed == true){
+            var dashes = str.split("-").length-1;
+            if(dashes == 0){
+                if(value == true){
+                    submit_set(user,workout,str);
+                }
+                else if(value == false){
+                    unsubmit_set(user,workout,str);
+                }
+                return;
+            }
+            else if(dashes == 1){
+                if(value == true){
+                    submit_ex(user,workout,list.str);
+                }
+                else if(value == false){
+                    unsubmit_ex(user,workout,list.str);
+                }
+                return;
+            }
+            else if(dashes == 2 || dashes == 3){
+                submit_ex(user,workout,(str.split("-")[0]+"-"+str.split("-")[1]));
+            }
+        }
+    });
+}
+function change_date(workout,date){
+    var full = workout.split("-")[0];
+    var groups = [];
+    conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
+    .on('data',function(row){
+        list.push(row);
+    })
+    .on('end',function(){
+        var users =[];
+        for(var i=0;i<groups.length();i++){
+            var list = [];
+            conn.query('SELECT name,email FROM ($1)',[group])
+            .on('data',function(row){
+                list.push(row);
+            })
+            .on('end',function(){
+                for(var j=0;j<l.length();j++){
+                    users.push(l[j].email);
+                    conn.query('SELECT date FROM ($1) WHERE "workout"=($2)',[users[0],workout])
+                    .on('data',function(row){
+                        if(row.date > date){
+                            for(var i=0;i<users.length();i++){
+                                conn.query('UPDATE ($1) SET "date"=($2) WHERE "workout"=($3)',[users[i],date,workout]);
+                            }
+                        }
+                        else if(row.date < date){
+                            for(var i=0;i<users.length();i++){
+                                conn.query('UPDATE ($1) SET "date"=($2),"skipped"=($3) WHERE "workout"=($4)',[users[i],date,true,workout]);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////DATABASE HELPER FUNCTIONS//////////////////////////////////////
-function other_latest(email,workout,exname){
-    var date;
+function other_latest(email,workout,name,callback){
+    var date =0;
     var max=0;
-    conn.query('SELECT workout,($1),date FROM ($2) WHERE "completed"=($3)',[exname,email,true])
+    conn.query('SELECT workout,($1),date FROM ($2) WHERE "completed"=($3)',[name,email,true])
     .on('data',function(row){
         if(row.workout != workout && row.date > date){
             max = Object.values(row)[1];
+            date = row.date;
         }
     })
     .on('end',function(){
-        return max;
-    })
+        callback(email,name,max);
+    });
 }
-function latest(email,workout,exname){
+function latest(email,workout,name,max,callback){
     var latest;
     var date=0;
     var val;
-    conn.query('SELECT workout,($1),date FROM ($2) WHERE completed=($3)',[exname,email,true])
+    var bool;
+    conn.query('SELECT workout,($1),date FROM ($2) WHERE completed=($3)',[name,email,true])
     .on('data',function(row){
         val = Object.values(row)[1];
         if(row.date > date && val != null){
             latest = row.workout;
+            date = row.date;
         }
     })
     .on('end',function(){
         if(latest == workout){
-            return true;
+            bool =true;
+            callback(email,workout,name,max,bool);
         }
         else{
-            return false;
+            bool = false;
+            callback(email,workout,name,max,bool);
         }
-    })
-}
-function get_wo_val(table,column,email){
-    conn.query('SELECT ($1) FROM ($2) where "email"=($3)',[column,table,email])
-    .on('data',function(row){
-        var val = Object.values(row)[0];
-        return val;
     });
 }
-function get_name_from_key(email,workout,str){
+function get_wo_val(workout,column,email,list,callback){
+    conn.query('SELECT ($1) FROM ($2) where "email"=($3)',[column,workout,email])
+    .on('data',function(row){
+        var val = Object.values(row)[0];
+        callback(workout,column,email,list,val);
+    });
+}
+function get_name_from_key(email,workout,str,callback){
     var s = str+"#";
     var len = s.length;
+    var name;
     conn.query('SELECT * FROM ($1) WHERE "email"=($2)',[workout,email])
     .on("data",funcion(row){
         var cols = Object.keys(row);
         for(var k=0;k<cols.length;k++){
             if(cols[k].slice(0,len) == s){
-                return cols[k].slice(len);
+                name = cols[k].slice(len);
+                callback(email,workout,str,name);
+                break;
             }
         }
-    })
+    });
 }
 function create_column(table,column,type){
     var str = 'ALTER TABLE ($1) ADD '+column+' ($2)';
@@ -890,43 +1010,43 @@ function update_col(table,column,value,cona,conb){
     var str = 'UPDATE ($1) SET ' + column +  '= ($2) WHERE ($3) = ($4)';
     conn.query(str,[table,value,cona,conb]);
 }
-function get_all_full(){
+function get_all_full(groups,callback){
     list = [];
     conn.query('SELECT workout,ident,cyclenum,cyclelen FROM workouts')
     .on('data'function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(groups,list);
     })
 }
-function wo_in_full(full){
+function wo_in_full(full,callback){
     list = [];
     conn.query('SELECT cycle,day,workout,day,skip FROM ($1)',[full])
     .on('data',function(row){
         list.push(row);
     })
     .on('end',function(){
-        return list;
+        callback(list);
     });
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////WEIGHTLIFTING MATH CALCULATIONS////////////////////////////
-function get_max_from_lift(email,workout,str){
-    var total=0;
-    var exlen = get_wo_val(workout,str+"-length",email);
-    exlen.then(function(){
+function get_max_from_lift(email,workout,str,callback){
+    get_wo_val(workout,str+"-length",email,{str:str},function(workout,column,email,list,val){
+        var total =0;
+        var exlen = val;
+        var value;
         for(var l=1;l<=exlen;l++){
-            var rds = str+"-"+l.toString();
-            var w = get_wo_val(workout,rds + "-weight",email);
-            w.then(function(){
-                var r = get_wo_val(workout,rds + "-reps",email);
-            })
-            w.then(function(){
-                total += get_new_max(r,w);
+            var rds = list.str+"-"+l.toString();
+            total += get_wo_val(workout,rds + "-weight",email,{str:str},function(workout,column,email,list,val){
+                return get_wo_val(workout,rds + "-reps",email{str:str,weight:val},function(workout,column,email,list,val){
+                    return get_new_max(val,list.weight);
+                });
             });
         }
-        return math.floor(total/exlen);
+        value = math.floor(total/exlen);
+        callback(email,workout,list.str,value);
     });
 }
 function get_old_max(user, exercise){
@@ -952,7 +1072,7 @@ function rounder(num,diff){
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////Check Progress Data Grabber Functions////////////////////////////
-function get_user_data(email){
+function get_user_data(email,callback){
     array = [];
     conn.query('SELECT * FROM ($1) WHERE "completed"=($2),"skipped"=($3)',[email,true,true])
     .on('data',function(row){
@@ -965,22 +1085,17 @@ function get_user_data(email){
             obj.name = name;
         })
         .on('end',function(){
-            return array;
+            callback(obj);
         });
     });
 }
 function get_group_data(group){
-    var array = [];
-    var list = get_group(group);
-    list
-    .then(function(){
+    get_group(group,function(list){
+        var array = [];
         for(var i=0;i<list.length;i++){
-            array.push(get_user_data(list[i].email))
+            array.push(get_user_data(list[i].email,function(obj){return obj;}))
         }
-        var obj = {groupname:group, data:array};
-    })
-    .then(function(){
-        return obj;
+        callback({groupname:group, data:array});
     });
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
