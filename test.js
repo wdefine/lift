@@ -39,6 +39,6 @@ app.get('/view', function(request, response){
 	response.render('view_Workout.html');
 });
 
-server.listen(8080, function() {
+server.listen(80, function() {
 	console.log('Listening...');
 });
