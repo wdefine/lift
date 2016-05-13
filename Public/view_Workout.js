@@ -1,7 +1,7 @@
 google.charts.load('current', {'packages':['corechart']});
 
 
-window.addEventListener('load', function(){
+body.addEventListener('load', function(){
 	var name = $("meta[name='metatag']").attr('content'); // meta tag trick
 	$.ajax({
 		"url": "/json/wdefine",
@@ -36,7 +36,7 @@ window.addEventListener('load', function(){
 				  $(function() {
 				  $( "#accordion" ).accordion({
 				      collapsible: true
-				    });
+				    	});
 				  });
 			}
 		});
