@@ -1,0 +1,15 @@
+{
+  "name": "Chatroom",
+  "description": "A web-based chatroom server.",
+  "version": "0.0.1",
+  "dependencies": {
+    "any-db": "2.1.x",
+    "any-db-sqlite3": "*",
+    "body-parser": "*",
+    "consolidate": "0.13.x",
+    "express": "3.0.*",
+    "hogan.js": "3.0.x",
+    "socket.io": "0.9.17",
+    "sqlite3": "3.1.x"
+  }
+}
