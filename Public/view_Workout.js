@@ -1,7 +1,6 @@
 google.charts.load('current', {'packages':['corechart']});
 
-
-body.addEventListener('load', function(){
+window.addEventListener('load', function(){
 	var name = $("meta[name='metatag']").attr('content'); // meta tag trick
 	$.ajax({
 		"url": "/json/wdefine",
@@ -15,7 +14,8 @@ body.addEventListener('load', function(){
 				wo.shift(); // this tosses the "date" key
 				for(var i=0; i<wo.length;i++){ // this creates 1 graph for each workout, but this loop strangely only runs once
 					$("#accordion").append("<h3>" + wo[i].replace(/_/g, " ") + "</h3>");
-					$("#accordion").append("<div id=" + wo[i] + "></div>");
+					var accordionContent = document.createElement('div');
+					$(accordionContent).attr('id', wo[i]);
 					var table = [["date", wo[i]]]; // this creates an array with the keys "date" and "name of workout"
 					for(var q=0;q<data.length;q++){ // loops through the number of data entries
 						table.push([data[q]["date"], data[q][wo[i]]]); // adds a [date, numberOfReps] pairing to the array
@@ -23,21 +23,23 @@ body.addEventListener('load', function(){
 					
 
 					google.charts.setOnLoadCallback(function(){ // google charts shenanigans
-					var d = new google.visualization.arrayToDataTable(table);
-					var chart = new google.visualization.LineChart(document.getElementById(wo[i]));
-					var options = {
-				          title: wo[i].replace(/_/g, " "),
-				          curveType: 'function',
-				          legend: { position: 'none' }
-				        };
-					chart.draw(d, options);
-				});
+						var d = new google.visualization.arrayToDataTable(table);
+						var chart = new google.visualization.LineChart(accordionContent);
+						var options = {
+					          title: wo[i].replace(/_/g, " "),
+					          curveType: 'function',
+					          legend: { position: 'none' }
+					        };
+						chart.draw(d, options);
+						$("#accordion").append(accordionContent);
+					});
 				}
-				  $(function() {
+				 $(function() {
 				  $( "#accordion" ).accordion({
 				      collapsible: true
 				    	});
 				  });
+				 
 			}
 		});
 
