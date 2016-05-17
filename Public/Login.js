@@ -1,4 +1,4 @@
-//var socket = io.connect();
+var socket = io.connect();
 window.addEventListener('load', function(){
 	$('#CreateAccount').hide();
 	$('#LoginButton').on('click', function(){
