@@ -17,7 +17,7 @@
         <!--Andys CSS-->
         <link rel="stylesheet" media="all and (orientation:portrait)" href="../Public/view_Workout.css">
     </head>
-	<body>
+	<body id="body" email="email">
         <h1>L I F T</h1>
         <!--<div id = "Hamburger_icon"></div>-->
         <ul id= "nav_bar">
@@ -26,14 +26,17 @@
             <li>Progress</li>
         </ul> 
         <ul id= "Workout_bar">
+            {{#allworkouts}}
+                <li id="{{workout}}" >{{date}}</li>
+            {{/allworkouts}}
             <li>1/20/00</li>
             <li>3/14/16</li>
             <li>4/1/16</li>
         </ul>
-
-        <div id="Workouts">
+        <div id="Workouts" name="{{workout))" done="false">
             <div id ="_2_3_4">
         </div>
+        <button id="submitWorkout">Sumbit Workout</button>
 
 
     </body>

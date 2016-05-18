@@ -1,7 +1,6 @@
  var socket = io.connect();
  window.addEventListener('load', function(){
-
-
+ 	document.getElementById('submitWorkout').addEventListener('click', submitWorkout, false);
 	addWorkout("_3-2-4", 3, true);
 	//////////////////////
 	////initial hides/////
@@ -42,8 +41,37 @@
 	*/
 	////PAGE SET UP////
 
-	socket.emit('getNextWorkout')
+	//ask for Initial data from server
+ 	sendInitialWoRequest();
+ 	//
+ 	//get the workout data from server
 
+ 	socket.on("nextWorkout",function(array){ //this is what you need for accordian. Right now everything you need is in one 
+ 											 //one big div tree. Each set is a div in #Workouts. Each div within that is an 
+ 											 //exercise. Each div within that is a round. Each round has a text field for reps
+ 											 //and weight. The id's for each are generated systematically #set-exercise-round.
+ 											 //Reorganize however you like, but this loop will get deliver to you all of the
+ 											 //data you need. You might want to keep this id system thou. Or you'll need to 
+ 											 //rebuild it when you call on sendWorkoutData(). It would be great if you could 
+ 											 //include the completed thing too. Unfotuantely, the id sent to sendWorkoutData 
+ 											 //has to be the same as the exercise or set id. Since you cannot have two things
+ 											 //with the same id, you either have to creatuve with collapsing exercises/sets or
+ 											 //we can bother with this feature later. 
+ 		
+ 		document.getElementById('Workouts').innerHTML = ""; //in case we are loading a new workout
+
+ 		for(var i=1;i<=array.length;i++){
+ 			$('#Workouts').append("<div id=\""+i+"\" completed=\""+array[i][i]+"\">Set #"+i+"</div>");
+ 			for(var j=1;j<=array[i][exercises].length;j++){
+ 				$('#'+i).append("<div id=\""+i+"-"+j+"\" name=\""+array[i][exercises][name]+"\" completed=\""+array[i][exercises][j]+"\">"+array[i][exercises][name]+"</div>");
+ 				for(var k=1;k<=array[i][exercises][rounds].length;k++){
+ 					$('#'+i+'-'+j).append("<div id=\""+i+"-"+j+"-"+k+"\">Round#"+k+"</div>");
+ 					$('#'+i+'-'+j+'-'+k).append("<text id=\""+i+"-"+j+"-"+k+"-reps\">"array[i][exercises][j][rounds][k][reps]"</text");
+ 					$('#'+i+'-'+j+'-'+k).append("<text id=\""+i+"-"+j+"-"+k+"-weight\">"array[i][exercises][j][rounds][k][weight]"</text");
+ 				}
+ 			}
+ 		}
+ 	});
 
 ///////TO BE FINISHED
 
@@ -82,7 +110,18 @@
 });
 
 function sendWorkoutData(){
-	socket.emit
+	var email = $('#body').attr('email');
+	var workout = $('#Workouts').attr('name');
+	var value = //get value somehow
+	var id = //get id NOTE: must be in the form set up above in my loop
+	var done = true/false //Right now this will always be false. If we add in functionality to edit old workouts, 
+						  //then done=true for old workouts.
+	socket.emit("changeWorkout",email,workout,id,value,done)
+}
+function sendInitialWoRequest(){
+	var email = $('#body').attr('email');
+	var workout = $('#Workouts').attr('name');
+ 	socket.emit("getNextWorkout", workout, email);
 }
 function show_only(elementType, elementToBeShown){
 	var elements = document.getElementsByTagName(elementType);
@@ -159,19 +198,14 @@ function addWorkoutTableLine(TableId, TableNumber, ExcerciseNumber, ExerciseName
 }
 
 function addDateToWorkoutBar(Date){
-
+	//don't bother with this. I will mustache in all of the future dates and workouts from which the user can chose. 
+	//i am not planning on mustacheing in all previous workouts thou in case they want to edit one of these
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+function submitWorkout(){ //there must be a button for submitting final workout
+	var email = $('#body').attr('email');
+	var workout = $('#Workouts').attr('name');
+	var date = new Date();
+	var d = date.UTC();
+	socket.emit('submitWorkout',email,workout,d);
+}
