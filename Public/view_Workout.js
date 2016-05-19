@@ -1,5 +1,16 @@
- var socket = io.connect();
+ //var socket = io.connect();
  window.addEventListener('load', function(){
+
+ 	var array = [3,2,1];
+ 	for(var i=1;i<=array.length;i++){
+ 			$('#Workouts').append("<div id=\""+i+"\" completed=\""+array[i][i]+"\">Set #"+i+"</div>"); 			for(var j=1;j<=array[i][exercises].length;j++){ 				$('#'+i).append("<div id=\""+i+"-"+j+"\" name=\""+array[i][exercises][name]+"\" completed=\""+array[i][exercises][j]+"\">"+array[i][exercises][name]+"</div>");
+				for(var k=1;k<=array[i][exercises][rounds].length;k++){
+					$('#'+i+'-'+j).append("<div id=\""+i+"-"+j+"-"+k+"\">Round#"+k+"</div>");
+					$('#'+i+'-'+j+'-'+k).append("<text id=\""+i+"-"+j+"-"+k+"-reps\">"+ array[i][exercises][j][rounds][k][reps]+"</text");
+					$('#'+i+'-'+j+'-'+k).append("<text id=\""+i+"-"+j+"-"+k+"-weight\">"+array[i][exercises][j][rounds][k][weight]+"</text");
+				}
+			}
+		}
 
 
 	addWorkout("_3-2-4", 3, true);
@@ -23,7 +34,8 @@
 
 	$("#Workout_bar li").on("tap",function(){
 		console.log("Date Bar tap");
-		$('#Workout_bar').css("background-color", "#323333");
+		var a = $('#Workout_bar');
+		a.css("background-color", "#323333");
 		$('#Workout_bar li').css("background-color", "#323333");
 	
 		$(this).css("background-color", '#737373' )
@@ -42,30 +54,19 @@
 	*/
 	////PAGE SET UP////
 
-	socket.emit('getNextWorkout')
+	//socket.emit('getNextWorkout')
 
 
 ///////TO BE FINISHED
-
-	var id_of_cell_to_be_sent;
-    var First_Cell_Clicked = false;
-    var Cell_ID_Number = "";
-    var Cell_Data_Type = "";
-    var Value_to_be_Sent;
-    var Cell_Column_Number;
-    var Cell_Row_Number;
-
+	var First_Cell_Clicked = false;
+	var Last_Cell;
     $("table").on("focus", "input", function(){
-    	console.log("Workws");
-       
+    	console.log("works");
         if (First_Cell_Clicked == true){
-            Value_to_be_Sent = $("#"+id_of_cell_to_be_sent).val();
-            console.log(id_of_cell_to_be_sent);
-            socket.emit("Entered_Data", Cell_ID_Number, Cell_Data_Type, Value_to_be_Sent, id_of_cell_to_be_sent);
+            var Value_to_be_Sent = $(this).val();
+            console.log(Value_to_be_Sent);
+            //socket.emit("Entered_Data", Cell_ID_Number, Cell_Data_Type, Value_to_be_Sent, id_of_cell_to_be_sent);
         }
-        Cell_ID_Number = $(this).data("ID");
-        Cell_Data_Type = $(this).data("Type_of_Data");
-        id_of_cell_to_be_sent = $(this).attr("id");
         First_Cell_Clicked = true;
     });
 
@@ -128,7 +129,7 @@ function addWorkout(WorkoutDate, ListOfExcercises, IsFirstExcercise){
 			$("#"+WorkoutDate+"_CollapsedSet").append('<div id = "'+WorkoutDate+'_GroupOfExcercises_'+num+'" data-role="collapsible" data-collapsed="false">');//each section of that accordion, expanded
 			first = false;
 		}
-		else(first == false){
+		else if(first == false){
 			$("#"+WorkoutDate+"_CollapsedSet").append('<div id = "'+WorkoutDate+'_GroupOfExcercises_'+num+'" data-role="collapsible"');//each section of that accordion, not expanded
 		}
 		$("#"+WorkoutDate+'_GroupOfExcercises_'+num).append("<h3>"+num);//header for each group of excercises
