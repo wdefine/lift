@@ -91,8 +91,8 @@ io.on('connection', function(socket) {
     socket.on('submitMax',function(email,exercise,max){ //all
         update_col("users",exercise.split(' ').join('_'),max,"email",email);
     });
-    socket.on('changeWorkout',function(email,workout,set,exercise,type,value,completed){ //all 
-        update_workout(set.toString()+"-"+exercise.toString()+"-"+type,value,completed,email,workout);
+    socket.on('changeWorkout',function(email,workout,str,value,completed){ //all 
+        update_workout(str,value,completed,email,workout);
     });
     socket.on('submitWorkout',function(email,workout,date){ //all
         submit_workout(email,workout,date);
@@ -115,7 +115,7 @@ io.on('connection', function(socket) {
         push_group(user,name);
     });
     socket.on('editGroupdelete',function(name,user){ //admin
-        pop_group(user,name);
+        pop_group(user.email,name);
     });
     socket.on('assignWorkout',function(group,full){ //admin
         assign_full_workout(group,full);
@@ -193,7 +193,7 @@ app.get('/', function(request, response){//
             get_next_wo(email,function(email,workout){
                 table_to_array_2(workout,email,email,null,function(array,workout,email,n){
                     get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                        response.render('workout.html'/*mustahce in workout and allworkouts*/);
+                        response.render('view_Workout.html',[email:email,workout:workout,array:array,allworkouts:allworkouts]/*mustahce in workout and allworkouts*/);
                     });
                 });
             });
@@ -665,7 +665,7 @@ function populate_table_full(array,table,setnum,email){
     for(var i=0;i<setnum;i++){
         var s = i+1;
         var setstr = s.toString();
-        update_col(table,setstr,false,"email",email);
+        update_col(table,setstr,true,"email",email);
         var exercises = array[i].exercises;
         var setlenstr = setstr+ '-length';
         update_col(table,setlenstr,exercises.length,"email",email);
@@ -686,7 +686,10 @@ function populate_table_full(array,table,setnum,email){
                 var rs= rds+"-reps";
                 var ws= rds+"-weight";
                 var r= rounds[k].reps;
-                var weightval= rounder(get_weight(r,(get_old_max(email,name))),5);
+                var weightval = 0
+                if(email != "email"){
+                    weightval= rounder(get_weight(r,(get_old_max(email,name))),5);
+                }
                 update_col(table,ws,w,"email",email);
                 update_col(table,rds,true,"email",email);
                 update_col(table,rs,r,"email",email);
