@@ -1,7 +1,7 @@
 google.charts.load('current', {'packages':['corechart']});
 
 
-body.addEventListener('load', function(){
+window.addEventListener('load', function(){
 	var name = $("meta[name='metatag']").attr('content'); // meta tag trick
 	$.ajax({
 		"url": "/json/wdefine",
