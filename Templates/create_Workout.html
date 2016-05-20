@@ -11,9 +11,68 @@
         <h1>L I F T</h1>
         <!--<div id = "Hamburger_icon"></div>-->
         <ul id= "nav_bar">
-            <li><a id="Create_Workout_Nav_Button" href="#news">Create Workout</a></li>
-            <li><a id="View_Progress_Nav_Button" href="#contact">View Progress</a></li>
+            <li><button type="button" id="Create_Workout_Nav_Button">Create Workout</button></li>
+            <li><button type="button" id="Full_Workout_Nav_Button">Create Full Workout</button></li>
+            <li><button type="button" id="Groups">Create/Edit Workout Group</button></li>
         </ul>
+        <div id="Create_Full_Workout_Page">
+            <div id="create_full">
+                <h2>Create Full Workout</h2>
+                <input type="text" id="full_name" placeholder="Full Workout Name">
+                <input type="text" id="cyclenum" placeholder="Number of Weeks">
+                <input type="text" id="cyclelen" placeholder="Number of Days in Week">
+                <button id="create_full_button" type="button">Create Full Workout</button>
+            </div>
+            <div id="assign_full">
+                <h2>Assign Full Workout</h2>
+                <select id="new_full">
+                    {{#workouts}}
+                        <option value="{{workout}}" cyclenum="{{cyclenum}}" cyclelen="{{cyclelen}}">{{workout}}</option>
+                    {{/workouts}}
+                </select>
+                <select id="new_group">
+                    {{#groups}}
+                        <option value="{{group}}">{{group}}</option>
+                    {{/groups}}
+                </select>
+                <button id="assign_full_button" type="button">Assign Group to Workout</button>--
+            </div>
+            <div id="unassign_full">
+                <select id="old_group">
+                    {{#groups}}
+                        <option value="{{group}}">{{group}}</option>
+                    {{/groups}}
+                </select>
+                put checkboxes here on selection
+            </div>
+        </div>
+        <div id="Group_generation">
+            <div id="new_user">
+                <h2> Create New User </h2>
+                <input type="text" id="name" placeholder="Athlete Name">
+                <input type="text" id="email"placeholder="Athlete Email address (stab accounts only)">
+                <button type="button" id="new_user_button">Create New User</button>
+            </div>
+            <div id="new_group">
+                <h2> Create New Group </h2>
+                <input type="text" id="name" placeholder="Group Name">
+                <h2> Select Athletes for this group
+                {{#users}}
+                    {{name}}:<input type="checkbox" name="{{name}}" email="{{email}}"><br/>
+                {{/users}}
+                <button type="button" id="new_group_button">Create New Group</button>
+            </div>
+            <div id="edit_group">
+                <h2> Select Group to Edit </h2>
+                    <select>
+                        {{#groups}}
+                            <option value="{{group}}">{{group}}</option>
+                        {{/groups}}
+                    </select>
+                <h2> Check Users in Group </h2>
+                <!--fill this stuff in after the page loads-->
+            </div>
+        </div>
         <div id="Create_Workout_Page">
             <!--<h2>Post Workout To:</h2>-->
             <table id="Workout_Post_Info">
@@ -21,43 +80,32 @@
                     <td class="Table_Header" colspan = "4">Workout Information</td>
                 </tr>
                 <tr>
-                    <th>Workout Date</th>
-                    <th>Team</th>
-                    <th>Grade</th>
-                    <th>Player</th>
+                    <th>Full</th>
+                    <th>Week/day</th>
+                    <th>Date</th>
                 </tr>
                 <tr>
-                    <td>3/4/16</td>
                     <td>
-                       <select>
-                            <option value="Bench Press">Any</option>
-                            <option value="Front Squat">Varsity Boys Baseball 2016</option>
-                            <option value="Push ups">Varsity Girls Fieldhockey</option>
-                            <option value="Chin ups">Varsity Boys Soccer</option>
+                       <select id="full_workout">
+                            {{#workouts}}
+                            <option value="{{full}}">{{workout}}</option>
+                            {{/workouts}}
                         </select>
                     </td>
                     <td>
-                        <select>
-                            <option value="Bench Press">Any</option>
-                            <option value="Front Squat">Freshman</option>
-                            <option value="Push ups">Sophomore</option>
-                            <option value="Chin ups">Junior</option>
-                            <option value="Chin ups">Senior</option>
+                        <select id="cycle/day"> <!--This will be filled in when workout is selected above-->
+                            <option cyclenum="" cyclelen="">Week x, Day y</option>
                         </select>
                     </td>
-                    <td>
-                        <select>
-                            <option value="Bench Press">Any</option>
-                            <option value="Front Squat">Will Define</option>
-                            <option value="Push ups">Scott Williams</option>
-                            <option value="Chin ups">Andy Wood</option>
-                        </select>
-                    </td>
-                </tr>
+                    <td><text id = "workout_date">05/19/2016</text></td>
+            </table>
                 
-            <table>
             <!--<h3>Workout Info:</h2>-->
+            <h1> Create Workout</h1>
             <table id="Excercise_Forms">
+                <button type="button" id="newset">Create New Set</button>
+            </table>
+                <!--
                 <tr>
                     <td class="Table_Header" colspan = "4">Workout Contents</td>
                 </tr>
@@ -144,7 +192,7 @@
                     </td>
                 </tr>
 
-            </table>
+            </table> -->
         </div>
         <div id="View_Progress_Page">
            <p>Scotts Filth</p>
