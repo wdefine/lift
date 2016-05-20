@@ -26,9 +26,11 @@ window.addEventListener('load', function(){
 						var d = new google.visualization.arrayToDataTable(table);
 						var chart = new google.visualization.LineChart(accordionContent);
 						var options = {
-					          title: wo[i].replace(/_/g, " "),
+					          title: $(accordionContent).attr('id').replace(/_/g, " "),
+					          width: $("#accordion").width(),
 					          curveType: 'function',
 					          legend: { position: 'none' }
+
 					        };
 						chart.draw(d, options);
 						$("#accordion").append(accordionContent);
