@@ -1037,7 +1037,7 @@ function get_all_full(groups,callback){
 }
 function wo_in_full(full,callback){
     list = [];
-    conn.query('SELECT cycle,day,workout,day,skip FROM ($1)',[full])
+    conn.query('SELECT cycle,day,workout,skip FROM ($1)',[full])
     .on('data',function(row){
         list.push(row);
     })
