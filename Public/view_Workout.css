@@ -104,11 +104,11 @@ h1{
 	margin-right:5%;
 }
 table{
-	/*position: absolute;
-	left:10%;
-	right:10%;
-	max-width:79%;
-	top:25%;*/
+	position: relative;
+	left:5%;
+	right:5%;
+	max-width:90%;
+	top:25%;
 	border:solid #7b3040 5px;
 }
 tr, td, th{

@@ -9,6 +9,10 @@ window.addEventListener('load', function(){
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
 	$("#Create_Workout_Page").show();
+
+	$("#WorkoutDatePicker").datepicker({
+		autoSize:true
+	});
 	///////////////////////////////////
 	/////Page Navigation//////////////
 	//////////////////////////////////
@@ -55,12 +59,13 @@ window.addEventListener('load', function(){
 
 	console.log($("#WorkoutName").val());
 	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
-	$("#SubmitWorkoutButton").on("click", function(){
+	$(document).on("click", "#SubmitWorkoutButton",function(){
 		if ($("#WorkoutName").val() == "" || $("#CycleNum").val() == ""){
 			//pop error message
 		}
 		else{
-			createFullWorkout()
+			console.log("poop");
+			createWorkout()
 		}
 	});
 	$(document).on("click", "#AssignWorkoutButton",function(){
@@ -119,15 +124,6 @@ function Sub_Bar_Off(){
 	$("#Create_sub_nav_bar").hide();
 }*/
 //done
-function createFullWorkout(){
-	//this is where you create the fullworkout which is basically just the name, number of cycles(weeks),
-	//and number of days in a cycle(days a week working out). You don'y even need dates for the workouts!
-	var name = $("#WorkoutName").val();//get name from text field
-	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
-	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
-	socket.emit("createFullWorkout",name,cyclenum,cyclelen);
-}
-//done
 function assignWorkout(){
 	//this is where you assign the full workout above to a group of users
 	var full = $("#AssignWorkoutDrop").val();//get full from dropdown
@@ -184,15 +180,26 @@ function createUser(){
 
 //Here is where the process of actually building the workout starts. This is the tricky part.
 //
+//done
+function createFullWorkout(){
+	//this is where you create the fullworkout which is basically just the name, number of cycles(weeks),
+	//and number of days in a cycle(days a week working out). You don'y even need dates for the workouts!
+	var name = $("#WorkoutName").val();//get name from text field
+	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
+	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
+	//socket.emit("createFullWorkout",name,cyclenum,cyclelen);
+}
 
 function createWorkout(){
 	var full = null;//the full workout that this workout is being built in
 	var cycle = null;//the cycle aka the week
 	var day = null;//the day of the week i.e. 1,2,3
-	var date = null//the actual day that this workout should take place in utc time---try http://api.jqueryui.com/datepicker/ for getting dates
+	var date = $("#WorkoutDatePicker").datepicker('getDate');//the actual day that this workout should take place in utc time---try http://api.jqueryui.com/datepicker/ for getting dates
 	var array = null// the tricky part
 				// we will create the workout in html and then convert that html into an array to send to the server
-	socket.emit("createWorkout",full,array,date,cycle,day);
+	console.log(date);
+
+	//socket.emit("createWorkout",full,array,date,cycle,day);
 }
 
 /* Basic HTML structure -the exact details depend on making it look nice
