@@ -399,7 +399,7 @@ function new_exercise(name,url,callback){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////GROUPS///////////////////////////////////////////////
 function new_group(array, name,callback){
-    conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT)',[name])
+    conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT UNIQUE)',[name])
     .on('error',function(){
         return;
     })
@@ -541,6 +541,7 @@ function get_assigned_wo(group,callback){
 function create_fullworkout(cyclenum,cyclelen,name){
     conn.query('INSERT INTO workouts (cyclenum,cyclelen,name) VALUES ($1,$2)',[cyclenum,cyclelen,name])
     .on('end',function(){
+        socket.emit("newFullWorkout", name);
         var full;
         conn.query('SELECT ident FROM workouts WHERE "cyclenum"=($1),"cyclelen"=($2),"name"=($3)',[cyclenum,cyclelen,name])
         .on('data',function(row){
@@ -550,6 +551,9 @@ function create_fullworkout(cyclenum,cyclelen,name){
             conn.query('CREATE TABLE ($1) ("group" TEXT)',[full.toString() + "-groups"]);
             create_blank_full_workout(full,cyclenum,cyclelen)
         });
+    })
+    .on('error',function(){
+        console.log("youse a dummy");
     });
 }
 function create_blank_full_workout(full,cyclenum,cyclelen){

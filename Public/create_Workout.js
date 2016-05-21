@@ -74,6 +74,15 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	socket.on("blankWorkout",function(array){
 		fillWorkout(array);
 	});
+	socket.on("newFullWorkout",function(name){
+		$("#full_workout").append("<option value=\""+name+"\">"+name+"</option>");
+	});
+	socket.on("workoutGroups",function(list){
+		addGroups(list);
+	});
+	socket.on("groupWorkouts",function(list){
+		addWorkouts(list);
+	});
 	///////////////////////////////////
 	/////////Send 
 
@@ -95,43 +104,45 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	$(document).on("click", "#UnAssignWorkoutButton",function(){
 		unAssignWorkout();
 	});
+	$(document).on("click", "#create_full_button",function(){
+		createFull();
+	});
 
-	$(document).on("click", "#SubmitGroupButton",function(){
-		createGroup();
+
+	//For automatically sorting through users by name/email
+	$(document).on("change", "#newgroupusername",function(){
+		$("#newgroupuseremail").val($("#newgroupusername").val());
+	});
+	$(document).on("change", "#newgroupuseremail",function(){
+		$("#newgroupusername").val($("#newgroupuseremail").val());
+	});
+	$(document).on("change", "#oldgroupusername",function(){
+		$("#oldgroupuseremail").val($("#oldgroupusername").val());
+	});
+	$(document).on("change", "#oldgroupuseremail",function(){
+		$("#oldgroupusername").val($("#oldgroupuseremail").val());
 	});
 	//Adding members to new group
 	$(document).on("click", "#AddToNewGroupButton",function(){
-		console.log("NEW");
-		var NewMemberName = $("#NewGroupMemberNameNew").val();
-		var NewMemberEmail = $("#NewGroupMemberEmailNew").val();
-		var name = $("#NewGroupName").val();
-		$("#AddMemberRowNew").before("<tr class='MemberOfNewGroup'><td class='Name'>"+NewMemberName+"</td><td class='Email'>"+NewMemberEmail+"</td><td><button class='RemoveNewMemberButton'>-</button></td></tr>")
-		editGroupadd(name, NewMemberName, NewMemberEmail);
+		var row = document.getElementById("Workout_Post_Info").insertRow(-2);
+		row.class = "MemberOfNewGroup";
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+		cell1.class = "Name";
+		cell1.value = $("#newgroupusername option:selected").html();
+		cell1.innerHTML = $("#newgroupusername option:selected").html();
+		cell2.class = "Email";
+		cell2.value = $("#newgroupuseremail option:selected").html();
+		cell2.innerHTML = $("#newgroupuseremail option:selected").html();
+		cell3.innerHTML = "<button class=\"RemoveNewMemberButton\" onclick=\"deleteGroupy(this)\">-</button>";
 	});
-	//adding members to existing group
-	$(document).on("click", "#AddToGroupButton",function(){
-		var NewMemberName = $("#NewGroupMemberName").val();
-		var NewMemberEmail = $("#NewGroupMemberEmail").val();
-		var name = $("#AssignGroupDrop").val();
-		$("#AddMemberRow").before("<tr class='MemberOfNewGroup'><td class='Name'>"+NewMemberName+"</td><td class='Email'>"+NewMemberEmail+"</td><td><button class='RemoveMemberButton'>-</button></td></tr>")
-		editGroupadd(name, NewMemberName, NewMemberEmail);
+	//submitting new Group
+	$(document).on("click", "#SubmitGroupButton",function(){
+		createGroup();
 	});
-	//Deleting members from new group
-	$(document).on("click", ".RemoveNewMemberButton",function(){
-		var NewMemberName = $("#NewGroupMemberName").val();
-		var NewMemberEmail = $("#NewGroupMemberEmail").val();
-		var name = $("#NewGroupName").val();
-		editGroupdelete(name, NewMemberName, NewMemberEmail);
-		$('tr').has($(this)).remove();
-		
-	});
-	//deleting members from existing group
-	$(document).on("click", ".RemoveMemberButton", function(){
-		var NewMemberName = $("#NewGroupMemberName").val();
-		var NewMemberEmail = $("#NewGroupMemberEmail").val();
-		var name = $("#AssignGroupDrop").val();
-		editGroupdelete(name, NewMemberName, NewMemberEmail);
-		$('tr').has($(this)).remove();
+	$(document).on("change", "#AddGroupDrop", function(){
+		getGroup();
 	});
 	$(document).on("click", "#CreateNewUserButton", function(){
 		createUser();
@@ -144,6 +155,9 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	});
 	$(document).on("change", "#week/day", function(){
 		getWeekDay();
+	});
+	$(document).on("change", "#AssignWorkoutDrop", function(){
+		getGroups();
 	});
 /*function Sub_Bar_On(){
 	$("#Create_sub_nav_bar").show();
@@ -248,20 +262,56 @@ function createFullWorkout(){
 	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
 	socket.emit("createFullWorkout",name,cyclenum,cyclelen);
 }
-//done
+function getGroups(){
+	var workout = $("#AssignWorkoutDrop").val();
+	if(workout != ""){
+		socket.emit("getWorkoutGroups",workout);
+	}
+	else{
+		$("#AssignGroupDrop").empty();
+	}
+}
+function addGroups(list){
+	for(var i=0;i<list.length;i++){
+		$('#AssignGroupDrop').append("<option value=\""+list[i].group+"\">"+list[i].group+"</option>");
+	}
+}
 function assignWorkout(){
 	//this is where you assign the full workout above to a group of users
 	var full = $("#AssignWorkoutDrop").val();//get full from dropdown
 	var group = $("#AssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
-	socket.emit("assignWorkout", full, group);
+	if(full != "" && group != ""){
+		socket.emit("assignWorkout", full, group);
+		getGroups();
+	}
 }
-//done
+function getWorkouts(){
+	var group = $("#UnAssignGroupDrop").val();
+	if(group != ""){
+		socket.emit("getWorkoutGroups",workout);
+	}
+	else{
+		$("#UnAssignWorkoutDrop").empty();
+	}
+}
+function addWorkouts(list){
+	for(var i=0;i<list.length;i++){
+		$('#UnAssignWorkoutDrop').append("<option value=\""+list[i].workout+"\">"+list[i].workout+"</option>");
+	}
+}
 function unAssignWorkout(){
 	var full = $("#UnAssignWorkoutDrop").val();//get full from dropdown
 	var group = $("#UnAssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
-	socket.emit("unAssignWorkout",full,group);
+	if(full != "" && group != ""){
+		socket.emit("unAssignWorkout",full,group);
+	}
+}
+//Deleting members from new group
+function deleteGroupy(element){
+	var grandma = element.parentNode.parentNode.rowIndex;
+	$("#Workout_Post_Info").deleteRow(grandma);
 }
 //done
 function createGroup(){
@@ -278,22 +328,53 @@ function createGroup(){
 	socket.emit("createGroup",name,array);
 }
 //done
-function editGroupadd(WorkoutName, MemberName, NewMemberEmail){ //adds an additional user to a preexisting group
-	var user = {name:MemberName, email:NewMemberEmail};
-	socket.emit("editGroupadd", WorkoutName, user);
-	$("#NewGroupMemberName").val("");
-	$("#NewGroupMemberEmail").val("");
+function editGroupadd(this){ //adds an additional user to a preexisting group
+	var group = $("#AddGroupDrop").val();
+	var name = $("#oldgroupusername").val();
+	var email = $("#oldgroupuseremail").val();
+	var user = {name:name, email:email};
+	socket.emit("editGroupadd", group, user);
+	addGroup([user]);
 }
 //done
-function editGroupdelete(WorkoutName, MemberName, NewMemberEmail){ //removes a user from a group
-	var name = WorkoutName;//name of the group
-	var user = {name:MemberName, email:NewMemberEmail};//object with email and name
-	socket.emit("editGroupdelete", name, user)
-
+function editGroupdelete(this){ //removes a user from a group
+	var group = $("#AddGroupDrop").val();
+	var name = this.parentNode.parentNode.find(".Name").val();
+	var email = this.parentNode.parentNode.find(".Email").val();
+	var user = {name:name, email:email};//object with email and name
+	socket.emit("editGroupdelete", group, user);
+}
+function getGroup(){
+	var group = $("#AddGroupDrop").val();
+	if(group != ""){
+		$("#AddGroupDrop").val("");
+		socket.emit("getGroupUsers",group);
+	}
+	else{
+		var groupies = $('.Member');
+		groupies.each(function(){
+			this.parentNode.deleteRow(this.rowIndex);
+		});
+	}
+}
+function addGroup(list){
+	var start = $('#header_existing').indexOf() +1;
+	for(var i=0;i<list.length;i++){
+		var row= document.getElementById('Group_Post_Info').insertRow(start);
+		row.class = "Member";
+		var c1 = row.insertCell(0);
+		var c2 = row.insertCell(1);
+		var c3 = row.insertCell(2);
+		c1.class = "Name";
+		c1.value = list[i].name;
+		c2.class = "Email";
+		c2.value = list[i].email;
+		c3.innerHTML = "<button class=\"RemoveMemberButton\" onclick=\"editGroupdelete(this)\">-</button>";
+		start +=1;
+	}
 }
 //done
 function createUser(){
-	//yes right now odonnell has to do this
 	var name = $("#NewUserFirstName").val() + " " + $("#NewUserLastName").val();
 	var email = $("#NewUserEmail").val();
 	console.log(name + " "+ email);
@@ -311,10 +392,10 @@ function createWorkout(){
 	var val = $("#week/day").val();
 	var week = val.substring(0,val.indexOf("/"));
 	var day = val.substring(val.indexOf("/")+1);
-	var de = $("#workout_date").val().split("/");
-	var day = de[0];
+	var de = $("#workout_date").val().split("-");
+	var day = de[2];
 	var month = de[1];
-	var year = de[2];
+	var year = de[0];
 	var date = new Date(year,month,day,0,0,0,0);
 	var d = date.UTC();
 	var tblarr = [];
@@ -383,4 +464,12 @@ function createWorkout(){
 	$("#new-exercise-sets").text() = "";
 	$("#new-exercise-reps").text() = "";
 	socket.emit("createWorkout",full,array,d,week,day);
+	$("#full_workout").val(''); 
+	getFull();
+}
+function createFull(){
+	var name = $("#full_name").val();
+	var weeks = parseInt($("#cyclenum").val());
+	var days = parseInt($("#cyclelen").val());
+	socket.emit('createFullWorkout',name,weeks,days)
 }

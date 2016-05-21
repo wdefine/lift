@@ -30,13 +30,17 @@
                 <a id="View_Progress_Nav_Button"> View Progress</a>
             </div>
         </div>
+
+
         <div id="Create_Full_Workout_Page">
             <h2>Create Full Workout</h2>
             <input type="text" id="full_name" placeholder="Full Workout Name">
-            <input type="text" id="cyclenum" placeholder="Number of Weeks"><!--Restrict to numbers-->
-            <input type="text" id="cyclelen" placeholder="Number of Days in Week"><!--Restrict to numbers-->
+            <input type="number" id="cyclenum" placeholder="Number of Weeks">
+            <input type="number" id="cyclelen" placeholder="Number of Days in Week">
             <button id="create_full_button" type="button">Create Full Workout</button>
         </div>
+
+
         <div id="Create_Workout_Page">
             <!--<h2>Post Workout To:</h2>-->
             <table id="Workout_Post_Info">
@@ -53,16 +57,16 @@
                        <select id="full_workout">
                             <option value="">Select Full</option>
                             {{#workouts}}
-                            <option value="{{full}}">{{workout}}</option>
+                            <option value="{{workout}}">{{workout}}</option>
                             {{/workouts}}
                         </select>
                     </td>
                     <td>
-                        <select id="week/day"> <!--This will be filled in when workout is selected above-->
+                        <select id="week/day">
                             <option week="" day="">Week x, Day y</option>
                         </select>
                     </td>
-                    <td><text id = "workout_date">05/19/2016</text></td><!--We may need to write a clever parser to ensure the right format-->
+                    <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
             </table>
             <!--<h3>Workout Info:</h2>-->
             <h1> Create Workout</h1>
@@ -77,10 +81,10 @@
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" id="new-set-number"><!--Restrict to numbers-->
+                        <input type="number" id="new-set-number" min="1" max="20">
                     </td>
                     <td>
-                        <input type="text" id="new-exercise-number"><!--Restrict to numbers-->
+                        <input type="number" id="new-exercise-number" min="1" max="20">
                     </td>
                     <td>
                         <select id="new-exercise-name">
@@ -91,10 +95,11 @@
                         </select>
                     </td>
                     <td>
-                        <input type="text" id="new-exercise-sets"><!--Restrict to numbers-->
+                        <input type="number" id="new-exercise-sets" min="1" max="20">
                     </td>
                     <td>
-                        <input type="text" id="new-exercise-reps"><!--Restrict to numbers-->
+                        <input type="number" id="new-exercise-reps"
+                        min="1" max="1000">
                     </td>
                     <td>
                         <button type="button" id="submit-ex-button">Submit</button>
@@ -103,6 +108,8 @@
             </table> 
             <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
         </div>
+
+
         <div id="Create_Group_Page">
             <table id="Workout_Post_Info">
                 <tr>
@@ -119,49 +126,27 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="Table_Header" colspan = "4">Current Group Members</td>
+                    <td class="Table_Header" colspan = "4">Add Group Members</td>
                 </tr>
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Remove</th>
                 </tr>
-                <tr class="MemberOfNewGroup">
-                    <td class="Name">Will Define</td>
-                    <td class="Email">wdefine@students.stab.org</td>
-                    <td>
-                        <button class="RemoveNewMemberButton">-</button>
-                    </td>
-                </tr>
-                <tr class="MemberOfNewGroup">
-                    <td class="Name">Scott Williams</td>
-                    <td class="Email">swilliams@students.stab.org</td>
-                    <td>
-                        <button class="RemoveNewMemberButton">-</button>
-                    </td>
-                </tr>
-                <tr id="AddMemberRowNew">
-                    <td class="Table_Header" colspan = "4">Add Group Member</td>
-                </tr>
                 <tr>
-                    <th>New Member Name</th>
-                    <th>New Member Email</th>
-                    <th>Add to Group</th>
-                </tr>
-                 <tr>
+                    {{#users}}
                     <td>
-                        <form>
-                            <input id="NewGroupMemberNameNew" type="text">
-                        </form>
+                        <select id="newgroupusername">
+                            <option value="{{name}}/{{email}}">{{name}}</option>
+                        </select>
                     </td>
                     <td>
-                        <form>
-                            <input id="NewGroupMemberEmailNew" type="text">
-                        </form>
+                        <select id="newgroupuseremail">
+                            <option value="{{name}}/{{email}}">{{email}}</option>
+                        </selcet>
                     </td>
-                    <td>
-                        <button id="AddToNewGroupButton">+</button>
-                    </td>
+                    {{/users}}
+                    <td><button id="AddToNewGroupButton">Add</button></td>
                 </tr>
                 <tr>
                     <td class="Table_Header" colspan = "3">
@@ -169,44 +154,31 @@
                     </td>
                 </tr> 
             </table>
-            <table id="Workout_Post_Info">
+
+            <table id="Group_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "4">Edit Existing Group</td>
                 </tr>
                 <tr>
                     <th colspan = "4">Name of Group</th>
                 </tr>
-                <tr>
+                <tr id="group_row">
                     <td colspan = "4">
                         <select id="AddGroupDrop">
-                            <option value="All">All</option>
-                            <option value="Varsity_Boys_Baseball_2016">Varsity Boys Baseball 2016</option>
-                            <option value="Varsity_Girls_Fieldhockey">Varsity Girls Fieldhockey</option>
-                            <option value="Varsity_Boys_Soccer">Varsity Boys Soccer</option>
+                            <option value="">Select</option>
+                            {{#groups}}
+                            <option value="{{group}}">{{group}}</option>
+                            {{/groups}}
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td class="Table_Header" colspan = "4">Current Group Members</td>
                 </tr>
-                <tr>
+                <tr id="header_existing">
                     <th>Name</th>
                     <th>Email</th>
                     <th>Remove</th>
-                </tr>
-                <tr class='Member'>
-                    <td class="Name">Will Define</td>
-                    <td class="Email">wdefine@students.stab.org</td>
-                    <td>
-                        <button class="RemoveMemberButton">-</button>
-                    </td>
-                </tr>
-                <tr class='Member'>
-                    <td class="Name">Scott Williams</td>
-                    <td class="Email">swilliams@students.stab.org</td>
-                    <td>
-                        <button class="RemoveMemberButton">-</button>
-                    </td>
                 </tr>
                 <tr id="AddMemberRow">
                     <td class="Table_Header" colspan = "4">Add Group Member</td>
@@ -216,59 +188,51 @@
                     <th>New Member Email</th>
                     <th>Add to Group</th>
                 </tr>
-                 <tr>
-                    <td>
-                        <form>
-                            <input id="NewGroupMemberName" type="text"> <!--This Name and email must be the same as an existing user-->
-                        </form>
-                    </td>
-                    <td>
-                        <form>
-                            <input id="NewGroupMemberEmail" type="text">
-                        </form>
-                    </td>
-                    <td>
-                        <button id="AddToGroupButton">+</button>
-                    </td>
-                </tr>
                 <tr>
-                    <td class="Table_Header" colspan = "3">
-                        <button id="SubmitGroupButton" type="button">Submit Edited Group</button>
+                    {{#users}}
+                    <td>
+                        <select id="oldgroupusername">
+                            <option value="{{name}}/{{email}}">{{name}}</option>
+                        </select>
                     </td>
-                </tr> 
+                    <td>
+                        <select id="oldgroupuseremail">
+                            <option value="{{name}}/{{email}}">{{email}}</option>
+                        </selcet>
+                    </td>
+                    {{/users}}
+                    <td><button id="AddToOldGroupButton" onclick="editGroupadd(this)">Add</button></td>
+                </tr>
             </table>
         </div> 
+
+
         <div id="View_Progress_Page">
            <p>Scott Stuff
            </p>
         </div>
+
+
         <div id="Assign_Workout_Page">
-            <table id="Workout_Post_Info">>
+            <table id="Assign_Post_Info">>
                 <tr>
                     <td class="Table_Header" colspan = "2">Assign a Workout to a Group</td>
                 </tr>
                 <tr>
-                    <th>Workouts</th>
-                    <th>Groups</th>
+                    <th>Workout</th>
+                    <th>Unassigned Groups</th>
                 </tr>
                 <tr>
                     <td>
                         <select id="AssignWorkoutDrop">
-                            <option value="Workout_1">Workout 1</option>
-                            <option value="Workout_2">Workout 2</option>
-                            <option value="Workout_3">Workout 3</option>
-                            <option value="Workout_4">Workout 4</option>
-                            <option value="Workout_5">Workout 5</option>
-                            <option value="Workout_6">Workout 6</option>
-                            <option value="Workout_7">Workout 7</option>
+                            <option value="">Select</option>
+                            {{#workouts}}
+                            <option value="{{workout}}">{{workout}}</option>
+                            {{/workouts}}
                         </select>
                     </td>
                     <td>
                        <select id="AssignGroupDrop">
-                            <option value="All">All</option>
-                            <option value="Varsity_Boys_Baseball_2016">Varsity Boys Baseball 2016</option>
-                            <option value="Varsity_Girls_Fieldhockey">Varsity Girls Fieldhockey</option>
-                            <option value="Varsity_Boys_Soccer">Varsity Boys Soccer</option>
                         </select>
                     </td>
                 </tr>
@@ -278,32 +242,25 @@
                     </td>
                 </tr> 
             </table>
-            <table id="Workout_Post_Info">
+            <table id="Unassign_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "4">UnAssign a Workout to a Group</td>
                 </tr>
                 <tr>
-                    <th>Workouts</th>
-                    <th>Groups</th>
+                    <th>Group</th>
+                    <th>Assigned Workouts</th>
                 </tr>
                 <tr>
                     <td>
-                        <select id="UnAssignWorkoutDrop">
-                            <option value="Workout_1">Workout 1</option>
-                            <option value="Workout_2">Workout 2</option>
-                            <option value="Workout_3">Workout 3</option>
-                            <option value="Workout_4">Workout 4</option>
-                            <option value="Workout_5">Workout 5</option>
-                            <option value="Workout_6">Workout 6</option>
-                            <option value="Workout_7">Workout 7</option>
+                        <select id="UnAssignGroupDrop">
+                            <option value="">Select</option>
+                            {{#groups}}
+                            <option value="{{group}}">{{group}}</option>
+                            {{/groups}}
                         </select>
                     </td>
                     <td>
-                       <select id="UnAssignGroupDrop">
-                            <option value="All">All</option>
-                            <option value="Varsity_Boys_Baseball_2016">Varsity Boys Baseball 2016</option>
-                            <option value="Varsity_Girls_Fieldhockey">Varsity Girls Fieldhockey</option>
-                            <option value="Varsity_Boys_Soccer">Varsity Boys Soccer</option>
+                       <select id="UnAssignWorkoutDrop">
                         </select>
                     </td>
                 </tr>
@@ -314,14 +271,14 @@
                 </tr>  
             </table>
         </div>
+
+
         <div id="Create_Account_Page">
-            <div id="CreateForm">
-                <form> <!--We use sockets here fyi-->
-                    <input id="NewUserFirstName" type="text" placeholder="First name" class='Name'> 
-                    <input id="NewUserLastName" type="text" placeholder="Last name" class='Name'>
-                    <input id="NewUserEmail" type="text" placeholder="STAB email">
-                    <input id="CreateNewUserButton" type="submit" value="Add User">
-                </form>
+            <div id="CreateForm">=
+                <input id="NewUserFirstName" type="text" placeholder="First name" class='Name'> 
+                <input id="NewUserLastName" type="text" placeholder="Last name" class='Name'>
+                <input id="NewUserEmail" type="text" placeholder="STAB email">
+                <button id="CreateNewUserButton">Create</button>
             <div>
         </div>
 
