@@ -386,7 +386,7 @@ function new_group(array, name,callback){
 function assign_full_workout(group,full){
     get_assigned_gro_1(full,[group,full],function(assigned,list){
         var x =0;
-        for(var i=0,i<assigned.length;i++){
+        for(var i=0;i<assigned.length;i++){
             if(assigned[i] == list[0]){
                 var x=1;
                 break;

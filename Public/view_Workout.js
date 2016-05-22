@@ -68,26 +68,16 @@ window.addEventListener('load', function(){
 
 
 ///////TO BE FINISHED
-	var First_Cell_Clicked = false;
-	var Last_Cell;
 	//$(document).on(tap)
-    $("table").on("focus", "input", function(){
+    $("table").on("blur", "input", function(){
     	console.log("works");
-        if (First_Cell_Clicked == true){
-        	Last_Cell = $(this);
-            var Value_to_be_Sent = $(this).val();
-            console.log(Value_to_be_Sent);
-        } 
-        else{
-        var Last_Cell_Id = Last_Cell.attr('id');
-        var Last_Cell_Value = Last_Cell.val();
+        var Cell_Id = $(this).attr('id');
+        var Cell_Value = $(this).val();
         var completed = false;//unless we add editing old workouts
-        var Workoutname = $("#Workoutname").text();
-        var email = $("#UserEmail").text();
-        console.log()
-        socket.emit("", id, value, completed, workoutname, email);
-    	First_Cell_Clicked = true;
-    	}
+        var Workoutname = $("#Workoutname").text();//mustached in on load
+        var email = $("#UserEmail").text();//mustached in on load
+        console.log("cell value :" + Cell_Value + "Cell Id: "+ Cell_Id+ "completed: "+completed+"Workout name: "+Workoutname +"email: "+email);
+        socket.emit("changeWorkout", Last_Cell_Id, Last_Cell_Value, completed, workoutname, email);
     });
 
 
