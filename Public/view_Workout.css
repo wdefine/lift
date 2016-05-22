@@ -120,11 +120,6 @@ tr, td, th{
 
 
 }
-.input{
-	height:45px;
-	width:100%;
-	font-size: 28px;
-}
 th{
 	color:#ffffff;
 	font-size: 28px;
@@ -148,9 +143,10 @@ tr:nth-child(odd) input{
     
 }
 input{
-	border: 0px solid;
 	font-size: 28px;
-	width:100%;
+	width:80%;
+	margin:0;
+	padding:0;
 	height:100%;
 }
 

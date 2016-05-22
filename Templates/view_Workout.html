@@ -5,10 +5,6 @@
         <!--Jquery Ui-->
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-        <!--Mustache.js-->
-        <!--<script src="../Public/mustache.js-master"></script>-->
-        <!--Hammer.js-->
-        <script src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
         <!--Jquery Mobile-->
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
@@ -19,27 +15,33 @@
         <link rel="stylesheet" media="all and (orientation:portrait)" href="../Public/view_Workout.css">
     </head>
     <div id="UserIfo" display="none">
-        <div id="Workout">{{workout}}</div>
-        <div id="UserEmail">{{email}}</div>
+        <div id="Workoutname" display="none">{{workout}}</div>
+        <div id="UserEmail" display="none">{{email}}</div>
     </div>
 	<body id="body" email="email">
 
         <h1>L I F T</h1>
         <!--<div id = "Hamburger_icon"></div>-->
         <ul id= "nav_bar">
-            <li>Profilekjbkjbkjb</li>
-            <li>Workout</li>
-            <li>Progress</li>
+            <li id="NavProfile">Profile</li>
+            <li id="NavWorkout">Workout</li>
+            <li id="NavProgress">Progress</li>
         </ul> 
-        <ul id= "Workout_bar">
-            {{#allworkouts}}
-                <li id="{{workout}}" >{{date}}</li>
-            {{/allworkouts}}
-        </ul>
-        <div id="Workouts">
-            <button id="submitWorkout">Sumbit Workout</button>
-            <div id="date"></div>
-
-        
-        <div/>
+        <div id="ProfilePage">
+            Profile
+        </div>
+        <div id="ProgressPage">
+            Scotts Stuff
+        </div>
+        <div id="WorkoutPage">
+            <ul id= "Workout_bar">
+                {{#allworkouts}}
+                    <li id="{{workout}}" >{{date}}</li>
+                {{/allworkouts}}
+            </ul>
+            <div id="Workouts">
+                <div id="date"></div>
+                <button id="submitWorkout">Sumbit Workout</button>
+            <div/>
+        </div> 
     </body>

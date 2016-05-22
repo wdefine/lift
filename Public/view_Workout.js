@@ -1,10 +1,7 @@
  //var socket = io.connect();
 $( document ).ready(function() {
-	console.log("ready");
-	$(document).on("tap", "table", function(){
-		cycle_Tables($(this).attr('id'));
-
-	});
+	
+	
 	//testing
 	var c = {reps:8, weight:135};
 	var g = {reps:5, weight:"none"};
@@ -17,37 +14,52 @@ $( document ).ready(function() {
 	var q = {completed:true,_name:"Tricep Extensions",rounds:w};
 	var e = {completed:true, exercises:[a,r,q]};//first round of excercises
 	var t = {completed:true, exercises:[a,r]};
-	var f = [e,e,t];//array
+	var f = [e,e,t,e,t,t];//array
 
  	var array = f
  	addWorkout(f);
+
+	$(document).on("swipeleft", "table", function(){
+		cycle_Tables($(this).attr('id'));
+	});
+	$(document).on("swiperight", "table", function(){
+		rev_cycle_Tables($(this).attr('id'));
+	});
+	$(document).on("tap", "#NavWorkout", function(){
+		$("#WorkoutPage").show();
+		$("#ProgressPage").hide();
+		$("#ProfilePage").hide();
+		$("#nav_bar li").css("background-color", '#7b3040' );
+		$(this).css("background-color", '#737373' );
+
+	});
+	$(document).on("tap", "#NavProfile", function(){
+		$("#WorkoutPage").hide();
+		$("#ProgressPage").hide();
+		$("#ProfilePage").show();
+		$("#nav_bar li").css("background-color", '#7b3040' );
+		$(this).css("background-color", '#737373' );
+
+	});
+	$(document).on("tap", "#NavProgress", function(){
+		$("#WorkoutPage").hide();
+		$("#ProgressPage").show();
+		$("#ProfilePage").hide();
+		$("#nav_bar li").css("background-color", '#7b3040' );
+		$(this).css("background-color", '#737373' );
+
+	});
+
+
+	show_only("table","0");//hides all tables except first
 });
-
-
-
 window.addEventListener('load', function(){
-	//show_only("table","1");
 	
 	//addWorkout("_3-2-4", 3, true);
 	//////////////////////
 	////initial hides/////
 	//////////////////////
-	$('#Date_3-2-16').accordion({
-		active:0
-	});
-	$( ".tabs" ).tabs({
-  		active: 0
-	});
-	$("h1").bind("tap",function(){
-		console.log("Date Bar tap");
-		$("h1").hide();
-		var a = $('#Workout_bar');
-		a.css("background-color", "#323333");
-		$('#Workout_bar li').css("background-color", "#323333");
 	
-		$(this).css("background-color", '#737373' )
-
-	});
 	//$(document).on("click", "table", function(){
 	//	cycle_Tables($(this).attr('id'));
 
@@ -60,17 +72,24 @@ window.addEventListener('load', function(){
 ///////TO BE FINISHED
 	var First_Cell_Clicked = false;
 	var Last_Cell;
+	//$(document).on(tap)
     $("table").on("focus", "input", function(){
     	console.log("works");
         if (First_Cell_Clicked == true){
+        	Last_Cell = $(this);
             var Value_to_be_Sent = $(this).val();
             console.log(Value_to_be_Sent);
         } 
-        var Cell_Id
-        Last_Cell = $(this);
-
-        First_Cell_Clicked = true;
-        //socket.emit("Entered_Data", Cell_ID_Number, Cell_Data_Type, Value_to_be_Sent, id_of_cell_to_be_sent);
+        else{
+        var Last_Cell_Id = Last_Cell.attr('id');
+        var Last_Cell_Value = Last_Cell.val();
+        var completed = false;//unless we add editing old workouts
+        var Workoutname = $("#Workoutname").text();
+        var email = $("#UserEmail").text();
+        console.log()
+        socket.emit("", id, value, completed, workoutname, email);
+    	First_Cell_Clicked = true;
+    	}
     });
 
 
@@ -86,15 +105,12 @@ window.addEventListener('load', function(){
 });
 function show_only(elementType, elementToBeShown){
 	var elements = document.getElementsByTagName(elementType);
-	console.log(elements.length);
 	for(var i = 0; i < elements.length; i++){
 		console.log(elements[i].getAttribute('id')+ " = "+ elementToBeShown);
 		if(elements[i].getAttribute('id') == elementToBeShown){
-			console.log("show");
 			$(elements[i]).show();
 		}
 		else{
-			console.log("not show");
 			$(elements[i]).hide();
 		}
 	}
@@ -115,6 +131,24 @@ function cycle_Tables(shownElementId){
 		show_only("table", elementIds[0]);
 	}
    
+}
+function rev_cycle_Tables(shownElementId){
+	var tables = document.getElementsByTagName("table");
+	var elementIds = [];
+	for (var i = 0; i < tables.length; i++){
+		var id = tables[i].getAttribute('id')
+		elementIds.push(id);
+	}
+	var previousElementIndex = elementIds.indexOf(shownElementId) -1;
+	console.log(previousElementIndex);
+	if(previousElementIndex >= 0){
+		var previousElementId = elementIds[previousElementIndex];
+		$(shownElementId).hide();
+		show_only("table", previousElementId);
+	}
+	else{
+		show_only("table", elementIds[elementIds.length - 1]);
+	}
 }
 ////////ADDING TABLE FUNCTION///////////
 function addWorkout(array){
