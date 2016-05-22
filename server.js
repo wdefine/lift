@@ -235,7 +235,7 @@ app.get('/progress', function(request, response){
             get_user_data(email,function(data){
                 get_all_exercises(data,null,function(groups,workouts,exercises){
                     var data = groups;
-                    response.render('user-progress.html'/*mustache in above data-data&exercises*/);
+                    response.render('user-progress.html',{data:data,exercises:exercises});
                 });
             });
         }
