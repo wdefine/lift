@@ -406,10 +406,6 @@ function createFullWorkout(){
 }
 
 function createWorkout(){
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 	var full = $("#full_workout").val();
 	var val = $("#week/day").val();
 	/*

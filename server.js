@@ -194,6 +194,7 @@ app.get('/', function(request, response){//
                 table_to_array_2(workout,email,email,null,function(array,workout,email,n){
                     get_all_false(email,workout,array,function(email,workout,array,allworkouts){
                         response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
+
                     });
                 });
             });
