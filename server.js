@@ -193,7 +193,7 @@ app.get('/', function(request, response){//
             get_next_wo(email,function(email,workout){
                 table_to_array_2(workout,email,email,null,function(array,workout,email,n){
                     get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                        response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/);
+                        response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
                     });
                 });
             });
@@ -386,7 +386,7 @@ function new_group(array, name,callback){
 function assign_full_workout(group,full){
     get_assigned_gro_1(full,[group,full],function(assigned,list){
         var x =0;
-        for(var i=0,i<assigned.length;i++){
+        for(var i=0;i<assigned.length;i++){
             if(assigned[i] == list[0]){
                 var x=1;
                 break;
