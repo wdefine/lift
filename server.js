@@ -187,7 +187,7 @@ function ensureAuthenticated(req, res, next) { //next runs the next function in 
 app.get('/', function(request, response){//
     get_email(request.user,function(email,domain){
         if(email == null){
-            response.render('request-account.html');
+            response.redirect('/login');
         }
         else{
             get_next_wo(email,function(email,workout){
@@ -200,10 +200,13 @@ app.get('/', function(request, response){//
         }
     });
 });
+app.get('/login',function(request,reponse){
+    reponse.render('login.html');
+});
 app.get('/create',function(request,response){
     get_email(request.user,function(email,domain){
         if(email == null){
-            response.render('request-account.html');
+            response.redirect('/login');
         }
         else{
             if(domain == "stab.org"){
@@ -223,54 +226,18 @@ app.get('/create',function(request,response){
         }
     });
 });
-app.get('/assign',function(request,response){
-    get_email(request.user,function(email,domain){
-        if(email == null){
-            response.render('request-account.html');
-        }
-        else{
-            if(domain == "stab.org"){
-                get_all_groups(function(groups){
-                    get_all_full(groups,function(groups,workouts){
-                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
-                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html'/*mustache in above data without exercises*/);
-                            });
-                        });
-                    });
-                });
-            }
-            else{
-                response.redirect('/');
-            }
-        }
-    });
-});
 app.get('/progress', function(request, response){
     get_email(request.user,function(email,domain){
         if(email == null){
-            response.render('request-account.html');
+            response.redirect('/login');
         }
         else{
-            if(domain == "stab.org"){
-                get_all_groups(function(groups){
-                    get_all_full(groups,function(groups,workouts){
-                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
-                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html'/*mustache in above data*/);
-                            });
-                        });
-                    });
+            get_user_data(email,function(data){
+                get_all_exercises(data,null,function(groups,workouts,exercises){
+                    var data = groups;
+                    response.render('user-progress.html'/*mustache in above data-data&exercises*/);
                 });
-            }
-            else{
-                get_user_data(email,function(data){
-                    get_all_exercises(data,null,function(groups,workouts,exercises){
-                        var data = groups;
-                        response.render('user-progress.html'/*mustache in above data-data&exercises*/);
-                    });
-                });
-            }
+            });
         }
     });   
 });
@@ -570,7 +537,7 @@ function create_workout(array, date, cycle, day, full,callback){
     create_wo_name(array, date,cycle,day,full,function(array,workout,date,cycle,day,full,callback){
         array_to_table_init(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
             populate_table_init_2(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
-                conn.query('UPDATE ($1) SET date=($2),skip=($3),workout=($4) WHERE "cycle"=($5),"day"=($6)',[full,date,false,workout,cycle,day]);
+                conn.query('UPDATE ($1) SET "date"=($2),"skip"=($3),"workout"=($4) WHERE "cycle"=($5),"day"=($6)',[full,date,false,workout,cycle,day]);
                 callback(workout);
             });
         });
@@ -816,8 +783,8 @@ function table_to_array_2(workout,email,a,b,callback){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////SUBMISSION FUNCTIONS////////////////////////////////////////////
 function submit_workout(email,workout,date){
-    conn.query('UPDATE ($1) SET completed=($2),date=($3) WHERE "email"=($4)',[workout,true,date,email]);
-    conn.query('UPDATE ($1) SET completed=($2),date=($3) WHERE "workout"=($4)',[email,true,date,workout])
+    conn.query('UPDATE ($1) SET "completed"=($2),"date"=($3) WHERE "email"=($4)',[workout,true,date,email]);
+    conn.query('UPDATE ($1) SET "completed"=($2),"date"=($3) WHERE "workout"=($4)',[email,true,date,workout])
     .on('end',function(){
         get_wo_val(workout, "sets",email,{},function(workout,column,email,list,val){
             for(var i=1;i<=val;i++){
@@ -908,8 +875,8 @@ function update_all_workouts(email,name){
                         get_wo_val(workout,list[0]+'-length',email,[weightval,list[0]],function(workout,column,email,list,val){
                             for(var i=0;i<val;i++){
                                 var x = i+1;
-                                var y = x.toString();
-                                conn.query('UPDATE ($1) SET ($2)=($3) WHERE "email"=($4)',[workout,list[1]+"-"+y+"-weight",list[0], email]);
+                                var y = 'UPDATE ($1) SET '+list[1]+"-"+x.toString()+"-weight"+'=($3) WHERE "email"=($4)'
+                                conn.query(y,[workout,list[0], email]);
                             }
                         });
                     });
