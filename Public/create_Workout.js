@@ -171,6 +171,10 @@ function Sub_Bar_Off(){
 	$("#Create_sub_nav_bar").hide();
 }*/
 //done
+<<<<<<< HEAD
+});
+=======
+>>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 function getFull(){
 	var full = $("#full_workout").val();
 	if(full == ""){
@@ -225,14 +229,14 @@ function fillWorkout(array){
 			var exnam = ex.name;
 			var sets = ex.rounds.length;
 			var reps = ex.rounds[0].reps;
-			$("#Exercise_Forms").append("
-			<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>
-			<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>
-			<td class=\"exercise-name\">"+exnam+"</td>
-			<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>
-			<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>
-			<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>
-			");
+			$("#Exercise_Forms").append(
+			"<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>"+
+			"<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>"+
+			"<td class=\"exercise-name\">"+exnam+"</td>"+
+			"<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>"+
+			"<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>"+
+			"<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>"
+			);
 		}
 	}
 }
@@ -243,14 +247,14 @@ function submitEx(){
 	var sets = $("#new-exercise-sets").text();
 	var reps = $("#new-exercise-reps").text();
 	if(set != "" && exnum != "" && exnam != "" && sets != "" && reps != ""){
-		$("#Exercise_Forms").append("
-		<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>
-		<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>
-		<td class=\"exercise-name\">"+exnam+"</td>
-		<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>
-		<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>
-		<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>
-		");
+		$("#Exercise_Forms").append(
+		"<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>"+
+		"<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>"+
+		"<td class=\"exercise-name\">"+exnam+"</td>"+
+		"<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>"+
+		"<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>"+
+		"<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>"
+		);
 
 		$("#new-set-number").text() = "";
 		$("#new-exercise-number").text() = "";
@@ -333,7 +337,7 @@ function createGroup(){
 	socket.emit("createGroup",name,array);
 }
 //done
-function editGroupadd(this){ //adds an additional user to a preexisting group
+function editGroupadd(){ //adds an additional user to a preexisting group
 	var group = $("#AddGroupDrop").val();
 	var name = $("#oldgroupusername").val();
 	var email = $("#oldgroupuseremail").val();
@@ -342,10 +346,10 @@ function editGroupadd(this){ //adds an additional user to a preexisting group
 	addGroup([user]);
 }
 //done
-function editGroupdelete(this){ //removes a user from a group
+function editGroupdelete(_this){ //removes a user from a group
 	var group = $("#AddGroupDrop").val();
-	var name = this.parentNode.parentNode.find(".Name").val();
-	var email = this.parentNode.parentNode.find(".Email").val();
+	var name = _this.parentNode.parentNode.find(".Name").val();
+	var email = _this.parentNode.parentNode.find(".Email").val();
 	var user = {name:name, email:email};//object with email and name
 	socket.emit("editGroupdelete", group, user);
 }
@@ -403,6 +407,9 @@ function createFullWorkout(){
 
 function createWorkout(){
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 	var full = $("#full_workout").val();
 	var val = $("#week/day").val();
 	/*
@@ -491,3 +498,6 @@ function createFull(){
 	var days = parseInt($("#cyclelen").val());
 	socket.emit('createFullWorkout',name,weeks,days)
 }
+
+
+
