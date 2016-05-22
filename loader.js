@@ -1,6 +1,6 @@
 var anyDB = require('any-db');
 
-var conn = anyDB.createConnection('sqlite3://weightroom.db.sqlite');
+var conn = anyDB.createConnection('sqlite3:../weightroom.db.sqlite');
 
 conn.query('CREATE  TABLE "main"."groups" ("ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "group" TEXT UNIQUE)');
 conn.query('CREATE  TABLE "main"."exercises" ("exercise" TEXT UNIQUE , "url" TEXT)');
