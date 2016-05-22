@@ -171,7 +171,10 @@ function Sub_Bar_Off(){
 	$("#Create_sub_nav_bar").hide();
 }*/
 //done
+<<<<<<< HEAD
 });
+=======
+>>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 function getFull(){
 	var full = $("#full_workout").val();
 	if(full == ""){
@@ -403,8 +406,13 @@ function createFullWorkout(){
 }
 
 function createWorkout(){
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 	var full = $("#full_workout").val();
 	var val = $("#week/day").val();
+	/*
 	var week = val.substring(0,val.indexOf("/"));
 	var day = val.substring(val.indexOf("/")+1);
 	var de = $("#workout_date").val().split("-");
@@ -412,6 +420,8 @@ function createWorkout(){
 	var month = de[1];
 	var year = de[0];
 	var date = new Date(year,month,day,0,0,0,0);
+	*/
+	var date = $("#WorkoutDatePicker").datepicker('getDate');
 	var d = date.UTC();
 	var tblarr = [];
 	var array = [];

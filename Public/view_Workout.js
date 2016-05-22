@@ -1,7 +1,5 @@
- //var socket = io.connect();
-$( document ).ready(function() {
-	
-	
+var socket = io.connect();
+$( document ).ready(function() {	
 	//testing
 	var c = {reps:8, weight:135};
 	var g = {reps:5, weight:"none"};
@@ -162,17 +160,4 @@ function addWorkout(array){
 function addDateToWorkoutBar(Date){
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
