@@ -211,7 +211,7 @@ app.get('/create',function(request,response){
                     get_all_full(groups,function(groups,workouts){
                         get_all_exercises(groups,workouts,function(groups,workouts,exercises){
                             get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html'/*mustache in above data*/);
+                                response.render('create-workout.html',[groups:groups, workouts:workouts, exercises:exercises, users:users]);
                             });
                         });
                     });
@@ -309,7 +309,7 @@ function new_user(name,email,callback){
 }
 function get_all_users(groups,workouts,exercises,callback){
     var users = [];
-    conn.query('SELECT name FROM users')
+    conn.query('SELECT name,email FROM users')
     .on('data',function(row){
         var user = {name:row.name, email:row.email}
         users.push(user);
@@ -417,15 +417,26 @@ function new_group(array, name,callback){
     });
 }
 function assign_full_workout(group,full){
-    conn.query('INSERT INTO ($1) (group) VALUES ($2)',[full.toString() +"-groups",group]);
-    conn.query('INSERT INTO ($1) (full) VALUES ($2)',[group.toString()+"-assigned",full]);
-    var date = new Date();
-    var d = date.UTC()-172800000;
-    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[full,true,d])
-    .on('data',function(row){
-        table_to_array_2(row.workout,"email",full,row.date,function(array,workout,a,b){
-            populate_table_init(array,workout,a,b);
-        });
+    get_assigned_gro_1(full,[group,full],function(assigned,list){
+        var x =0;
+        for(var i=0,i<assigned.length;i++){
+            if(assigned[i] == list[0]){
+                var x=1;
+                break;
+            }
+        }
+        if(x=0){
+            conn.query('INSERT INTO ($1) (group) VALUES ($2)',[list[1].toString() +"-groups",list[0]]);
+            conn.query('INSERT INTO ($1) (full) VALUES ($2)',[list[0].toString()+"-assigned",list[1]]);
+            var date = new Date();
+            var d = date.UTC()-172800000;
+            conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[list[1],true,d])
+            .on('data',function(row){
+                table_to_array_2(row.workout,"email",list[1],row.date,function(array,workout,a,b){
+                    populate_table_init(array,workout,a,b);
+                });
+            });
+        }
     });
 }
 function unassign_workout(group,full){

@@ -13,7 +13,10 @@
         <h1>L I F T</h1>
         <!--<div id = "Hamburger_icon"></div>-->
         <div id= "nav_bar">
-            <div >
+            <div>
+                <a id="Create_Full_Workout_Nav_Button">Create Full Workout</a>
+            </div>
+            <div>
                 <a id="Create_Workout_Nav_Button">Create Workout</a>
             </div>
             <div>
@@ -29,10 +32,13 @@
                 <a id="View_Progress_Nav_Button"> View Progress</a>
             </div>
         </div>
-        <!--<ul id= "Create_sub_nav_bar">
-            <li><a id="Create_Group" href="/">Create Group</a></li>
-            <li><a id="Create_Workout" href="/">Create Workout</a></li>
-        </ul>-->
+        <div id="Create_Full_Workout_Page">
+            <h2>Create Full Workout</h2>
+            <input type="text" id="full_name" placeholder="Full Workout Name">
+            <input type="text" id="cyclenum" placeholder="Number of Weeks">
+            <input type="text" id="cyclelen" placeholder="Number of Days in Week">
+            <button id="create_full_button" type="button">Create Full Workout</button>
+        </div>
         <div id="Create_Workout_Page">
             <!--<h2>Post Workout To:</h2>-->
             <table id="Workout_Post_Info">
@@ -40,6 +46,25 @@
                     <td class="Table_Header" colspan = "4">Workout Information</td>
                 </tr>
                 <tr>
+                    <th>Full</th>
+                    <th>Week/day</th>
+                    <th>Date</th>
+                </tr>
+                <tr>
+                    <td>
+                       <select id="full_workout">
+                            {{#workouts}}
+                            <option value="{{full}}">{{workout}}</option>
+                            {{/workouts}}
+                        </select>
+                    </td>
+                    <td>
+                        <select id="cycle/day"> <!--This will be filled in when workout is selected above-->
+                            <option cyclenum="" cyclelen="">Week x, Day y</option>
+                        </select>
+                    </td>
+                    <td><text id = "workout_date">05/19/2016</text></td>
+            </table>
                     <th>Name</th>
                     <th>Number of Weeks</th>
                     <th>Number of Days/Week</th>
@@ -74,7 +99,11 @@
                 </tr> 
             </table>
             <!--<h3>Workout Info:</h2>-->
+            <h1> Create Workout</h1>
             <table id="Excercise_Forms">
+                <button type="button" id="newset">Create New Set</button>
+            </table>
+                <!--
                 <tr>
                     <td class="Table_Header" colspan = "4">Workout Contents</td>
                 </tr>
@@ -176,6 +205,7 @@
                         </form>
                     </td>
                 </tr>
+            </table> -->
                 <tr>
                     <td colspan = "4">
                         <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
@@ -299,7 +329,7 @@
                  <tr>
                     <td>
                         <form>
-                            <input id="NewGroupMemberName" type="text">
+                            <input id="NewGroupMemberName" type="text"> <!--This Name and email must be the same as an existing user-->
                         </form>
                     </td>
                     <td>
@@ -396,7 +426,7 @@
         </div>
         <div id="Create_Account_Page">
             <div id="CreateForm">
-                <form>
+                <form> <!--We use sockets here fyi-->
                     <input id="NewUserFirstName" type="text" placeholder="First name" class='Name'> 
                     <input id="NewUserLastName" type="text" placeholder="Last name" class='Name'>
                     <input id="NewUserEmail" type="text" placeholder="STAB email">

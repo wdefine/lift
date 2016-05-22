@@ -4,6 +4,7 @@
 ///populate dropdowns from server
 //var socket = io.connect();
 window.addEventListener('load', function(){
+	$('#Create_Full_Workout_Page').hide();
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
 	$("#View_Progress_Page").hide();
@@ -18,6 +19,7 @@ window.addEventListener('load', function(){
 	//////////////////////////////////
 	//will clean up later
 	$("#Create_Workout_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
@@ -25,6 +27,7 @@ window.addEventListener('load', function(){
 		$("#Create_Workout_Page").show();
 	});
 	$("#Create_Group_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").show();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
@@ -32,6 +35,7 @@ window.addEventListener('load', function(){
 		$("#Create_Workout_Page").hide();
 	});
 		$("#View_Progress_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").show();
@@ -39,6 +43,7 @@ window.addEventListener('load', function(){
 		$("#Create_Workout_Page").hide();
 	});
 	$("#Assign_Workout_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
@@ -46,8 +51,17 @@ window.addEventListener('load', function(){
 		$("#Create_Workout_Page").hide();
 	});
 	$("#Create_User_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").show();
+		$("#View_Progress_Page").hide();
+		$("#Assign_Workout_Page").hide();
+		$("#Create_Workout_Page").hide();
+	});
+	$("#Create_Full_Workout_Button").click(function(){
+		$('#Create_Full_Workout_Page').show();
+		$("#Create_Group_Page").hide();
+		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
