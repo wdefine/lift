@@ -214,7 +214,7 @@ app.get('/create',function(request,response){
                     get_all_full(groups,function(groups,workouts){
                         get_all_exercises(groups,workouts,function(groups,workouts,exercises){
                             get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html',[groups:groups, workouts:workouts, exercises:exercises, users:users]);
+                                response.render('create_Workout.html',[groups:groups, workouts:workouts, exercises:exercises, users:users]);
                             });
                         });
                     });
