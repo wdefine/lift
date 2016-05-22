@@ -5,171 +5,43 @@
         <!--Jquery Ui-->
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-
-        <!--Hammer.js-->
-        <script src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
         <!--Jquery Mobile-->
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
         <!--Andys JS-->
-        <script type="text/javascript" src="/Users/AndyWood/Desktop/Coding_Projects/Unfinished/WeightRoomManagment/Public/view_Workout.js">
+        <script type="text/javascript" src="../Public/view_Workout.js">
         </script>
         <!--Andys CSS-->
         <link rel="stylesheet" media="all and (orientation:portrait)" href="../Public/view_Workout.css">
     </head>
+    <div id="UserIfo" display="none">
+        <div id="Workoutname" display="none">{{workout}}</div>
+        <div id="UserEmail" display="none">{{email}}</div>
+    </div>
 	<body id="body" email="email">
+
         <h1>L I F T</h1>
         <!--<div id = "Hamburger_icon"></div>-->
         <ul id= "nav_bar">
-            <li>Profile</li>
-            <li>Workout</li>
-            <li>Progress</li>
+            <li id="NavProfile">Profile</li>
+            <li id="NavWorkout">Workout</li>
+            <li id="NavProgress">Progress</li>
         </ul> 
-        <ul id= "Workout_bar">
-            {{#allworkouts}}
-                <li id="{{workout}}" >{{date}}</li>
-            {{/allworkouts}}
-        </ul>
-        <div id="Workouts">
-            <div data-role="collapsible" name="{{workout))" done="false">
-                <h3>3</h3>
-                    <div role="main" class="ui-content">
-                        <div data-role="tabs">
-                            <ul>
-                                    <li><a href="#Excersie_3_Set_1" class="ui-btn-active">Round 1</a></li>
-                                    <li><a href="#Excersie_3_Set_2">Round 2</a></li>
-                                    <li><a href="#Excersie_3_Set_3">Round 3</a></li>
-                            </ul>
-                            <table id="Excersie_3_Set_1">
-                                <tr>
-                                    <th>Exercise Number
-                                    <th>Exercise Name
-                                    <th>Sets
-                                    <th>Reps
-                                    <th>Weight(Kg)
-                                    <th>Weight(Lbs)
-
-                                </tr>
-                                <tr>
-                                    <td>1a
-                                    <td>Bench
-                                    <td>3
-                                    <td>8
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>1b
-                                    <td>Squat
-                                    <td>1
-                                    <td>6
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr></table>
-                    <table id="Excersie_3_Set_2" >
-                                <tr>
-                                    <th>Exercise Number
-                                    <th>Exercise Name
-                                    <th>Sets
-                                    <th>Reps
-                                    <th>Weight(Kg)
-                                    <th>Weight(Lbs)
-
-                                </tr>
-                                <tr>
-                                    <td>1a
-                                    <td>Front Squat
-                                    <td>3
-                                    <td>8
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>1b
-                                    <td>Push Up
-                                    <td>2
-                                    <td>6
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr></table>
-                    <table id="Excersie_3_Set_3" >
-                                <tr>
-                                    <th>Exercise Number
-                                    <th>Exercise Name
-                                    <th>Sets
-                                    <th>Reps
-                                    <th>Weight(Kg)
-                                    <th>Weight(Lbs)
-
-                                </tr>
-                                <tr>
-                                    <td>1a
-                                    <td>Pull Ups
-                                    <td>3
-                                    <td>8
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>1b
-                                    <td>run
-                                    <td>4
-                                    <td>6
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form>
-                                            <input class="input" type="text" value="0">
-                                        </form>
-                                    </td>
-                                </tr></table>
-                            
-                        </div>
-                 </div>         
-            </div>
-            <button id="submitWorkout">Sumbit Workout</button>
-        <div/>
+        <div id="ProfilePage">
+            Profile
+        </div>
+        <div id="ProgressPage">
+            Scotts Stuff
+        </div>
+        <div id="WorkoutPage">
+            <ul id= "Workout_bar">
+                {{#allworkouts}}
+                    <li id="{{workout}}" >{{date}}</li>
+                {{/allworkouts}}
+            </ul>
+            <div id="Workouts">
+                <div id="date"></div>
+                <button id="submitWorkout">Sumbit Workout</button>
+            <div/>
+        </div> 
     </body>

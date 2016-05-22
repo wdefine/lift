@@ -14,6 +14,10 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
 	$("#Create_Workout_Page").show();
+
+	$("#WorkoutDatePicker").datepicker({
+		autoSize:true
+	});
 	///////////////////////////////////
 	/////Page Navigation//////////////
 	//////////////////////////////////
@@ -89,12 +93,13 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	/*
 	console.log($("#WorkoutName").val());
 	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
-	$("#SubmitWorkoutButton").on("click", function(){
+	$(document).on("click", "#SubmitWorkoutButton",function(){
 		if ($("#WorkoutName").val() == "" || $("#CycleNum").val() == ""){
 			//pop error message
 		}
 		else{
-			createFullWorkout()
+			console.log("poop");
+			createWorkout()
 		}
 	});
 	*/
@@ -386,10 +391,21 @@ function createUser(){
 
 //Here is where the process of actually building the workout starts. This is the tricky part.
 //
+//done
+function createFullWorkout(){
+	//this is where you create the fullworkout which is basically just the name, number of cycles(weeks),
+	//and number of days in a cycle(days a week working out). You don'y even need dates for the workouts!
+	var name = $("#WorkoutName").val();//get name from text field
+	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
+	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
+	//socket.emit("createFullWorkout",name,cyclenum,cyclelen);
+}
 
 function createWorkout(){
+<<<<<<< HEAD
 	var full = $("#full_workout").val();
 	var val = $("#week/day").val();
+	/*
 	var week = val.substring(0,val.indexOf("/"));
 	var day = val.substring(val.indexOf("/")+1);
 	var de = $("#workout_date").val().split("-");
@@ -397,6 +413,8 @@ function createWorkout(){
 	var month = de[1];
 	var year = de[0];
 	var date = new Date(year,month,day,0,0,0,0);
+	*/
+	var date = $("#WorkoutDatePicker").datepicker('getDate');
 	var d = date.UTC();
 	var tblarr = [];
 	var array = [];

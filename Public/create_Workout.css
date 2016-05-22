@@ -108,7 +108,11 @@ h1{
     border-right: solid #fff 1px;
 }
 
-
+#WorkoutDatePicker{
+    text-align: middle;
+    padding-left: auto;
+    padding-right:auto;
+}
 /*//////////////////////////////////
 ///////New Workout Excercise////////
 //////////////////////////////////*/

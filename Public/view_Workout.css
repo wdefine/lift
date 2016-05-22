@@ -104,11 +104,11 @@ h1{
 	margin-right:5%;
 }
 table{
-	/*position: absolute;
-	left:10%;
-	right:10%;
-	max-width:79%;
-	top:25%;*/
+	position: relative;
+	left:5%;
+	right:5%;
+	max-width:90%;
+	top:25%;
 	border:solid #7b3040 5px;
 }
 tr, td, th{
@@ -119,11 +119,6 @@ tr, td, th{
 	padding: 1%;
 
 
-}
-.input{
-	height:45px;
-	width:100%;
-	font-size: 28px;
 }
 th{
 	color:#ffffff;
@@ -148,9 +143,10 @@ tr:nth-child(odd) input{
     
 }
 input{
-	border: 0px solid;
 	font-size: 28px;
-	width:100%;
+	width:80%;
+	margin:0;
+	padding:0;
 	height:100%;
 }
 

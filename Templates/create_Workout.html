@@ -2,6 +2,8 @@
     <head>
                 <!-- <script src="/socket.io/socket.io.js"></script> -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="../Public/create_Workout.js">
         </script>
         <link rel="stylesheet" href="../Public/create_Workout.css">
@@ -66,7 +68,7 @@
                             <option week="" day="">Week x, Day y</option>
                         </select>
                     </td>
-                    <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
+                    <td><div id = "WorkoutDatePicker"></div></td>
             </table>
             <!--<h3>Workout Info:</h2>-->
             <h1> Create Workout</h1>
