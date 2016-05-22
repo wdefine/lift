@@ -200,33 +200,8 @@ app.get('/', function(request, response){//
         }
     });
 });
-<<<<<<< HEAD
-app.get('/create',function(request,response){
-    get_email(request.user,function(email,domain){
-        if(email == null){
-            response.render('request-account.html');
-        }
-        else{
-            if(domain == "stab.org"){
-                get_all_groups(function(groups){
-                    get_all_full(groups,function(groups,workouts){
-                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
-                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html',{groups:groups, workouts:workouts, exercises:exercises, users:users});
-                            });
-                        });
-                    });
-                });
-            }
-            else{
-                response.redirect('/');
-            }
-        }
-    });
-=======
 app.get('/login',function(request,reponse){
     reponse.render('login.html');
->>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 });
 app.get('/create',function(request,response){
     get_email(request.user,function(email,domain){
