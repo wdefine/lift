@@ -13,4 +13,4 @@ conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["Back_Squat"]);
 conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["Hang_Clean"]);
 conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["Deadlift"]);
 conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["RDL"]);
-conn.query('CREATE  TABLE "main"."workouts" ("full_workout" TEXT, "ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "cyclenum" INTEGER, "cyclelen" INTEGER)');
+conn.query('CREATE  TABLE "main"."workouts" ("full_workout" TEXT UNIQUE, "ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "cyclenum" INTEGER, "cyclelen" INTEGER)');

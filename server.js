@@ -193,7 +193,7 @@ app.get('/', function(request, response){//
             get_next_wo(email,function(email,workout){
                 table_to_array_2(workout,email,email,null,function(array,workout,email,n){
                     get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                        response.render('view_Workout.html',[email:email,workout:workout,array:array,allworkouts:allworkouts]/*mustahce in workout and allworkouts*/);
+                        response.render('view_Workout.html',[email:email,workout:workout,allworkouts:allworkouts]/*mustahce in workout and allworkouts*/);
                     });
                 });
             });
@@ -211,7 +211,7 @@ app.get('/create',function(request,response){
                     get_all_full(groups,function(groups,workouts){
                         get_all_exercises(groups,workouts,function(groups,workouts,exercises){
                             get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create-workout.html'/*mustache in above data*/);
+                                response.render('create-workout.html',[groups:groups, workouts:workouts, exercises:exercises, users:users]);
                             });
                         });
                     });
@@ -309,7 +309,7 @@ function new_user(name,email,callback){
 }
 function get_all_users(groups,workouts,exercises,callback){
     var users = [];
-    conn.query('SELECT name FROM users')
+    conn.query('SELECT name,email FROM users')
     .on('data',function(row){
         var user = {name:row.name, email:row.email}
         users.push(user);
@@ -399,7 +399,7 @@ function new_exercise(name,url,callback){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////GROUPS///////////////////////////////////////////////
 function new_group(array, name,callback){
-    conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT)',[name])
+    conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT UNIQUE)',[name])
     .on('error',function(){
         return;
     })
@@ -417,15 +417,26 @@ function new_group(array, name,callback){
     });
 }
 function assign_full_workout(group,full){
-    conn.query('INSERT INTO ($1) (group) VALUES ($2)',[full.toString() +"-groups",group]);
-    conn.query('INSERT INTO ($1) (full) VALUES ($2)',[group.toString()+"-assigned",full]);
-    var date = new Date();
-    var d = date.UTC()-172800000;
-    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[full,true,d])
-    .on('data',function(row){
-        table_to_array_2(row.workout,"email",full,row.date,function(array,workout,a,b){
-            populate_table_init(array,workout,a,b);
-        });
+    get_assigned_gro_1(full,[group,full],function(assigned,list){
+        var x =0;
+        for(var i=0,i<assigned.length;i++){
+            if(assigned[i] == list[0]){
+                var x=1;
+                break;
+            }
+        }
+        if(x=0){
+            conn.query('INSERT INTO ($1) (group) VALUES ($2)',[list[1].toString() +"-groups",list[0]]);
+            conn.query('INSERT INTO ($1) (full) VALUES ($2)',[list[0].toString()+"-assigned",list[1]]);
+            var date = new Date();
+            var d = date.UTC()-172800000;
+            conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[list[1],true,d])
+            .on('data',function(row){
+                table_to_array_2(row.workout,"email",list[1],row.date,function(array,workout,a,b){
+                    populate_table_init(array,workout,a,b);
+                });
+            });
+        }
     });
 }
 function unassign_workout(group,full){
@@ -530,6 +541,7 @@ function get_assigned_wo(group,callback){
 function create_fullworkout(cyclenum,cyclelen,name){
     conn.query('INSERT INTO workouts (cyclenum,cyclelen,name) VALUES ($1,$2)',[cyclenum,cyclelen,name])
     .on('end',function(){
+        socket.emit("newFullWorkout", name);
         var full;
         conn.query('SELECT ident FROM workouts WHERE "cyclenum"=($1),"cyclelen"=($2),"name"=($3)',[cyclenum,cyclelen,name])
         .on('data',function(row){
@@ -539,6 +551,9 @@ function create_fullworkout(cyclenum,cyclelen,name){
             conn.query('CREATE TABLE ($1) ("group" TEXT)',[full.toString() + "-groups"]);
             create_blank_full_workout(full,cyclenum,cyclelen)
         });
+    })
+    .on('error',function(){
+        console.log("youse a dummy");
     });
 }
 function create_blank_full_workout(full,cyclenum,cyclelen){
@@ -686,7 +701,7 @@ function populate_table_full(array,table,setnum,email){
                 var rs= rds+"-reps";
                 var ws= rds+"-weight";
                 var r= rounds[k].reps;
-                var weightval = 0
+                var weightval = 0;
                 if(email != "email"){
                     weightval= rounder(get_weight(r,(get_old_max(email,name))),5);
                 }
@@ -708,30 +723,26 @@ function table_to_array(workout,email,callback){
             var exlenstr=i.toString()+"-length"; 
             var exlen = values[keys.indexOf(exlenstr)];
             var newset = new Object();
-            newset[i] == false;
+            newset.completed == true;
             newset.exercises == {};
             for(var j=1;j<=exlen;j++){
                 var exstr = set.toString()+"-"+j.toString();
                 var rdlenstr = exstr+"-length";
                 var rdlen = values[keys.indexOf(rdlenstr)];
                 var newex = new Object();
-                newex[j] = true;
+                newex.completed = true;
                 var s = exstr+"#";
                 var len = s.length;
-                conn.query('SELECT * FROM ($1) WHERE "email"=($2)',[workout,email])
-                .on("data",function(row){
-                    var cols = Object.keys(row);
-                    for(var k=0;k<cols.length;k++){
-                        if(cols[k].slice(0,len) == s){
-                            newex.name = cols[k].slice(len).split('_').join(' ');
-                            break;
-                        }
+                for(var k=0;k<keys.length;k++){
+                    if(keys[k].slice(0,len) == s){
+                        newex.name = keys[k].slice(len).split('_').join(' ');
+                        break;
                     }
-                });
+                }
                 newex.rounds = {};
                 for(var l=1;l<=rdlen;l++){
                     var round = new Object();
-                    round[l] = true;
+                    round.completed = true;
                     var rdstr = exstr+"-"+l.toString();
                     var ws = exstr + "-weight";
                     var rs = exstr + "-reps";
@@ -761,30 +772,26 @@ function table_to_array_2(workout,email,a,b,callback){
             var exlenstr=i.toString()+"-length"; 
             var exlen = values[keys.indexOf(exlenstr)];
             var newset = new Object();
-            newset[i] == false;
+            newset.completed == true;
             newset.exercises == {};
             for(var j=1;j<=exlen;j++){
                 var exstr = set.toString()+"-"+j.toString();
                 var rdlenstr = exstr+"-length";
                 var rdlen = values[keys.indexOf(rdlenstr)];
                 var newex = new Object();
-                newex[j] = true;
+                newex.completed = true;
                 var s = exstr+"#";
-                var len = s.length;
-                conn.query('SELECT * FROM ($1) WHERE "email"=($2)',[workout,email])
-                .on("data",function(row){
-                    var cols = Object.keys(row);
-                    for(var k=0;k<cols.length;k++){
-                        if(cols[k].slice(0,len) == s){
-                            newex.name = cols[k].slice(len).split('_').join(' ');
-                            break;
-                        }
+                var len = s.length;               
+                for(var k=0;k<keys.length;k++){
+                    if(keys[k].slice(0,len) == s){
+                        newex.name = keys[k].slice(len).split('_').join(' ');
+                        break;
                     }
-                });
+                }
                 newex.rounds = {};
                 for(var l=1;l<=rdlen;l++){
                     var round = new Object();
-                    round[l] = true;
+                    round.completed = true;
                     var rdstr = exstr+"-"+l.toString();
                     var ws = exstr + "-weight";
                     var rs = exstr + "-reps";
@@ -854,6 +861,7 @@ function unsubmmit_ex(email,workout,str){
                 if(bool){
                     other_latest(email,workout,name,function(email,name,max){
                         update_col("users",name,max,"email",email);
+                        update_all_workouts(email,name);
                     });
                 }
             });
@@ -870,9 +878,43 @@ function submmit_ex(email,workout,str){
                     latest(email,workout,str,val,function(email,workout,name,max,bool){
                         if(bool){
                             update_col("users",name,max,"email",email);
+                            update_all_workouts(email,name);
                         }
                     });
                 });
+            }
+        });
+    });
+}
+function update_all_workouts(email,name){
+    conn.query("SELECT workout FROM ($1) WHERE 'completed'=false,'skipped'=false",[email])
+    .on('data',function(row){
+        var wo = row.workout;
+        conn.query("SELECT * FROM ($1) WHERE 'email'=($2)",[wo,email])
+        .on('data',function(row){
+            var keys = Object.keys(row);
+            var values = Object.values(row);
+            var namelen = name.length;
+            for(var k=0;k<keys.length;k++){
+                if(keys[k].slice(-namelen) == name){
+                    var col = keys[k];
+                    var str1 = col.slice(0,col.length-namelen-1);
+                     var strlen = str1 + "-1-reps";
+                    get_wo_val(wo,strlen,email,[str1,name],function(workout,column,email,list,val){
+                        var weightval = 0;
+                        if(email != "email"){
+                            weightval= rounder(get_weight(val,(get_old_max(email,list[1]))),5);
+                        }
+                        get_wo_val(workout,list[0]+'-length',email,[weightval,list[0]],function(workout,column,email,list,val){
+                            for(var i=0;i<val;i++){
+                                var x = i+1;
+                                var y = x.toString();
+                                conn.query('UPDATE ($1) SET ($2)=($3) WHERE "email"=($4)',[workout,list[1]+"-"+y+"-weight",list[0], email]);
+                            }
+                        });
+                    });
+                    break;
+                }
             }
         });
     });
@@ -1026,7 +1068,7 @@ function get_all_full(groups,callback){
 }
 function wo_in_full(full,callback){
     list = [];
-    conn.query('SELECT cycle,day,workout,day,skip FROM ($1)',[full])
+    conn.query('SELECT cycle,day,workout,skip FROM ($1)',[full])
     .on('data',function(row){
         list.push(row);
     })
