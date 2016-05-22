@@ -143,7 +143,7 @@ th {
     color: white;
 }
 
-#Workout_Post_Info{
+table{
     margin-top: 125px;
     font-family: sans-serif;
     width:90%;
@@ -188,14 +188,15 @@ footer{
     margin-top: 126px;
     background-color:#7b3040;
     border-radius: 3px;
+    padding:3%;
 
-}
-#CreateForm form{
-    padding:5%;
 }
 #CreateForm input{
     margin: 1px;
     font-size: 15px;
+}
+#CreateNewUserButton{
+    width: 99%;
 }
 #NewUserEmail{
     width:97%;
@@ -203,5 +204,11 @@ footer{
 .Name{
     width:47%;
 }
-
+#SubmitWorkoutButton{
+    margin-top: 10px;
+    width:90%;
+    height:25px;
+    margin-right: 5%;
+    margin-left: 5%;
+}
 }
