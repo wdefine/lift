@@ -193,7 +193,7 @@ app.get('/', function(request, response){//
             get_next_wo(email,function(email,workout){
                 table_to_array_2(workout,email,email,null,function(array,workout,email,n){
                     get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                        response.render('view_Workout.html',[email:email,workout:workout,allworkouts:allworkouts]/*mustahce in workout and allworkouts*/);
+                        response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/);
                     });
                 });
             });
@@ -214,7 +214,7 @@ app.get('/create',function(request,response){
                     get_all_full(groups,function(groups,workouts){
                         get_all_exercises(groups,workouts,function(groups,workouts,exercises){
                             get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create_Workout.html',[groups:groups, workouts:workouts, exercises:exercises, users:users]);
+                                response.render('create_Workout.html',{groups:groups, workouts:workouts, exercises:exercises, users:users});
                             });
                         });
                     });
@@ -235,7 +235,7 @@ app.get('/progress', function(request, response){
             get_user_data(email,function(data){
                 get_all_exercises(data,null,function(groups,workouts,exercises){
                     var data = groups;
-                    response.render('user-progress.html'/*mustache in above data-data&exercises*/);
+                    response.render('user-progress.html',{data:data,exercises:exercises});
                 });
             });
         }
