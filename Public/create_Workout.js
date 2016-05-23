@@ -171,10 +171,7 @@ function Sub_Bar_Off(){
 	$("#Create_sub_nav_bar").hide();
 }*/
 //done
-<<<<<<< HEAD
 });
-=======
->>>>>>> 86a7188938158ebb29b2536f8d926a913d0b01b5
 function getFull(){
 	var full = $("#full_workout").val();
 	if(full == ""){

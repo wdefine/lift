@@ -16,7 +16,7 @@ var server = http.createServer(app);
 
 var io = require('socket.io').listen(server);
 var anyDB = require('any-db');
-var conn = anyDB.createConnection('sqlite3://weightroom.db.sqlite');
+var conn = anyDB.createConnection('sqlite3://lift.db.sqlite');
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
