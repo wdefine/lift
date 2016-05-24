@@ -6,9 +6,6 @@
 7b) check over everything
 */
 
-
-var Q = require('q');//new code
-
 var http = require('http'); 
 var express = require('express');
 var app = express();
@@ -47,12 +44,26 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
             clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
             clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
-            callbackURL: "http://localhost:8080/auth/google/callback"//problem line
+            callbackURL: "http://localhost:8080/auth/google/callback"
         },
         function(token, refreshToken, profile, done) {
-            conn.query('INSERT INTO backfill (email,digits) VALUES ($1,$2)',[profile._json.emails[0].value,profile._json.id]);
+            var x = 0;
             if (profile._json.domain == 'stab.org' || profile._json.domain == 'students.stab.org') { 
-                done(null, profile);
+                conn.query('SELECT * FROM backfill')
+                .on('data',function(row){
+                    if(row.email == profile._json.emails[0].value && row.digits == profile._json.id){
+                        console.log("old email");
+                        x=1;
+                    }
+                })
+                .on('end',function(){
+                    if(x==0){
+                        console.log("new email");
+                        conn.query('INSERT INTO backfill (email,digits) VALUES ($1,$2)',[profile._json.emails[0].value,profile._json.id]);
+                    }
+                    done(null, profile);
+
+                });
             }
             else{
                 done(null, null);
@@ -65,14 +76,14 @@ app.get('/auth/google', passport.authenticate('google',{scope: 'https://www.goog
 app.get('/auth/google/callback', function (req, res) {
     console.log("Trying to authenticate");
     passport.authenticate('google', {
-        successRedirect: '/submit', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
+        successRedirect: '/', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
         failureRedirect: '/auth/google'
     })(req, res);
 });
 
 app.get('/logout', function (req, res) {
     req.logOut();
-    res.redirect('/');
+    res.redirect('/login');
 });
 
 io.on('connection', function(socket) {
@@ -167,80 +178,63 @@ function get_email(req,callback){
     conn.query('SELECT email FROM backfill WHERE "digits"=($1)',[req])
     .on('data',function(row){
         email= row.email;
-        domain = email.slice(email.indexOf('@'));
         callback(email,domain);
     })
-    .on('end',function(){
-        if(email == null){
-            callback(null,null);
-        }
+    .on('error',function(){
+        console.log("shit shit shit");
     });
 }
 function ensureAuthenticated(req, res, next) { //next runs the next function in the arguement line "app.get('/datapage', ensureAuthenticated, function(req, res)" would move to function(req, res)
         if (req.user || req.isAuthenticated()) {    // is the user logged in?
             // proceed normally
+            console.log("we are ensured");
             return next();
         } else {                                    // user is not logged in
+            console.log("we are not ensured");
             res.redirect('/auth/google');
         }
 }
-app.get('/', function(request, response){//
-    get_email(request.user,function(email,domain){
-        if(email == null){
-            response.redirect('/login');
-        }
-        else{
-            get_next_wo(email,function(email,workout){
-                table_to_array_2(workout,email,email,null,function(array,workout,email,n){
-                    get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                        response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
-
-                    });
+app.get('/', ensureAuthenticated, function(request, response){
+    get_email(request,function(email,domain){
+        get_next_wo(email,function(email,workout){
+            table_to_array_2(workout,email,email,null,function(array,workout,email,n){
+                get_all_false(email,workout,array,function(email,workout,array,allworkouts){
+                    response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
                 });
             });
-        }
+        });
     });
 });
-app.get('/login',function(request,reponse){
-    reponse.render('login.html');
+app.get('/login', function(request,reponse){
+    reponse.render('Login.html');
 });
-app.get('/create',function(request,response){
-    get_email(request.user,function(email,domain){
-        if(email == null){
-            response.redirect('/login');
-        }
-        else{
-            if(domain == "stab.org"){
-                get_all_groups(function(groups){
-                    get_all_full(groups,function(groups,workouts){
-                        get_all_exercises(groups,workouts,function(groups,workouts,exercises){
-                            get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
-                                response.render('create_Workout.html',{groups:groups, workouts:workouts, exercises:exercises, users:users});
-                            });
+app.get('/create', ensureAuthenticated, function(request,response){
+    get_email(request,function(email,domain){
+        if(domain == "stab.org"){
+            get_all_groups(function(groups){
+                get_all_full(groups,function(groups,workouts){
+                    get_all_exercises(groups,workouts,function(groups,workouts,exercises){
+                        get_all_users(groups,workouts,exercises,function(groups,workouts,exercises,users){
+                            response.render('create_Workout.html',{groups:groups, workouts:workouts, exercises:exercises, users:users});
                         });
                     });
                 });
-            }
-            else{
-                response.redirect('/');
-            }
+            });
+        }
+        else{
+            response.redirect('/');
         }
     });
 });
-app.get('/progress', function(request, response){
-    get_email(request.user,function(email,domain){
-        if(email == null){
-            response.redirect('/login');
-        }
-        else{
-            get_user_data(email,function(data){
-                get_all_exercises(data,null,function(groups,workouts,exercises){
-                    var data = groups;
-                    response.render('user-progress.html',{data:data,exercises:exercises});
-                });
+app.get('/progress', ensureAuthenticated, function(request, response){
+    get_email(request,function(email,domain){
+        get_user_data(email,function(data){
+            get_all_exercises(data,null,function(groups,workouts,exercises){
+                var data = groups;
+                response.render('user-progress.html',{data:data,exercises:exercises});
             });
-        }
-    });   
+        });
+    });
 });
 
 server.listen(8080);
