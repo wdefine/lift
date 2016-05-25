@@ -87,6 +87,12 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	socket.on("groupWorkouts",function(list){
 		addWorkouts(list);
 	});
+	socket.on("newUser",function(user){
+		addUser(user);
+	});
+	socket.on("newGroup",function(group){
+		addGroup(group);
+	})
 	///////////////////////////////////
 	/////////Send 
 
@@ -491,6 +497,19 @@ function createFull(){
 	var days = parseInt($("#cyclelen").val());
 	socket.emit('createFullWorkout',name,weeks,days)
 }
-
+function addUser(user){
+	if(user.email != null){
+		$("#newgroupusername").append("<option value=\""+user.name+"/"+user.email+"\">"+user.name+"</option>");
+		$("#newgroupuseremail").append("<option value=\""+user.name+"/"+user.email+"\">"+user.email+"</option>");
+		$("#oldgroupusername").append("<option value=\""+user.name+"/"+user.email+"\">"+user.name+"</option>");
+		$("#oldgroupuseremail").append("<option value=\""+user.name+"/"+user.email+"\">"+user.email+"</option>");
+	}
+}
+function addGroup(group){
+	if(group != null){
+		$("#AddGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
+		$("#UnAssignGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
+	}
+}
 
 

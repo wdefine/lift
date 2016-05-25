@@ -175,6 +175,7 @@ io.on('connection', function(socket) {
 function get_email(req,callback){
     var email = null;
     var domain;
+    console.log("we're at get_email");
     conn.query('SELECT email FROM backfill WHERE "digits"=($1)',[req])
     .on('data',function(row){
         email= row.email;
@@ -195,12 +196,12 @@ function ensureAuthenticated(req, res, next) { //next runs the next function in 
         }
 }
 app.get('/', ensureAuthenticated, function(request, response){
-    get_email(request,function(email,domain){
+    get_email(request.user,function(email,domain){
         get_next_wo(email,function(email,workout){
-            table_to_array_2(workout,email,email,null,function(array,workout,email,n){
-                get_all_false(email,workout,array,function(email,workout,array,allworkouts){
-                    response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
-                });
+            get_all_false(email,workout,null,function(email,workout,array,allworkouts){
+                var date = new Date();
+                console.log(date+"\nother workouts found");
+                response.render('view_Workout.html',{email:email,workout:workout,allworkouts:allworkouts});/*mustahce in workout and allworkouts*/
             });
         });
     });
@@ -209,7 +210,7 @@ app.get('/login', function(request,reponse){
     reponse.render('Login.html');
 });
 app.get('/create', ensureAuthenticated, function(request,response){
-    get_email(request,function(email,domain){
+    get_email(request.user,function(email,domain){
         if(domain == "stab.org"){
             get_all_groups(function(groups){
                 get_all_full(groups,function(groups,workouts){
@@ -227,7 +228,7 @@ app.get('/create', ensureAuthenticated, function(request,response){
     });
 });
 app.get('/progress', ensureAuthenticated, function(request, response){
-    get_email(request,function(email,domain){
+    get_email(request.user,function(email,domain){
         get_user_data(email,function(data){
             get_all_exercises(data,null,function(groups,workouts,exercises){
                 var data = groups;
@@ -250,9 +251,11 @@ function new_user(name,email,callback){
         return null;
     })
     .on('end',function(){
+        var x =0;
         conn.query('CREATE  TABLE IF NOT EXISTS ($1) ("workout" TEXT ,"completed" BOOL, "skipped" BOOL, "date" INTEGER)', [email])
         .on('error',function(){
-            return null;
+            x=1;
+            console.log('user not created');
         })
         .on('end',function(){
             var exercises = [];
@@ -264,7 +267,12 @@ function new_user(name,email,callback){
                 for(var i = 0;i<exercises.length;i++){
                     conn.query('ALTER TABLE ($1) ADD '+exercises[0]+' FLOAT',[email]);
                 }
-                callback({name:name, email:email});
+                if(x=0){
+                    callback({name:name, email:email});
+                }
+                else{
+                    callback({name:null,email:null});
+                }
             });
         });
     });
@@ -280,20 +288,23 @@ function get_all_users(groups,workouts,exercises,callback){
         callback(groups,workouts,exercises,users);
     });
 }
-function get_next_wo(email,workout,array,callback){
+function get_next_wo(email,callback){
     var date = new Date();
-    var d= date.UTC();
+    var d= Date.UTC(date);
     var newest = d;
     var workout = null;
-    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2),"skipped"=($3) "date">($4)',[email,false,false,date])
+    conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2),"skipped"=($3)',[email,false,false])
     .on('data',function(row){
         if(row.date < (d-172800000)){ //48 hours after it is assumed that workout has been skipped
             update_col(email,"skipped",true,"workout",row.workout);
         }
-        if(row.date < newest){
+        else if(row.date < newest){
             row.date = newest;
             workout = row.workout;
         }
+    })
+    .on('error',function(){
+        console.log("get_next_wo has an error")
     })
     .on('end',function(){
         if(workout == null){
@@ -314,11 +325,14 @@ function get_all_false(email,workout,array,callback){
         var full = workout.slice(0,workout.indexOf("-"));
         conn.query('SELECT cycle,day FROM ($1) WHERE "workout"=($2)',[full,row.workout])
         .on('data',function(row){
-            obj.string = getRealDate(obj.date)+ " Cycle:"+row.cycle.toString()+", Day:"+row.day.toString();
+            obj.string = getRealDate(obj.date)+ " Week:"+row.cycle.toString()+", Day:"+row.day.toString();
         })
         .on('end',function(){
             list.push(obj);
         });
+    })
+    .on('end',function(){
+        console.log("get_all_false is empty");
     })
     .on('end',function(){
         callback(email,workout,array,list);
@@ -361,21 +375,27 @@ function new_exercise(name,url,callback){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////GROUPS///////////////////////////////////////////////
 function new_group(array, name,callback){
+    var x=0;
     conn.query('CREATE TABLE IF NOT EXISTS ($1) ("name" TEXT, "email" TEXT UNIQUE)',[name])
     .on('error',function(){
-        return;
+        x=1;
     })
     .on('end',function(){
-        conn.query('INSERT INTO groups (group) VALUES ($1)', [name])
-        .on('end',function(){
-            for(var i =0;i<array.length;i++){
-                conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email]);
-            }
-            conn.query('CREATE TABLE ($1) ("full" TEXT)',[name+"-assigned"])
+        if(x=0){
+            conn.query('INSERT INTO groups (group) VALUES ($1)', [name])
             .on('end',function(){
-                callback(name);
+                for(var i =0;i<array.length;i++){
+                    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email]);
+                }
+                conn.query('CREATE TABLE ($1) ("full" TEXT)',[name+"-assigned"])
+                .on('end',function(){
+                    callback(name);
+                });
             });
-        });
+        }
+        else{
+            callback(null);
+        }
     });
 }
 function assign_full_workout(group,full){
@@ -391,7 +411,7 @@ function assign_full_workout(group,full){
             conn.query('INSERT INTO ($1) (group) VALUES ($2)',[list[1].toString() +"-groups",list[0]]);
             conn.query('INSERT INTO ($1) (full) VALUES ($2)',[list[0].toString()+"-assigned",list[1]]);
             var date = new Date();
-            var d = date.UTC()-172800000;
+            var d = Date.UTC(date)-172800000;
             conn.query('SELECT workout,date FROM ($1) WHERE "completed"=($2), "date">($3)',[list[1],true,d])
             .on('data',function(row){
                 table_to_array_2(row.workout,"email",list[1],row.date,function(array,workout,a,b){
@@ -423,7 +443,7 @@ function unassign_workout(group,full){
 ;
 function push_group(user,group){
     var date = new Date();
-    var d = date.UTC()-172800000;
+    var d = Date.UTC(date)-172800000;
     conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[group,user.name,user.email]);
     conn.query('SELECT full FROM ($1)',[group.toString()+"-assigned"])
     .on('data',function(row){
@@ -769,7 +789,7 @@ function table_to_array_2(workout,email,a,b,callback){
         }
     })
     .on('error',function(){
-        callback(array,workout,a,b);
+        console.log("table_to_array_2 has failed us all");
     })
     .on('end',function(){
         callback(array,workout,a,b);
