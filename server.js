@@ -59,7 +59,14 @@ passport.use(new GoogleStrategy({
                 .on('end',function(){
                     if(x==0){
                         console.log("new email");
-                        conn.query('INSERT INTO backfill (email,digits) VALUES ($1,$2)',[profile._json.emails[0].value,profile._json.id]);
+                        var status = "athlete";
+                        conn.query('SELECT status FROM users WHERE "email"=($1)',[profile._json.emails[0].value])
+                        .on('data',function(row){
+                            status = row.value;
+                        })
+                        .on('end',function(){
+                            conn.query('INSERT INTO backfill (email,digits,status) VALUES ($1,$2,$3)',[profile._json.emails[0].value,profile._json.id,status]);
+                        });
                     }
                     done(null, profile);
 
@@ -156,8 +163,8 @@ io.on('connection', function(socket) {
     socket.on('getBlankWorkout',function(workout){ //admin
         table_to_array(workout,"email",function(array){socket.emit('blankWorkout',array);});
     });
-    socket.on('createUser',function(name,email){ //admin
-        new_user(name,email,function(obj){
+    socket.on('createUser',function(name,email,status){ //admin
+        new_user(name,email,status,function(obj){
             socket.emit('newUser',obj);
         });
     });
@@ -176,10 +183,11 @@ function get_email(req,callback){
     var email = null;
     var domain;
     console.log("we're at get_email");
-    conn.query('SELECT email FROM backfill WHERE "digits"=($1)',[req])
+    conn.query('SELECT email,status FROM backfill WHERE "digits"=($1)',[req])
     .on('data',function(row){
         email= row.email;
-        if(email == "wdefine@students.stab.org" || email == "awood@students.stab.org" || email == "swilliams@students.stab.org" || email == "modonnell@stab.org"){
+        domain=row.status;
+        if(email == "wdefine@students.stab.org" || email == "awood@students.stab.org" || email == "swilliams@students.stab.org" || status == "modonnell@stab.org"){
             domain = "admin";
         }
         callback(email,domain);
@@ -248,8 +256,8 @@ function getRealDate(number){
     return date; 
 }
 ////////////////////////////////////////////////////////////USERS////////////////////////////////////////////////
-function new_user(name,email,callback){
-    conn.query('INSERT INTO users (name,email) VALUES ($1,$2)',[name,email])
+function new_user(name,email,status,callback){
+    conn.query('INSERT INTO users (name,email,status) VALUES ($1,$2,$3)',[name,email,status])
     .on('error',function(){
         return null;
     })

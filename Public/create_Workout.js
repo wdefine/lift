@@ -389,8 +389,9 @@ function addGroup(list){
 function createUser(){
 	var name = $("#NewUserFirstName").val() + " " + $("#NewUserLastName").val();
 	var email = $("#NewUserEmail").val();
+	var status = $("#statusDrop").val();
 	console.log(name + " "+ email);
-	socket.emit("createUser",name,email);
+	socket.emit("createUser",name,email,status);
 	$("#NewUserFirstName").val("");
 	$("#NewUserLastName").val("");
 	$("#NewUserEmail").val("");
