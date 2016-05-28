@@ -2,7 +2,7 @@ var anyDB = require('any-db');
 
 var conn = anyDB.createConnection('sqlite3://lift.db.sqlite');
 
-conn.query('CREATE  TABLE "main"."groups" ("group" TEXT UNIQUE)');
+conn.query('CREATE  TABLE "main"."groupsf" ("groupf" TEXT UNIQUE)');
 conn.query('CREATE  TABLE "main"."exercises" ("exercise" TEXT UNIQUE , "url" TEXT)');
 conn.query('CREATE  TABLE "main"."users" ("name" TEXT, "email" TEXT UNIQUE , "Bench_Press" 	INTEGER, "Military_Press" INTEGER, "Front_Squat" INTEGER, "Back_Squat" INTEGER, "Hang_Clean" INTEGER, "Deadlift" INTEGER, "RDL" INTEGER)');
 conn.query('CREATE  TABLE "main"."backfill" ("email" TEXT UNIQUE , "digits" INTEGER UNIQUE)');
@@ -47,4 +47,4 @@ conn.query('SELECT exercise FROM exercises')
     }
 });
 
-//conn.query('INSERT INTO groups (group) VALUES ($1)',["Rearden_Steel"]);
+conn.query('INSERT INTO groupsf (groupf) VALUES ($1)',["Rearden_Steel"]);

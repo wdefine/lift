@@ -179,6 +179,9 @@ function get_email(req,callback){
     conn.query('SELECT email FROM backfill WHERE "digits"=($1)',[req])
     .on('data',function(row){
         email= row.email;
+        if(email == "wdefine@students.stab.org" || email == "awood@students.stab.org" || email == "swilliams@students.stab.org" || email == "modonnell@stab.org"){
+            domain = "admin";
+        }
         callback(email,domain);
     })
     .on('error',function(){
@@ -211,7 +214,7 @@ app.get('/login', function(request,reponse){
 });
 app.get('/create', ensureAuthenticated, function(request,response){
     get_email(request.user,function(email,domain){
-        if(domain == "stab.org"){
+        if(domain == "admin"){
             get_all_groups(function(groups){
                 get_all_full(groups,function(groups,workouts){
                     get_all_exercises(groups,workouts,function(groups,workouts,exercises){
@@ -382,10 +385,10 @@ function new_group(array, name,callback){
     })
     .on('end',function(){
         if(x=0){
-            conn.query('INSERT INTO groups (group) VALUES ($1)', [name])
+            conn.query('INSERT INTO groupsf (groupf) VALUES ($1)', [name])
             .on('end',function(){
                 for(var i =0;i<array.length;i++){
-                    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email]);
+                    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email];
                 }
                 conn.query('CREATE TABLE ($1) ("full" TEXT)',[name+"-assigned"])
                 .on('end',function(){
@@ -408,7 +411,7 @@ function assign_full_workout(group,full){
             }
         }
         if(x=0){
-            conn.query('INSERT INTO ($1) (group) VALUES ($2)',[list[1].toString() +"-groups",list[0]]);
+            conn.query('INSERT INTO ($1) (groupf) VALUES ($2)',[list[1].toString() +"-groups",list[0]]);
             conn.query('INSERT INTO ($1) (full) VALUES ($2)',[list[0].toString()+"-assigned",list[1]]);
             var date = new Date();
             var d = Date.UTC(date)-172800000;
@@ -424,7 +427,7 @@ function assign_full_workout(group,full){
 function unassign_workout(group,full){
     var str = full.toString() +"-groups";
     var str2 = group.toString()+"-assigned";
-    conn.query('DELETE FROM ($1) WHERE "group"=($2)',[str,group]);
+    conn.query('DELETE FROM ($1) WHERE "groupf"=($2)',[str,group]);
     conn.query('DELETE FROM ($1) WHERE "full"=($2)',[str2,full]);
     var w;
     var e;
@@ -469,9 +472,10 @@ function pop_group(email,group){
 }
 function get_all_groups(callback){
     var list = [];
-    conn.query('SELECT group FROM groups')
+    conn.query('SELECT groupf FROM groupsf')
     .on('data',function(row){
-        list.push(row);
+        var group = row.groupf;
+        list.push(group);
     })
     .on('end',function(){
         callback(list);
@@ -490,9 +494,10 @@ function get_group(group,callback){
 }
 function get_assigned_gro(workout,callback){
     var list = [];
-    conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
+    conn.query('SELECT groupf FROM ($1)',[workout+ "-groups"])
     .on('data',function(row){
-        list.push(row);
+        var group = row.groupf
+        list.push(group);
     })
     .on('end',function(){
         callback(list);
@@ -500,9 +505,10 @@ function get_assigned_gro(workout,callback){
 }
 function get_assigned_gro_1(workout,a,callback){
     var list = [];
-    conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
+    conn.query('SELECT groupf FROM ($1)',[workout+ "-groups"])
     .on('data',function(row){
-        list.push(row);
+        var group = row.groupf
+        list.push(group);
     })
     .on('end',function(){
         callback(list,a);
@@ -530,7 +536,7 @@ function create_fullworkout(cyclenum,cyclelen,name){
             full = row.ident;
         })
         .on('end', function(){
-            conn.query('CREATE TABLE ($1) ("group" TEXT)',[full.toString() + "-groups"]);
+            conn.query('CREATE TABLE ($1) ("groupf" TEXT)',[full.toString() + "-groups"]);
             create_blank_full_workout(full,cyclenum,cyclelen)
         });
     })
@@ -569,9 +575,9 @@ function create_wo_name(array, date,cycle,day,full,callback){
     });
 }
 function populate_table_init(array,table,full,date){
-    conn.query('SELECT group FROM ($1)',[full.toString() + "-groups"])
+    conn.query('SELECT groupf FROM ($1)',[full.toString() + "-groups"])
     .on("data",function(row){
-        conn.query('SELECT name,email FROM ($1)',[row.group])
+        conn.query('SELECT name,email FROM ($1)',[row.groupf])
         .on('data',function(row){
             insert_wo_row(row.name,row.email,array.length,table,array,date);
         });
@@ -581,9 +587,9 @@ function populate_table_init(array,table,full,date){
     });
 }
 function populate_table_init_2(array,table,date,cycle,day,full,callback){
-    conn.query('SELECT group FROM ($1)',[full.toString() + "-groups"])
+    conn.query('SELECT groupf FROM ($1)',[full.toString() + "-groups"])
     .on("data",function(row){
-        conn.query('SELECT name,email FROM ($1)',[row.group])
+        conn.query('SELECT name,email FROM ($1)',[row.groupf])
         .on('data',function(row){
             insert_wo_row(row.name,row.email,array.length,table,array,date);
         });
@@ -934,15 +940,15 @@ function update_workout(str, value, completed, user, workout){
 function change_date(workout,date){
     var full = workout.split("-")[0];
     var groups = [];
-    conn.query('SELECT group FROM ($1)',[workout+ "-groups"])
+    conn.query('SELECT groupf FROM ($1)',[workout+ "-groups"])
     .on('data',function(row){
-        list.push(row);
+        groups.push(row);
     })
     .on('end',function(){
         var users =[];
         for(var i=0;i<groups.length();i++){
             var list = [];
-            conn.query('SELECT name,email FROM ($1)',[group])
+            conn.query('SELECT name,email FROM ($1)',[groups[i]])
             .on('data',function(row){
                 list.push(row);
             })
