@@ -1,5 +1,7 @@
 var socket = io.connect();
-$( document ).ready(function() {	
+var userData = [];
+$( document ).ready(function() {
+	socket.emit('getUserData',$('#UserEmail').val())
 	//testing
 	var c = {reps:8, weight:135};
 	var g = {reps:5, weight:"none"};
@@ -50,6 +52,11 @@ $( document ).ready(function() {
 
 
 	show_only("table","0");//hides all tables except first
+
+	socket.on('userData',function(data){
+		userData = data;
+		//do stuff with data here (for Scott's stuff)
+	})
 });
 window.addEventListener('load', function(){
 	
