@@ -76,7 +76,7 @@ app.get('/auth/google', passport.authenticate('google',{scope: 'https://www.goog
 app.get('/auth/google/callback', function (req, res) {
     console.log("Trying to authenticate");
     passport.authenticate('google', {
-        successRedirect: '/', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
+        successRedirect: '/create_Workout', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
         failureRedirect: '/auth/google'
     })(req, res);
 });
@@ -388,7 +388,7 @@ function new_group(array, name,callback){
             conn.query('INSERT INTO groupsf (groupf) VALUES ($1)', [name])
             .on('end',function(){
                 for(var i =0;i<array.length;i++){
-                    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email];
+                    conn.query('INSERT INTO ($1) (name,email) VALUES ($2,$3)',[name,array[i].name,array[i].email]);
                 }
                 conn.query('CREATE TABLE ($1) ("full" TEXT)',[name+"-assigned"])
                 .on('end',function(){

@@ -4,47 +4,62 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="create_Workout.js">
+        <script type="text/javascript" src="../Public/create_Workout.js">
         </script>
-        <link rel="stylesheet" href="create_Workout.css">
+        <link rel="stylesheet" href="../Public/create_Workout.css">
 
     </head>
 	<body>
-        <h1>L I F T</h1>
-        <!--<div id = "Hamburger_icon"></div>-->
-        <div id= "nav_bar">
-            <div>
-                <a id="Create_Full_Workout_Nav_Button">Create Full Workout</a>
-            </div>
-            <div>
-                <a id="Create_Workout_Nav_Button">Create Workout</a>
-            </div>
-            <div>
-                <a id="Assign_Workout_Nav_Button" >Assign Workout</a>
-            </div>
-            <div>
-                <a id="Create_Group_Nav_Button" > Create Group</a>
-            </div>
-            <div>
-                <a id="Create_User_Nav_Button" > Create User</a>
-            </div>
-            <div>
-                <a id="View_Progress_Nav_Button"> View Progress</a>
-            </div>
+        <div id="Spacer"></div>
+        <div id ="Logo_Background">
+            <div id = "Logo"></div>
         </div>
+        <ul id= "nav_bar">
+            <li>
+                <a id="Create_Full_Workout_Nav_Button"  class="nav_bar_link" name="false">Create Full Workout</a>
+            </li>
+            <li>
+                <a id="Create_Workout_Nav_Button" class="nav_bar_link" name="false">Create Workout</a>
+            </li>
+            <li>
+                <a id="Assign_Workout_Nav_Button" class="nav_bar_link" name="false">Assign Workout</a>
+            </li>
+            <li>
+                <a id="Create_Group_Nav_Button" class="nav_bar_link" name="false"> Create Group</a>
+            </li>
+            <li>
+                <a id="Create_User_Nav_Button" class="nav_bar_link" name="false"> Create User</a>
+            </li>
+            <li>
+                <a id="View_Progress_Nav_Button" class="nav_bar_link" name="false"> View Progress</a>
+            </li>
+        </ul>
 
 
         <div id="Create_Full_Workout_Page">
-            <h2>Create Full Workout</h2>
-            <input type="text" id="full_name" placeholder="Full Workout Name">
-            <input type="number" id="cyclenum" placeholder="Number of Weeks">
-            <input type="number" id="cyclelen" placeholder="Number of Days in Week">
-            <button id="create_full_button" type="button">Create Full Workout</button>
+            <table>
+                <tr>
+                    <td class="Table_Header" colspan="3">Full Workout Information</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" id="full_name" placeholder="Full Workout Name">
+                    </td>
+                    <td>
+                        <input type="number" id="cyclenum" placeholder="Number of Weeks">
+                    </td>
+                     <td>
+                        <input type="number" id="cyclelen" placeholder="Number of Days in Week">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button id="create_full_button" type="button">Create Full Workout</button>
+                    </td>
+                </tr>
+        </table>
         </div>
-
-
         <div id="Create_Workout_Page">
-            <!--<h2>Post Workout To:</h2>-->
             <table id="Workout_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "3">Workout Information</td>
@@ -69,17 +84,13 @@
                         </select>
                     </td>
                     <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
-                </tr> 
-                <tr>
-                    <td></td>
-                    <td><div id = "WorkoutDatePicker"></div></td>
-                    <td></td>
                 </tr>
 
             </table>
-            <!--<h3>Workout Info:</h2>-->
-            <h1> Create Workout</h1>
             <table id="Excercise_Forms">
+                <tr>
+                    <td class="Table_Header" colspan = "6">Workout</td>
+                </tr>
                 <tr>
                     <th>Set Number</th>
                     <th>Excercise Order</th>
@@ -114,11 +125,15 @@
                         <button type="button" id="submit-ex-button">Submit</button>
                     </td>
                 </tr>
+                <tr id="AddWorkoutRowButtonRow">
+                    <td class="Table_Header" colspan = "6">
+                        <button id="AddWorkoutRow" type="button">Add Row</button>
+                    </td>
+                </tr>
             </table> 
+
             <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
         </div>
-
-
         <div id="Create_Group_Page">
             <table id="Workout_Post_Info">
                 <tr>
@@ -214,16 +229,12 @@
                 </tr>
             </table>
         </div> 
-
-
         <div id="View_Progress_Page">
            <p>Scott Stuff
            </p>
         </div>
-
-
         <div id="Assign_Workout_Page">
-            <table id="Assign_Post_Info">>
+            <table id="Assign_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "2">Assign a Workout to a Group</td>
                 </tr>
@@ -280,14 +291,17 @@
                 </tr>  
             </table>
         </div>
-
-
         <div id="Create_Account_Page">
+
             <div id="CreateForm">
-                <input id="NewUserFirstName" type="text" placeholder="First name" class='Name'> 
-                <input id="NewUserLastName" type="text" placeholder="Last name" class='Name'>
-                <input id="NewUserEmail" type="text" placeholder="STAB email">
-                <button id="CreateNewUserButton">Create</button>
+                <h2>Create New User</h2>
+                <div >First Name :</div> 
+                <input  id="NewUserFirstName" type="text" placeholder="John" class='Name'><br>
+                <div>Last Name :</div>
+                <input id="NewUserLastName" type="text" placeholder="Smith" class='Name'><br>
+                <div>Email :</div> 
+                <input id="NewUserEmail" type="text" placeholder="jsmith@students.stab.org"><br>
+                <button id="CreateNewUserButton">Create User</button>
             <div>
         </div>
 

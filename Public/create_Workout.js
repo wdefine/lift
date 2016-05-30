@@ -22,6 +22,24 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	/////Page Navigation//////////////
 	//////////////////////////////////
 	//will clean up later
+	$(".nav_bar_link").hover(function(){
+		$(this).css("background-color", "#b04f66");
+	}, function(){
+		if ($(this).prop("name") == "true"){
+			$(this).css("background-color", "#3a3a3a");
+		}
+		if ($(this).prop("name") == "false"){
+			$(this).css("background-color", "#843849");
+		}
+	});
+	$(".nav_bar_link").click(function(){
+		$(".nav_bar_link").each(function(){
+			$(this).css("background-color", "#843849");
+			$(this).attr("name", "false");
+		});
+		$(this).css("background-color", "#3a3a3a");
+		$(this).attr("name", "true");
+	});
 	$("#Create_Workout_Nav_Button").click(function(){
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
@@ -62,7 +80,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
 	});
-	$("#Create_Full_Workout_Button").click(function(){
+	$("#Create_Full_Workout_Nav_Button").click(function(){
 		$('#Create_Full_Workout_Page').show();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
@@ -71,7 +89,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Create_Workout_Page").hide();
 	});
 
-
+/*
 	socket.on("fullWorkout",function(list){
 		sortFull(list);
 	});
@@ -95,7 +113,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	})
 	///////////////////////////////////
 	/////////Send 
-
+*/
 	/*
 	console.log($("#WorkoutName").val());
 	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
@@ -109,6 +127,9 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		}
 	});
 	*/
+	$(document).on("click", "#AddWorkoutRow",function(){
+		addWorkoutRow();
+	});
 	$(document).on("click", "#AssignWorkoutButton",function(){
 		assignWorkout();
 	});
@@ -170,13 +191,6 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	$(document).on("change", "#AssignWorkoutDrop", function(){
 		getGroups();
 	});
-/*function Sub_Bar_On(){
-	$("#Create_sub_nav_bar").show();
-}
-function Sub_Bar_Off(){
-	$("#Create_sub_nav_bar").hide();
-}*/
-//done
 });
 function getFull(){
 	var full = $("#full_workout").val();
@@ -191,7 +205,7 @@ function getFull(){
 		$("#week/day").append("<option value=\"\">Week x, Day y</option>");
 		finished = [];
 		unfinished = [];
-		socket.emit("getFullWorkout", full);
+		//socket.emit("getFullWorkout", full);
 	}
 }
 function sortFull(list){
@@ -213,7 +227,7 @@ function getWeekDay(){  //this is why we have fulls, if user has already created
 		var day = val.substring(val.indexOf("/")+1);
 		for(var i=unfinished.length-1;i>=0;i--){
 			if(unfinished[i].day == day){
-				socket.emit("getBlankWorkout", unfinished[i].workout);
+				//socket.emit("getBlankWorkout", unfinished[i].workout);
 				break;
 			}
 		}
@@ -272,12 +286,12 @@ function createFullWorkout(){
 	var name = $("#WorkoutName").val();//get name from text field
 	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
 	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
-	socket.emit("createFullWorkout",name,cyclenum,cyclelen);
+	//socket.emit("createFullWorkout",name,cyclenum,cyclelen);
 }
 function getGroups(){
 	var workout = $("#AssignWorkoutDrop").val();
 	if(workout != ""){
-		socket.emit("getWorkoutGroups",workout);
+		//socket.emit("getWorkoutGroups",workout);
 	}
 	else{
 		$("#AssignGroupDrop").empty();
@@ -294,14 +308,14 @@ function assignWorkout(){
 	var group = $("#AssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
 	if(full != "" && group != ""){
-		socket.emit("assignWorkout", full, group);
+		//socket.emit("assignWorkout", full, group);
 		getGroups();
 	}
 }
 function getWorkouts(){
 	var group = $("#UnAssignGroupDrop").val();
 	if(group != ""){
-		socket.emit("getWorkoutGroups",workout);
+		//socket.emit("getWorkoutGroups",workout);
 	}
 	else{
 		$("#UnAssignWorkoutDrop").empty();
@@ -317,7 +331,7 @@ function unAssignWorkout(){
 	var group = $("#UnAssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
 	if(full != "" && group != ""){
-		socket.emit("unAssignWorkout",full,group);
+		//socket.emit("unAssignWorkout",full,group);
 	}
 }
 //Deleting members from new group
@@ -337,7 +351,7 @@ function createGroup(){
 		array.push(user);
 	});
 	//list of users(objects with name and email fields) that are initially put in group
-	socket.emit("createGroup",name,array);
+	//socket.emit("createGroup",name,array);
 }
 //done
 function editGroupadd(){ //adds an additional user to a preexisting group
@@ -345,7 +359,7 @@ function editGroupadd(){ //adds an additional user to a preexisting group
 	var name = $("#oldgroupusername").val();
 	var email = $("#oldgroupuseremail").val();
 	var user = {name:name, email:email};
-	socket.emit("editGroupadd", group, user);
+	//socket.emit("editGroupadd", group, user);
 	addGroup([user]);
 }
 //done
@@ -354,13 +368,13 @@ function editGroupdelete(_this){ //removes a user from a group
 	var name = _this.parentNode.parentNode.find(".Name").val();
 	var email = _this.parentNode.parentNode.find(".Email").val();
 	var user = {name:name, email:email};//object with email and name
-	socket.emit("editGroupdelete", group, user);
+	//socket.emit("editGroupdelete", group, user);
 }
 function getGroup(){
 	var group = $("#AddGroupDrop").val();
 	if(group != ""){
 		$("#AddGroupDrop").val("");
-		socket.emit("getGroupUsers",group);
+		//socket.emit("getGroupUsers",group);
 	}
 	else{
 		var groupies = $('.Member');
@@ -390,7 +404,7 @@ function createUser(){
 	var name = $("#NewUserFirstName").val() + " " + $("#NewUserLastName").val();
 	var email = $("#NewUserEmail").val();
 	console.log(name + " "+ email);
-	socket.emit("createUser",name,email);
+	//socket.emit("createUser",name,email);
 	$("#NewUserFirstName").val("");
 	$("#NewUserLastName").val("");
 	$("#NewUserEmail").val("");
@@ -487,7 +501,7 @@ function createWorkout(){
 	$("#new-exercise-name").text() = "";
 	$("#new-exercise-sets").text() = "";
 	$("#new-exercise-reps").text() = "";
-	socket.emit("createWorkout",full,array,d,week,day);
+	//socket.emit("createWorkout",full,array,d,week,day);
 	$("#full_workout").val(''); 
 	getFull();
 }
@@ -495,7 +509,7 @@ function createFull(){
 	var name = $("#full_name").val();
 	var weeks = parseInt($("#cyclenum").val());
 	var days = parseInt($("#cyclelen").val());
-	socket.emit('createFullWorkout',name,weeks,days)
+	//socket.emit('createFullWorkout',name,weeks,days)
 }
 function addUser(user){
 	if(user.email != null){
@@ -510,6 +524,33 @@ function addGroup(group){
 		$("#AddGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
 		$("#UnAssignGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
 	}
+}
+function addWorkoutRow(){
+	console.log("called");
+	$("#AddWorkoutRowButtonRow").before('<tr><td>'+
+            	'<input type="number" id="new-set-number" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-number" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<select id="new-exercise-name">'+
+                        '<option class="Exercise-name" value="">Select Exercise</option>'+
+                    '{{#exercises}}'+
+                        '<option class="Exercise-name" url="{{url}}" value="{{name}}">{{name}}</option><!--we may be able to do something with url here-->'+
+                    '{{/exercises}}'+
+                '</select>'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-sets" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-reps" min="1" max="1000">'+
+            '</td>'+
+            '<td>'+
+                '<button type="button" id="submit-ex-button">Submit</button>'+
+            '</td>'+
+        '</tr>');
 }
 
 
