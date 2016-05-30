@@ -4,9 +4,9 @@ var conn = anyDB.createConnection('sqlite3://lift.db.sqlite');
 
 conn.query('CREATE  TABLE "main"."groupsf" ("groupf" TEXT UNIQUE)');
 conn.query('CREATE  TABLE "main"."exercises" ("exercise" TEXT UNIQUE , "url" TEXT)');
-conn.query('CREATE  TABLE "main"."users" ("name" TEXT, "email" TEXT UNIQUE , "Bench_Press" 	INTEGER, "Military_Press" INTEGER, "Front_Squat" INTEGER, "Back_Squat" INTEGER, "Hang_Clean" INTEGER, "Deadlift" INTEGER, "RDL" INTEGER)');
-conn.query('CREATE  TABLE "main"."backfill" ("email" TEXT UNIQUE , "digits" INTEGER UNIQUE)');
-conn.query('CREATE  TABLE "main"."workouts" ("full_workout" TEXT UNIQUE, "ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "cyclenum" INTEGER, "cyclelen" INTEGER)');
+conn.query('CREATE  TABLE "main"."users" ("name" TEXT, "email" TEXT UNIQUE , "status" TEXT)');
+conn.query('CREATE  TABLE "main"."backfill" ("email" TEXT UNIQUE , "digits" INTEGER UNIQUE, "status" TEXT)');
+conn.query('CREATE  TABLE "main"."workouts" ("workout" TEXT UNIQUE, "ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "cyclenum" INTEGER, "cyclelen" INTEGER)');
 //Helpful starting data
 console.log("were here");
 
@@ -26,9 +26,9 @@ conn.query('INSERT INTO Rearden_Steel (name,email) VALUES ($1,$2)',["Will Define
 conn.query('INSERT INTO Rearden_Steel (name,email) VALUES ($1,$2)',["Scott Williams","swilliams@students.stab.org"]);
 conn.query('INSERT INTO Rearden_Steel (name,email) VALUES ($1,$2)',["Andy Wood","awood@students.stab.org"]);
 
-conn.query('INSERT INTO users (name,email) VALUES ($1,$2)',["Will Define","wdefine@students.stab.org"]);
-conn.query('INSERT INTO users (name,email) VALUES ($1,$2)',["Scott Williams","swilliams@students.stab.org"]);
-conn.query('INSERT INTO users (name,email) VALUES ($1,$2)',["Andy Wood","awood@students.stab.org"]);
+conn.query('INSERT INTO users (name,email,status) VALUES ($1,$2,$3)',["Will Define","wdefine@students.stab.org","admin"]);
+conn.query('INSERT INTO users (name,email,status) VALUES ($1,$2,$3)',["Scott Williams","swilliams@students.stab.org","admin"]);
+conn.query('INSERT INTO users (name,email,status) VALUES ($1,$2,$3)',["Andy Wood","awood@students.stab.org","admin"]);
 
 conn.query('CREATE  TABLE IF NOT EXISTS "wdefine@students.stab.org" ("workout" TEXT ,"completed" BOOL, "skipped" BOOL, "date" INTEGER)');
 conn.query('CREATE  TABLE IF NOT EXISTS "swilliams@students.stab.org" ("workout" TEXT ,"completed" BOOL, "skipped" BOOL, "date" INTEGER)');
@@ -41,6 +41,7 @@ conn.query('SELECT exercise FROM exercises')
 })
 .on('end',function(){
     for(var i = 0;i<exercises.length;i++){
+    	conn.query('ALTER TABLE "users" ADD '+ exercises[i] +' FLOAT');
         conn.query('ALTER TABLE "wdefine@students.stab.org" ADD '+exercises[i]+' FLOAT');
         conn.query('ALTER TABLE "swilliams@students.stab.org" ADD '+exercises[i]+' FLOAT');
         conn.query('ALTER TABLE "awood@students.stab.org" ADD '+exercises[i]+' FLOAT');
