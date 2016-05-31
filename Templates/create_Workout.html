@@ -11,53 +11,57 @@
 
     </head>
 	<body>
-        <h1>L I F T</h1>
-        <!--<div id = "Hamburger_icon"></div>-->
-        <div id= "nav_bar">
-            <div>
-                <a id="Create_Full_Workout_Nav_Button">Create Full Workout</a>
-            </div>
-            <div>
-                <a id="Create_Workout_Nav_Button">Create Workout</a>
-            </div>
-            <div>
-                <a id="Assign_Workout_Nav_Button" >Assign Workout</a>
-            </div>
-            <div>
-                <a id="Create_Group_Nav_Button" > Create Group</a>
-            </div>
-            <div>
-                <a id="Create_User_Nav_Button" > Create User</a>
-            </div>
-            <div>
-                <a id="View_Progress_Nav_Button"> View Progress</a>
-            </div>
+        <div id="Spacer"></div>
+        <div id ="Logo_Background">
+            <div id = "Logo"></div>
         </div>
+        <ul id= "nav_bar">
+            <li>
+                <button id="Create_Full_Workout_Nav_Button"  class="nav_bar_link" name="false">Create Full Workout</button>
+            </li>
+            <li>
+                <button id="Create_Workout_Nav_Button" class="nav_bar_link" name="false">Create Workout</button>
+            </li>
+            <li>
+                <button id="Assign_Workout_Nav_Button" class="nav_bar_link" name="false">Assign Workout</button>
+            </li>
+            <li>
+                <button id="Create_Group_Nav_Button" class="nav_bar_link" name="false"> Create Group</button>
+            </li>
+            <li>
+                <button id="Create_User_Nav_Button" class="nav_bar_link" name="false"> Create User</button>
+            </li>
+            <li>
+                <button id="View_Progress_Nav_Button" class="nav_bar_link" name="false"> View Progress</button>
+            </li>
+        </ul>
 
 
         <div id="Create_Full_Workout_Page">
-            <table id="newfull">
+            <table>
                 <tr>
-                    <td class="Table_Header" colspan="4">Create Full Workout</td>
+                    <td class="Table_Header" colspan="3">Full Workout Information</td>
                 </tr>
                 <tr>
-                    <th>Full Workout Name</th>
-                    <th>Number of Weeks</th>
-                    <th>Numbers of Workouts in Week</th>
-                    <th>Create Full Workout</th>
+                    <td>
+                        <input type="text" id="full_name" placeholder="Full Workout Name">
+                    </td>
+                    <td>
+                        <input type="number" id="cyclenum" placeholder="Number of Weeks">
+                    </td>
+                     <td>
+                        <input type="number" id="cyclelen" placeholder="Number of Days in Week">
+                    </td>
                 </tr>
                 <tr>
-                    <td><input type="text" id="full_name" placeholder="Full Workout Name"></td>
-                    <td><input type="number" min="1" id="cyclenum" placeholder="Number of Weeks"></td>
-                    <td><input type="number" min="1" max="7" id="cyclelen" placeholder="Number of Days in Week"></td>
-                    <td><button id="create_full_button" type="button">Submit</button></td>
+                    <td colspan="3">
+                        <button id="create_full_button" type="button">Create Full Workout</button>
+                    </td>
                 </tr>
-            </table>
+        </table>
         </div>
 
-
         <div id="Create_Workout_Page">
-            <!--<h2>Post Workout To:</h2>-->
             <table id="Workout_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "3">Workout Information</td>
@@ -84,13 +88,10 @@
                     <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
                     <!--I removed this because it was bulky "<div id = "WorkoutDatePicker"></div>"-->
                 </tr>
-
             </table>
-            <!--<h3>Workout Info:</h2>-->
-            <h1> Create Workout</h1>
             <table id="Excercise_Forms">
-                <tr>
-                    <td class="Table_Header"  colspan="6">Create Workout</td>
+                <tr id="efr1">
+                    <td class="Table_Header" colspan = "6">Workout</td>
                 </tr>
                 <tr>
                     <th>Set Number</th>
@@ -111,7 +112,7 @@
                         <select id="new-exercise-name">
                                 <option class="Exercise-name" value="">Select Exercise</option>
                             {{#exercises}}
-                                <option class="Exercise-name" url="{{url}}" value="{{name}}">{{name}}</option><!--we may be able to do something with url here-->
+                                <option class="Exercise-name" url="{{url}}" value="{{exercise}}">{{exercise}}</option><!--we may be able to do something with url here-->
                             {{/exercises}}
                         </select>
                     </td>
@@ -131,10 +132,8 @@
                         <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
                     </td>
                 </tr>
-            </table> 
+            </table>
         </div>
-
-
         <div id="Create_Group_Page">
             <table id="Workout_Post_Info">
                 <tr>
@@ -234,16 +233,12 @@
                 </tr>
             </table>
         </div> 
-
-
         <div id="View_Progress_Page">
            <p>Scott Stuff
            </p>
         </div>
-
-
         <div id="Assign_Workout_Page">
-            <table id="Assign_Post_Info">>
+            <table id="Assign_Post_Info">
                 <tr>
                     <td class="Table_Header" colspan = "2">Assign a Workout to a Group</td>
                 </tr>
@@ -300,18 +295,22 @@
                 </tr>  
             </table>
         </div>
-
-
         <div id="Create_Account_Page">
+
             <div id="CreateForm">
-                <input id="NewUserFirstName" type="text" placeholder="First name" class='Name'> 
-                <input id="NewUserLastName" type="text" placeholder="Last name" class='Name'>
-                <input id="NewUserEmail" type="text" placeholder="STAB email">
+                <h2>Create New User</h2>
+                <div >First Name :</div> 
+                <input  id="NewUserFirstName" type="text" placeholder="John" class='Name'><br>
+                <div>Last Name :</div>
+                <input id="NewUserLastName" type="text" placeholder="Smith" class='Name'><br>
+                <div>Email :</div> 
+                <input id="NewUserEmail" type="text" placeholder="jsmith@students.stab.org"><br>
+                <div>User Type :</div> 
                 <select id="statusDrop">
                     <option value="athlete">Athlete</option>
                     <option value="admin">Admin</option>
-                </select>
-                <button id="CreateNewUserButton">Create</button>
+                </select><br>
+                <button id="CreateNewUserButton">Create User</button>
             <div>
         </div>
 

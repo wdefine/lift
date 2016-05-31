@@ -1,113 +1,71 @@
+@font-face {
+    font-family: SourceSansProLight;
+    /*src: url(../Fonts/SourceSansPro-Light.otf);*/
+}
+@font-face {
+    font-family: SourceSansProLightBold;
+    /*src: url(../Fonts/SourceSansPro-Semibold.otf);*/
+}
+
 body {
-    background-color: #737373; /*<!-- #555555 -->*/
-    width:100%;
-    height:100%;
+    background-color: #3a3a3a; /*<!-- #555555 -->*/
+    min-width: 1012px;
     margin:0;
     padding:0;
 
 }
-h1{
-	font-size: 30px;
-	margin:0px;
-	padding:13px 0px 0px 0px;
-	text-align: center;
-	color: white;
-	background-color: #7b3040;
-	font-family: sans-serif;
-	width:100%;
-	position:fixed;
-	min-height: 45px;
-    vertical-align: center;
+#Logo_Background{
+    width:20%;
+    height:72px;
+    background-color: #843849;
+    z-index: 1;
+    position:fixed;
     top:0;
-    z-index: 2;
-    border: solid white 1px;
-
+    left:0;
 }
-#Hamburger_icon{
-	width:50px;
-	height:50px;
-	margin:4px 10px 0px 10px;
-	padding:0px;
-	background-image:url("/Users/AndyWood/Desktop/Coding_Projects/Unfinished/WeightRoomManagment/Public/Images/menu-alt-512.png");
+
+#Logo{
+	width:150px;
+    margin-right:2%;
+    margin-left:2%;
+	height:75px;
+    margin-top:-8px;
+    vertical-align:middle;
+	/*background-image:url("../Images/WorkoutWebsiteLogo.png");*/
 	background-size:cover;
-	position:absolute;
+	position:fixed;
 	left:0px;
 	top:0px;
+    z-index: 2;
 }
 #nav_bar{
-
-    font-size: 100%;
+    margin:0;
+    padding:0;
+    top:0px;
+    right:0px;
     position: fixed;
-  	width: 100%;
-  	height: 44px;
-  	margin: -21px 0 0 0%;
+  	height: 72px;
+    width:80%;
+    text-align: center;
     list-style-type: none;
-    padding: 0px 0% 0px 0%;
-    background-color: #333;
-    z-index: 1;
-    top:80px;
-    border: solid white 1px;    
+    background-color: #843849;
+    z-index: 2;
+    
 }
-#nav_bar div{
-    text-align: center;
-    display:inline-block;
-    width:33%;
+#nav_bar li{
+    display:inline;
 }
-
-#nav_bar li a {
-    display: block;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    height:44px;
+#nav_bar li button {
+    background-color: #843849;
+    height: 72px;
+    font-family: SourceSansProLight;
+    color:#fff;
+    display: inline-block;
+    line-height: 72px;
+    padding:0px 2% 0px 2%;
+    margin:0;
 }
-
-#nav_bar li a:hover {
-    background-color: #111;
-}
-
-#Create_sub_nav_bar{
-    position: fixed;
-    width: 100%;
-    height: 30px;
-    margin: -21px 0 0 0%;
-    list-style-type: none;
-    padding: 0px 0% 0px 0%;
-    background-color: #111;
-    z-index: 1;
-    top:126px;
-    border: solid white 1px;
-    border-top: none;    
-}
-
-#Create_sub_nav_bar li {
-    font-size: 15px;
-    font-family: sans-serif;
-    display:inline-block;
-    width:49.5%;
-    vertical-align: center;
-    line-height:30px;
-    height:30px;
-    margin-bottom: 40px;
-
-}
-
-#Create_sub_nav_bar li a {
-    display: block;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    height:30px;
-}
-
-#Create_sub_nav_bar li a:hover {
-    background-color: #111;
-}
-
-#Create_sub_nav_bar li:first-child {
-    border-right: solid #fff 1px;
-}
-
+/*3a3a3a b04f66*/
 #WorkoutDatePicker{
     text-align: middle;
     padding-left: auto;
@@ -120,15 +78,18 @@ h1{
 //////////////////////////////////*/
 #Excercise_Forms{
     margin-top: 20px;
-    font-family: sans-serif;
     width:90%;
     margin-left:auto; 
     margin-right:auto;
-    border:solid #7b3040;
     position:relative;
+}
+#Spacer{
+    width:100%;
+    height:72px;
 }
 
 th, td {
+    font-family: SourceSansProLight;
     text-align: center;
     padding: 8px;
 }
@@ -139,20 +100,25 @@ tr:nth-child(even){
 tr:nth-child(odd){
     background-color: #b2b3b3;
 }
-
 th {
-    background-color: #333;
+    background-color: #843849;
     color: white;
 }
 
 table{
-    margin-top: 125px;
+    margin-top: 30px;
     font-family: sans-serif;
     width:90%;
     margin-left:auto; 
     margin-right:auto;
-    border:solid #7b3040;
+    /*border:solid #843849;*/
     position:relative;
+}
+.Table_Header{
+    font-family: SourceSansProLightBold;
+    background-color: #843849;
+    color:white;
+    font-size: 22px;
 }
 /*//////////////////////////////////
 /////////Scott Page/////////////////
@@ -164,47 +130,34 @@ table{
     margin-left:auto;
 }
 
-/*//////////////////////////////////
-/////////RIGHT CLICK MENU///////////
-//////////////////////////////////*/
-
-.Table_Header{
-    background-color: #7b3040;
-    color:white;
-    font-family: sans-serif;
-    font-size: 22px;
-}
-
-footer{
-    background-color: #7b3040;
-    height:45px;
-    width:100%;
-    position:fixed;
-    bottom:0;
-}
-
 #CreateForm{
     width: 60%;
     margin-left: 20%;
     margin-right: 20%;
-    margin-top: 126px;
-    background-color:#7b3040;
+    margin-top: 30px;
+    background-color:#843849;
     border-radius: 3px;
+    border: solid 3px white;
     padding:3%;
+    color:white;
+    font-family: SourceSansProLight;
+
 
 }
 #CreateForm input{
     margin: 1px;
     font-size: 15px;
 }
-#CreateNewUserButton{
-    width: 99%;
+#CreateForm div{
+    width:100px;
+    text-align: right;
+    display:inline-block;
 }
 #NewUserEmail{
-    width:97%;
+    width:40%;
 }
-.Name{
-    width:47%;
+#CreateNewUserButton{
+    margin-left:20px;
 }
 #SubmitWorkoutButton{
     margin-top: 10px;
@@ -213,4 +166,18 @@ footer{
     margin-right: 5%;
     margin-left: 5%;
 }
+#AddWorkoutRow{
+    width:100%;
+    height:100%;
+}
+#create_full_button{
+    height:30px;
+    width:100%;
+    
+}
+h2{
+    margin:0;
+    padding-bottom:3px;
+    margin-bottom:10px;
+    border-bottom: 1px solid white;
 }

@@ -2,19 +2,18 @@
 // to break this into multiple pages. There are more possible functions than the
 //ones down there too. Lets get the basics down first.
 ///populate dropdowns from server
-//var socket = io.connect();
 
 var unfinished = [];
 var finished = [];
 var socket = io.connect('http://localhost:8080');
-window.addEventListener('load', function(){ 
+window.addEventListener('load', function(){
 	$('#Create_Full_Workout_Page').show();
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
 	$("#Create_Workout_Page").hide();
-
+/*
 	$("#WorkoutDatePicker").datepicker({
 		autoSize:true
 	});
@@ -22,6 +21,26 @@ window.addEventListener('load', function(){
 	/////Page Navigation//////////////
 	//////////////////////////////////
 	//will clean up later
+
+	$(".nav_bar_link").hover(function(){
+		$(this).css("background-color", "#b04f66");
+	}, function(){
+		if ($(this).prop("name") == "true"){
+			$(this).css("background-color", "#3a3a3a");
+		}
+		if ($(this).prop("name") == "false"){
+			$(this).css("background-color", "#843849");
+		}
+	});
+	$(".nav_bar_link").click(function(){
+		$(".nav_bar_link").each(function(){
+			$(this).css("background-color", "#843849");
+			$(this).attr("name", "false");
+		});
+		$(this).css("background-color", "#3a3a3a");
+		$(this).attr("name", "true");
+	});
+*/
 	$("#Create_Workout_Nav_Button").click(function(){
 		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
@@ -81,7 +100,7 @@ window.addEventListener('load', function(){
 		console.log("fullWorkout received");
 		sortFull(list);
 	});
-	socket.on("blankWorkout",function(array){
+	socket.on("blankWorkout",function(array){ //////////////this is bad
 		console.log("blankWorkout received");
 		fillWorkout(array);
 	});
@@ -108,19 +127,16 @@ window.addEventListener('load', function(){
 	///////////////////////////////////
 	/////////Send 
 
-	/*
-	console.log($("#WorkoutName").val());
+	//console.log($("#WorkoutName").val());
 	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
+
 	$(document).on("click", "#SubmitWorkoutButton",function(){
-		if ($("#WorkoutName").val() == "" || $("#CycleNum").val() == ""){
-			//pop error message
-		}
-		else{
-			console.log("poop");
-			createWorkout()
-		}
+		createWorkout()
 	});
-	*/
+	$(document).on("click", "#submit-ex-button",function(){
+		console.log("clciked");
+		submitEx();
+	});
 	$(document).on("click", "#AssignWorkoutButton",function(){
 		assignWorkout();
 	});
@@ -149,7 +165,7 @@ window.addEventListener('load', function(){
 	//Adding members to new group
 	$(document).on("click", "#AddToNewGroupButton",function(){
 		console.log("add to group button pressed")
-		var l = $('#myTable tr').length;
+		var l = $('#Workout_Post_Info tr').length;
 		var row = document.getElementById("Workout_Post_Info").insertRow(l-1);
 		row.class = "MemberOfNewGroup";
 		var cell1 = row.insertCell(0);
@@ -185,13 +201,6 @@ window.addEventListener('load', function(){
 	$(document).on("change", "#AssignWorkoutDrop", function(){
 		getGroups();
 	});
-/*function Sub_Bar_On(){
-	$("#Create_sub_nav_bar").show();
-}
-function Sub_Bar_Off(){
-	$("#Create_sub_nav_bar").hide();
-}*/
-//done
 });
 function getFull(){
 	var full = $("#full_workout").val();
@@ -219,7 +228,7 @@ function sortFull(list){
 			unfinished.push(list[i]);
 		}
 	}
-};
+}
 function getWeekDay(){  //this is why we have fulls, if user has already created week 1 day 1 workout, 
 						//then week 2 day 1 workout will be filled in for the user
 	var val = $("#week-day").val();
@@ -259,26 +268,50 @@ function fillWorkout(array){
 	}
 }
 function submitEx(){
-	var set = $("#new-set-number").text();
-	var exnum = $("#new-exercise-number").text();
-	var exnam = $("#new-exercise-name").text();
-	var sets = $("#new-exercise-sets").text();
-	var reps = $("#new-exercise-reps").text();
+	var set = $("#new-set-number").val();
+	var exnum = $("#new-exercise-number").val();
+	var exnam = $("#new-exercise-name").val();
+	var sets = $("#new-exercise-sets").val();
+	var reps = $("#new-exercise-reps").val();
+	console.log(set,exnum,exnam,sets,reps);
 	if(set != "" && exnum != "" && exnam != "" && sets != "" && reps != ""){
-		$("#Exercise_Forms").append(
-		"<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>"+
-		"<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>"+
-		"<td class=\"exercise-name\">"+exnam+"</td>"+
-		"<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>"+
-		"<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>"+
-		"<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>"
-		);
+		var l = $('#Exercise_Forms tr').length;
+		console.log(l);
+		var row = document.getElementById("efr1").parentNode.insertRow(3);
+		var c1 = row.insertCell(0);
+		var c2 = row.insertCell(1);
+		var c3 = row.insertCell(2);
+		var c4 = row.insertCell(3);
+		var c5 = row.insertCell(4);
+		var c6 = row.insertCell(5);
+		c1.innerHTML = set;
+		c2.innerHTML = exnum;
+		c3.innerHTML = exnam;
+		c4.innerHTML = sets;
+		c5.innerHTML = reps;
+		c6.innerHTML = "Delete";
+		c1.className = "set-number";
+		c2.className = "exercise-number";
+		c3.className = "exercise-name";
+		c4.className = "exercise-sets";
+		c5.className = "exercise-reps";
+		c6.className = "delete-ex-button";
+		/*
+		c1.contentEditable = true;
+		c2.contentEditable = true;
+		c4.contentEditable = true;
+		c5.contentEditable = true;
+		c1.type = "number";
+		c1.min ="1";
+		c1.max ="20";
+		*/
+		c6.onclick = function(){this.parentNode.remove();}
 
-		$("#new-set-number").text() = "";
-		$("#new-exercise-number").text() = "";
-		$("#new-exercise-name").text() = "";
-		$("#new-exercise-sets").text() = "";
-		$("#new-exercise-reps").text() = "";
+		$("#new-set-number").val("");
+		$("#new-exercise-number").val("");
+		$("#new-exercise-name").val("");
+		$("#new-exercise-sets").val("");
+		$("#new-exercise-reps").val("");
 	}
 }
 function createFullWorkout(){
@@ -411,6 +444,18 @@ function createUser(){
 	$("#NewUserLastName").val("");
 	$("#NewUserEmail").val("");
 }
+//Here is where the process of actually building the workout starts. This is the tricky part.
+//
+//done
+function createFullWorkout(){
+	//this is where you create the fullworkout which is basically just the name, number of cycles(weeks),
+	//and number of days in a cycle(days a week working out). You don'y even need dates for the workouts!
+	var name = $("#WorkoutName").val();//get name from text field
+	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
+	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
+	socket.emit("createFullWorkout",name,cyclenum,cyclelen);
+}
+
 function createWorkout(){
 	var full = $("#full_workout").val();
 	var val = $("#week-day").val();
@@ -520,5 +565,34 @@ function addGroup(group){
 		$("#UnAssignGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
 	}
 }
+/* Andy, I already did this. It's called submitEx(). It may not work perfectly but it is se
+function addWorkoutRow(){
+	console.log("called");
+	$("#AddWorkoutRowButtonRow").before('<tr><td>'+
+            	'<input type="number" id="new-set-number" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-number" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<select id="new-exercise-name">'+
+                        '<option class="Exercise-name" value="">Select Exercise</option>'+
+                    '{{#exercises}}'+
+                        '<option class="Exercise-name" url="{{url}}" value="{{name}}">{{name}}</option><!--we may be able to do something with url here-->'+
+                    '{{/exercises}}'+
+                '</select>'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-sets" min="1" max="20">'+
+            '</td>'+
+            '<td>'+
+                '<input type="number" id="new-exercise-reps" min="1" max="1000">'+
+            '</td>'+
+            '<td>'+
+                '<button type="button" id="submit-ex-button">Submit</button>'+
+            '</td>'+
+        '</tr>');
+}
+*/
 
 
