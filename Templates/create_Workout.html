@@ -2,6 +2,7 @@
     <head>
                 <!-- <script src="/socket.io/socket.io.js"></script> -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="create_Workout.js">
@@ -35,11 +36,23 @@
 
 
         <div id="Create_Full_Workout_Page">
-            <h2>Create Full Workout</h2>
-            <input type="text" id="full_name" placeholder="Full Workout Name">
-            <input type="number" id="cyclenum" placeholder="Number of Weeks">
-            <input type="number" id="cyclelen" placeholder="Number of Days in Week">
-            <button id="create_full_button" type="button">Create Full Workout</button>
+            <table id="newfull">
+                <tr>
+                    <td class="Table_Header" colspan="4">Create Full Workout</td>
+                </tr>
+                <tr>
+                    <th>Full Workout Name</th>
+                    <th>Number of Weeks</th>
+                    <th>Numbers of Workouts in Week</th>
+                    <th>Create Full Workout</th>
+                </tr>
+                <tr>
+                    <td><input type="text" id="full_name" placeholder="Full Workout Name"></td>
+                    <td><input type="number" min="1" id="cyclenum" placeholder="Number of Weeks"></td>
+                    <td><input type="number" min="1" max="7" id="cyclelen" placeholder="Number of Days in Week"></td>
+                    <td><button id="create_full_button" type="button">Submit</button></td>
+                </tr>
+            </table>
         </div>
 
 
@@ -64,22 +77,21 @@
                         </select>
                     </td>
                     <td>
-                        <select id="week/day">
+                        <select id="week-day">
                             <option week="" day="">Week x, Day y</option>
                         </select>
                     </td>
                     <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
-                </tr> 
-                <tr>
-                    <td></td>
-                    <td><div id = "WorkoutDatePicker"></div></td>
-                    <td></td>
+                    <!--I removed this because it was bulky "<div id = "WorkoutDatePicker"></div>"-->
                 </tr>
 
             </table>
             <!--<h3>Workout Info:</h2>-->
             <h1> Create Workout</h1>
             <table id="Excercise_Forms">
+                <tr>
+                    <td class="Table_Header"  colspan="6">Create Workout</td>
+                </tr>
                 <tr>
                     <th>Set Number</th>
                     <th>Excercise Order</th>
@@ -114,8 +126,12 @@
                         <button type="button" id="submit-ex-button">Submit</button>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="6">
+                        <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
+                    </td>
+                </tr>
             </table> 
-            <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
         </div>
 
 
@@ -143,18 +159,20 @@
                     <th>Remove</th>
                 </tr>
                 <tr>
-                    {{#users}}
                     <td>
                         <select id="newgroupusername">
+                            {{#users}}
                             <option value="{{name}}/{{email}}">{{name}}</option>
+                            {{/users}}
                         </select>
                     </td>
                     <td>
                         <select id="newgroupuseremail">
+                            {{#users}}
                             <option value="{{name}}/{{email}}">{{email}}</option>
+                            {{/users}}
                         </selcet>
                     </td>
-                    {{/users}}
                     <td><button id="AddToNewGroupButton">Add</button></td>
                 </tr>
                 <tr>
@@ -198,18 +216,20 @@
                     <th>Add to Group</th>
                 </tr>
                 <tr>
-                    {{#users}}
                     <td>
                         <select id="oldgroupusername">
+                            {{#users}}
                             <option value="{{name}}/{{email}}">{{name}}</option>
+                            {{/users}}
                         </select>
                     </td>
                     <td>
                         <select id="oldgroupuseremail">
+                            {{#users}}
                             <option value="{{name}}/{{email}}">{{email}}</option>
+                            {{/users}}
                         </selcet>
                     </td>
-                    {{/users}}
                     <td><button id="AddToOldGroupButton" onclick="editGroupadd(this)">Add</button></td>
                 </tr>
             </table>

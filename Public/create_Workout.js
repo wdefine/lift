@@ -6,14 +6,14 @@
 
 var unfinished = [];
 var finished = [];
-
-window.addEventListener('load', function(){ //  --- }); ---where should this final line of code go?????
-	$('#Create_Full_Workout_Page').hide();
+var socket = io.connect('http://localhost:8080');
+window.addEventListener('load', function(){ 
+	$('#Create_Full_Workout_Page').show();
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
-	$("#Create_Workout_Page").show();
+	$("#Create_Workout_Page").hide();
 
 	$("#WorkoutDatePicker").datepicker({
 		autoSize:true
@@ -23,6 +23,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	//////////////////////////////////
 	//will clean up later
 	$("#Create_Workout_Nav_Button").click(function(){
+		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
@@ -31,6 +32,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Create_Workout_Page").show();
 	});
 	$("#Create_Group_Nav_Button").click(function(){
+		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").show();
 		$("#Create_Account_Page").hide();
@@ -39,6 +41,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Create_Workout_Page").hide();
 	});
 		$("#View_Progress_Nav_Button").click(function(){
+		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
@@ -47,6 +50,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Create_Workout_Page").hide();
 	});
 	$("#Assign_Workout_Nav_Button").click(function(){
+		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
@@ -55,6 +59,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Create_Workout_Page").hide();
 	});
 	$("#Create_User_Nav_Button").click(function(){
+		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").show();
@@ -62,7 +67,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
 	});
-	$("#Create_Full_Workout_Button").click(function(){
+	$("#Create_Full_Workout_Nav_Button").click(function(){
 		$('#Create_Full_Workout_Page').show();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
@@ -73,24 +78,31 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 
 
 	socket.on("fullWorkout",function(list){
+		console.log("fullWorkout received");
 		sortFull(list);
 	});
 	socket.on("blankWorkout",function(array){
+		console.log("blankWorkout received");
 		fillWorkout(array);
 	});
 	socket.on("newFullWorkout",function(name){
+		console.log("newFullWorkout received");
 		$("#full_workout").append("<option value=\""+name+"\">"+name+"</option>");
 	});
 	socket.on("workoutGroups",function(list){
+		console.log("workoutGroups received");
 		addGroups(list);
 	});
 	socket.on("groupWorkouts",function(list){
+		console.log("groupWorkouts received");
 		addWorkouts(list);
 	});
 	socket.on("newUser",function(user){
+		console.log("newUser received");
 		addUser(user);
 	});
 	socket.on("newGroup",function(group){
+		console.log("newGroup received");
 		addGroup(group);
 	})
 	///////////////////////////////////
@@ -116,6 +128,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 		unAssignWorkout();
 	});
 	$(document).on("click", "#create_full_button",function(){
+		console.log("full created");
 		createFull();
 	});
 
@@ -135,7 +148,9 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	});
 	//Adding members to new group
 	$(document).on("click", "#AddToNewGroupButton",function(){
-		var row = document.getElementById("Workout_Post_Info").insertRow(-2);
+		console.log("add to group button pressed")
+		var l = $('#myTable tr').length;
+		var row = document.getElementById("Workout_Post_Info").insertRow(l-1);
 		row.class = "MemberOfNewGroup";
 		var cell1 = row.insertCell(0);
 		var cell2 = row.insertCell(1);
@@ -164,7 +179,7 @@ window.addEventListener('load', function(){ //  --- }); ---where should this fin
 	$(document).on("change", "#full_workout", function(){
 		getFull();
 	});
-	$(document).on("change", "#week/day", function(){
+	$(document).on("change", "#week-day", function(){
 		getWeekDay();
 	});
 	$(document).on("change", "#AssignWorkoutDrop", function(){
@@ -181,14 +196,14 @@ function Sub_Bar_Off(){
 function getFull(){
 	var full = $("#full_workout").val();
 	if(full == ""){
-		$("#week/day").empty();
-		$("#week/day").append("<option value=\"\">Week x, Day y</option>");
+		$("#week-day").empty();
+		$("#week-day").append("<option value=\"\">Week x, Day y</option>");
 		finished = [];
 		unfinished = [];
 	}
 	else{
-		$("#week/day").empty();
-		$("#week/day").append("<option value=\"\">Week x, Day y</option>");
+		$("#week-day").empty();
+		$("#week-day").append("<option value=\"\">Week x, Day y</option>");
 		finished = [];
 		unfinished = [];
 		socket.emit("getFullWorkout", full);
@@ -198,7 +213,7 @@ function sortFull(list){
 	for(var i=0;i<list.length;i++){
 		if(list[i].skip == true){
 			finished.push(list[i]);
-			$("#week/day").append("<option value=\""+list[i].cycle+"/"+list[i].day+"\">Week "+list[i].cycle+", Day "+list[i].day+"</option>");
+			$("#week-day").append("<option value=\""+list[i].cycle+"/"+list[i].day+"\">Week "+list[i].cycle+", Day "+list[i].day+"</option>");
 		}
 		else{
 			unfinished.push(list[i]);
@@ -207,7 +222,7 @@ function sortFull(list){
 };
 function getWeekDay(){  //this is why we have fulls, if user has already created week 1 day 1 workout, 
 						//then week 2 day 1 workout will be filled in for the user
-	var val = $("#week/day").val();
+	var val = $("#week-day").val();
 	if(val != ""){
 		var week = val.substring(0,val.indexOf("/"));
 		var day = val.substring(val.indexOf("/")+1);
@@ -396,22 +411,9 @@ function createUser(){
 	$("#NewUserLastName").val("");
 	$("#NewUserEmail").val("");
 }
-
-//Here is where the process of actually building the workout starts. This is the tricky part.
-//
-//done
-function createFullWorkout(){
-	//this is where you create the fullworkout which is basically just the name, number of cycles(weeks),
-	//and number of days in a cycle(days a week working out). You don'y even need dates for the workouts!
-	var name = $("#WorkoutName").val();//get name from text field
-	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
-	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
-	//socket.emit("createFullWorkout",name,cyclenum,cyclelen);
-}
-
 function createWorkout(){
 	var full = $("#full_workout").val();
-	var val = $("#week/day").val();
+	var val = $("#week-day").val();
 	/*
 	var week = val.substring(0,val.indexOf("/"));
 	var day = val.substring(val.indexOf("/")+1);
@@ -496,7 +498,13 @@ function createFull(){
 	var name = $("#full_name").val();
 	var weeks = parseInt($("#cyclenum").val());
 	var days = parseInt($("#cyclelen").val());
-	socket.emit('createFullWorkout',name,weeks,days)
+	console.log(name,weeks,days);
+	if(name != ''){
+		socket.emit('createFullWorkout',name,weeks,days);
+	}
+	$("#full_name").val('');
+	$("#cyclenum").val(1);
+	$("#cyclelen").val(1);
 }
 function addUser(user){
 	if(user.email != null){
