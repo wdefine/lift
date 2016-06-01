@@ -5,8 +5,11 @@
 
 var unfinished = [];
 var finished = [];
+var killswitch;
 var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
+	document.getElementById("full_workout").selectedIndex = "0";
+	document.getElementById("AssignWorkoutDrop").selectedIndex = "0";
 	$('#Create_Full_Workout_Page').show();
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
@@ -97,23 +100,24 @@ window.addEventListener('load', function(){
 
 
 	socket.on("fullWorkout",function(list){
-		console.log("fullWorkout received");
+		console.log("fullWorkout received",list);
 		sortFull(list);
 	});
 	socket.on("blankWorkout",function(array){ //////////////this is bad
 		console.log("blankWorkout received");
 		fillWorkout(array);
 	});
-	socket.on("newFullWorkout",function(name){
+	socket.on("newFullWorkout",function(name,ident){
 		console.log("newFullWorkout received");
-		$("#full_workout").append("<option value=\""+name+"\">"+name+"</option>");
+		$("#full_workout").append("<option value=\""+ident+"\">"+name+"</option>");
+		$("#AssignWorkoutDrop").append("<option value=\""+ident+"\">"+name+"</option>");
 	});
-	socket.on("workoutGroups",function(list){
-		console.log("workoutGroups received");
+	socket.on("groups",function(list){
+		console.log("workoutGroups received",list);
 		addGroups(list);
 	});
-	socket.on("groupWorkouts",function(list){
-		console.log("groupWorkouts received");
+	socket.on("workouts",function(list){
+		console.log("groupWorkouts received",list);
 		addWorkouts(list);
 	});
 	socket.on("newUser",function(user){
@@ -131,6 +135,8 @@ window.addEventListener('load', function(){
 	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
 
 	$(document).on("click", "#SubmitWorkoutButton",function(){
+		console.log("create workout button pressed");
+		killswitch = true;
 		createWorkout()
 	});
 	$(document).on("click", "#submit-ex-button",function(){
@@ -166,18 +172,24 @@ window.addEventListener('load', function(){
 	$(document).on("click", "#AddToNewGroupButton",function(){
 		console.log("add to group button pressed")
 		var l = $('#Workout_Post_Info tr').length;
-		var row = document.getElementById("Workout_Post_Info").insertRow(l-1);
-		row.class = "MemberOfNewGroup";
+		console.log(l);
+		var row = document.getElementById("qwerty").parentNode.insertRow(6);
+		row.className = "MemberOfNewGroup";
 		var cell1 = row.insertCell(0);
 		var cell2 = row.insertCell(1);
 		var cell3 = row.insertCell(2);
-		cell1.class = "Name";
-		cell1.value = $("#newgroupusername option:selected").html();
-		cell1.innerHTML = $("#newgroupusername option:selected").html();
-		cell2.class = "Email";
-		cell2.value = $("#newgroupuseremail option:selected").html();
-		cell2.innerHTML = $("#newgroupuseremail option:selected").html();
-		cell3.innerHTML = "<button class=\"RemoveNewMemberButton\" onclick=\"deleteGroupy(this)\">-</button>";
+		cell1.className = "Name";
+		var nameemail = $("#newgroupusername").val();
+		var x = nameemail.indexOf("/");
+		var name = nameemail.substring(0,x);
+		var email = nameemail.substring(x+1);
+		cell1.value = name;
+		cell1.innerHTML = name;
+		cell2.className = "Email";
+		cell2.value = email;
+		cell2.innerHTML = email;
+		cell3.innerHTML = "<button class=\"RemoveNewMemberButton\">Delete</button>";
+		cell3.onclick = function(){this.parentNode.remove();}
 	});
 	//submitting new Group
 	$(document).on("click", "#SubmitGroupButton",function(){
@@ -201,9 +213,15 @@ window.addEventListener('load', function(){
 	$(document).on("change", "#AssignWorkoutDrop", function(){
 		getGroups();
 	});
+	$(document).on("change", "#UnAssignGroupDrop", function(){
+		console.log("change received");
+		getWorkouts();
+	});
 });
 function getFull(){
+	console.log("getFull called");
 	var full = $("#full_workout").val();
+	console.log(full);
 	if(full == ""){
 		$("#week-day").empty();
 		$("#week-day").append("<option value=\"\">Week x, Day y</option>");
@@ -256,14 +274,26 @@ function fillWorkout(array){
 			var exnam = ex.name;
 			var sets = ex.rounds.length;
 			var reps = ex.rounds[0].reps;
-			$("#Exercise_Forms").append(
-			"<td class=\"set-number\" contentEditable=\"true\">"+set+"</td>"+
-			"<td class=\"exercise-number\" contentEditable=\"true\">"+exnum+"</td>"+
-			"<td class=\"exercise-name\">"+exnam+"</td>"+
-			"<td class=\"exercise-sets\" contentEditable=\"true\">"+sets+"</td>"+
-			"<td class=\"exercise-reps\" contentEditable=\"true\">"+reps+"</td>"+
-			"<td class=\"delete-ex-button\" onclick=function(){this.parent().remove();}>Delete</td>"
-			);
+			var row = document.getElementById("efr1").parentNode.insertRow(3);
+			var c1 = row.insertCell(0);
+			var c2 = row.insertCell(1);
+			var c3 = row.insertCell(2);
+			var c4 = row.insertCell(3);
+			var c5 = row.insertCell(4);
+			var c6 = row.insertCell(5);
+			c1.innerHTML = "<input type=\"number\" value=\""+set+"\" min=\"1\" max=\"20\">";
+			//c1.childNode.val(sets);
+			c2.innerHTML = "<input type=\"number\" value=\""+exnum+"\" min=\"1\" max=\"20\">";
+			c3.innerHTML = exnam;
+			c4.innerHTML = "<input type=\"number\" value=\""+sets+"\" min=\"1\" max=\"20\">";
+			c5.innerHTML = "<input type=\"number\" value=\""+reps+"\" min=\"1\" max=\"1000\">";
+			c6.innerHTML = "Delete";
+			c1.className = "set-number";
+			c2.className = "exercise-number";
+			c3.className = "exercise-name";
+			c4.className = "exercise-sets";
+			c5.className = "exercise-reps";
+			c6.className = "delete-ex-button";
 		}
 	}
 }
@@ -284,11 +314,12 @@ function submitEx(){
 		var c4 = row.insertCell(3);
 		var c5 = row.insertCell(4);
 		var c6 = row.insertCell(5);
-		c1.innerHTML = set;
-		c2.innerHTML = exnum;
+		c1.innerHTML = "<input type=\"number\" value=\""+set+"\" min=\"1\" max=\"20\">";
+		//c1.childNode.val(sets);
+		c2.innerHTML = "<input type=\"number\" value=\""+exnum+"\" min=\"1\" max=\"20\">";
 		c3.innerHTML = exnam;
-		c4.innerHTML = sets;
-		c5.innerHTML = reps;
+		c4.innerHTML = "<input type=\"number\" value=\""+sets+"\" min=\"1\" max=\"20\">";
+		c5.innerHTML = "<input type=\"number\" value=\""+reps+"\" min=\"1\" max=\"1000\">";
 		c6.innerHTML = "Delete";
 		c1.className = "set-number";
 		c2.className = "exercise-number";
@@ -325,13 +356,15 @@ function createFullWorkout(){
 function getGroups(){
 	var workout = $("#AssignWorkoutDrop").val();
 	if(workout != ""){
-		socket.emit("getWorkoutGroups",workout);
+		console.log(workout);
+		socket.emit("getGroups");
 	}
 	else{
 		$("#AssignGroupDrop").empty();
 	}
 }
 function addGroups(list){
+	document.getElementById("AssignGroupDrop").innerHTML = "";
 	for(var i=0;i<list.length;i++){
 		$('#AssignGroupDrop').append("<option value=\""+list[i].group+"\">"+list[i].group+"</option>");
 	}
@@ -342,14 +375,14 @@ function assignWorkout(){
 	var group = $("#AssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
 	if(full != "" && group != ""){
-		socket.emit("assignWorkout", full, group);
+		socket.emit("assignWorkout", group,full);
 		getGroups();
 	}
 }
 function getWorkouts(){
 	var group = $("#UnAssignGroupDrop").val();
 	if(group != ""){
-		socket.emit("getWorkoutGroups",workout);
+		socket.emit("getWorkouts", group);
 	}
 	else{
 		$("#UnAssignWorkoutDrop").empty();
@@ -385,6 +418,7 @@ function createGroup(){
 		array.push(user);
 	});
 	//list of users(objects with name and email fields) that are initially put in group
+	console.log(name,array);
 	socket.emit("createGroup",name,array);
 }
 //done
@@ -433,7 +467,7 @@ function addGroup(list){
 		start +=1;
 	}
 }
-//done
+//done7
 function createUser(){
 	var name = $("#NewUserFirstName").val() + " " + $("#NewUserLastName").val();
 	var email = $("#NewUserEmail").val();
@@ -457,87 +491,127 @@ function createFullWorkout(){
 }
 
 function createWorkout(){
-	var full = $("#full_workout").val();
-	var val = $("#week-day").val();
-	/*
-	var week = val.substring(0,val.indexOf("/"));
-	var day = val.substring(val.indexOf("/")+1);
-	var de = $("#workout_date").val().split("-");
-	var day = de[2];
-	var month = de[1];
-	var year = de[0];
-	var date = new Date(year,month,day,0,0,0,0);
-	*/
-	var date = $("#WorkoutDatePicker").datepicker('getDate');
-	var d = date.UTC();
+	console.log("here 1");
 	var tblarr = [];
 	var array = [];
-	var tbllen = $("#Exercise_Forms").rows.length;
-	for(var i=2;i<tbllen;i++){ //this first for loop puts the table into a more usable array
-		var row = $("#Exercise_Forms").rows[i];
-		tblarr.append({
-			set:row.find(".set-number").val(),
-			exnum:row.find(".exercise-number").val(),
-			name:row.find(".exercise-name").val(),
-			rounds:row.find(".exercise-sets").val(),
-			reps:row.find(".exercise-reps").val()
+	var tblrows = document.getElementById("Exercise_Forms").rows;
+	for(var i=3;i<tblrows.length-1;i++){ //this first for loop puts the table into a more usable array
+		var rowe = tblrows[i];
+		var cells = rowe.cells;
+		tblarr.push({
+			set:cells[0].firstChild.value,
+			exnum:cells[1].firstChild.value,
+			name:cells[2].innerHTML,
+			rounds:cells[3].firstChild.value,
+			reps:cells[4].firstChild.value
 		});
 	}
-	var sety =1;
-	while (tblarr.length > 0){
+	console.log("here 2");
+	getNextSet(array,tblarr,1,true);
+}
+function getNextSet(array,tblarr,sety,done){
+	if(done && killswitch){
+		console.log("bigger tblarr", tblarr)
+		console.log("starting loop 1  -do 1 loop for every set");
 		var setlist = [];
-		for(var i=0;i<tblarr.length;i++){
-			if(tblarr[i].set == set){
-				setlist += tblarr[i];
+		console.log("empty setlist: ",setlist);
+		console.log(tblarr.length);
+		for(var i=0;i<tblarr.length;){
+			if(tblarr[i].set == sety){
+				setlist.push(tblarr[i]);
 				tblarr.splice(i,1);
 			}
+			else{
+				i++;
+			}
 		}
-		var loopy = true;
-		while(loopy){ //sorting algorithm based on exnum
-			var doopy = true;
-			for(var i=1;i<setlist.length;i++){
-				if(setlist[i].exnum < setlist[i-1].exnum){
-					var a = setlist[i-1];
-					var b = setlist[i];
-					delete array[i-1];
-					delete array[i];
-					array[i-1] = b;
-					array[i] = a;
-					doopy = false;
+		console.log("smaller tblarr: ",tblarr);
+		console.log("full setlist: ",setlist);
+		orderSetlist(array,tblarr,sety,setlist,true);
+	}
+	else if(killswitch){
+		killswitch = false;
+		var tblrows = document.getElementById("Exercise_Forms").rows;
+		var date = $("#workout_date").val();
+		var d = Date.UTC(date.substring(0,4),date.substring(5,7),date.substring(8,10));
+		var full = $("#full_workout").val();
+		var val = $("#week-day").val();
+		var x = val.indexOf("/");
+		var week = val.substring(0,x);
+		var day = val.substring(x+1);
+		for(var i=3;i<tblrows.length-1;){
+			document.getElementById("Exercise_Forms").deleteRow(i);
+		}
+		$("#new-set-number").val("");
+		$("#new-exercise-number").val("");
+		document.getElementById("new-exercise-name").selectedIndex = "0";
+		$("#new-exercise-sets").val("");
+		$("#new-exercise-reps").val("");
+		console.log("fuck yes jesus", full,array,d,week,day);
+		socket.emit("createWorkout",full,array,d,week,day);
+		document.getElementById("full_workout").selectedIndex = "0"; 
+		getFull();
+	}
+}
+function orderSetlist(array,tblarr,sety,setlist,loopy){
+	while(loopy && killswitch){ //sorting algorithm based on exnum
+		console.log("sorting loop 2");
+		var doopy = true;
+		for(var i=1;i<setlist.length;i++){
+			if(setlist[i].exnum < setlist[i-1].exnum){
+				console.log("old setlist: ",setlist);
+				var a = setlist[i-1];
+				var b = setlist[i];
+				setlist.splice(i-1,2);
+				setlist.push(b);
+				setlist.push(a);
+				doopy = false;
+				console.log("new setlist: ",setlist);
+			}
+		}
+		if(doopy){
+			if(setlist.length != 0){
+				console.log("we have sorted a set this should appear for number of sets");
+				console.log("tblarr: ",tblarr);
+				console.log("tblarr length:", tblarr.length)
+				console.log("setlist: ",setlist);
+				var set ={};
+				var exercises = [];
+				console.log("exercises: ",exercises);
+				console.log("setlist.length: ", setlist.length);
+				for(var i=0;i<setlist.length;i++){
+					var exercise = {name:setlist[i].name}
+					var rounds = [];
+					console.log("rounds: ",rounds);
+					var rdl = setlist[i].rounds;
+					console.log("round length", rdl);
+					for(var j=0;j<rdl;j++){
+						rounds.push({reps:setlist[i].reps})
+					}
+					console.log("rounds: ",rounds);
+					exercise.rounds = rounds;
+					exercises.push(exercise);
+					console.log("exercise push", exercise);
 				}
+				console.log("exercises: ",exercises);
+				set.exercises = exercises;
+				console.log("set: ",set);
+				array.push(set);
 			}
-			if(doopy){
-				loopy=false;
+			if(tblarr.length == 0){
+				console.log("i should get here once");
+				loopy = false;
+				getNextSet(array,tblarr,sety+1,false);
 			}
-		}
-		var set ={};
-		var exercises = [];
-		for(var i=0;i<setlist.length;i++){
-			var exercise = {name:setlist[i].exnam}
-			var rounds = [];
-			var rdl = parseInt(setlist[i].sets);
-			for(var j=0;j<rdl;j++){
-				rounds.append({reps:setlist[i].reps})
+			else{
+				console.log("what the fuck is tblarr", tblarr, tblarr.length);
+				getNextSet(array,tblarr,sety+1,true);
 			}
-			exercise.rounds = rounds;
-			exercises.append(exercise);
-		}
-		set.exercises = exercises;
-		array.append(set);
-		sety +=1;
+	    }
+	    else{
+	    	orderSetlist(array,tblarr,sety,setlist,loopy)
+	    }
 	}
-	var rowlen = $("#Exercise_Forms").rows.length; //erases the table
-	for(var i=2;i<rowlen;i++){
-		$("#Exercise_Forms").deleteRow(i);
-	}
-	$("#new-set-number").text() = "";
-	$("#new-exercise-number").text() = "";
-	$("#new-exercise-name").text() = "";
-	$("#new-exercise-sets").text() = "";
-	$("#new-exercise-reps").text() = "";
-	socket.emit("createWorkout",full,array,d,week,day);
-	$("#full_workout").val(''); 
-	getFull();
 }
 function createFull(){
 	var name = $("#full_name").val();

@@ -100,11 +100,14 @@ io.on('connection', function(socket) {
     socket.on('getNextWorkout',function(workout,email){ //all
         table_to_array(workout,email, function(array){socket.emit('nextWorkout',array);});
     });
-    socket.on('getGroupWorkouts',function(group){ //admin
-        get_assigned_wo(group,function(list){socket.emit('groupWorkouts',list);});
+    socket.on('getGroups',function(){ //admin
+        get_all_groups(function(list){socket.emit('groups',list);});
     });
-    socket.on('getWorkoutGroups',function(workout){ //admin
-        get_assigned_gro(workout,function(list){socket.emit('workoutGroups',list);});
+    socket.on('getWorkouts',function(group){ //admin
+        get_assigned_wo(group,function(list){
+            console.log(list, "here are assigned gros");
+            socket.emit('workouts',list);
+        });
     });
     socket.on('getGroupUsers',function(group){ //admin
         get_group(group,function(list){socket.emit('groupUsers',list);});
@@ -161,6 +164,7 @@ io.on('connection', function(socket) {
     });
     socket.on('getFullWorkout',function(full){ //admin
         wo_in_full(full,function(list){
+            console.log("get full workout request received", list)
             socket.emit('fullWorkout',list);
         });
     });
@@ -416,6 +420,7 @@ function new_exercise(name,url,callback){
 ////////////////////////////////////////////////////////GROUPS///////////////////////////////////////////////
 function new_group(array, name,callback){
     var x=0;
+    console.log('arrived at new group');
     conn.query('CREATE TABLE "main"."'+name+'" ("name" TEXT, "email" TEXT UNIQUE)')
     .on('error',function(){
         x=1;
@@ -423,6 +428,7 @@ function new_group(array, name,callback){
     });
     setTimeout(function(){
         if(x==0){
+            console.log("wehave a new group");
             conn.query('INSERT INTO groupsf (groupf) VALUES ($1)', [name]);
             for(var i =0;i<array.length;i++){
                 conn.query('INSERT INTO "main"."'+name+'" (name,email) VALUES ($1,$2)',[array[i].name,array[i].email]);
@@ -436,22 +442,32 @@ function new_group(array, name,callback){
     },1000);
 }
 function assign_full_workout(group,full){
+    console.log("ready to assign",group,full);
     get_assigned_gro_1(full,[group,full],function(assigned,list){
+        console.log("were back ",assigned);
         var x =0;
         for(var i=0;i<assigned.length;i++){
+            console.log(assigned[i], list[0]);
             if(assigned[i] == list[0]){
                 var x=1;
+                console.log("thats already assigned");
                 break;
             }
         }
-        if(x=0){
+        if(x==0){
+            console.log("this is not a repeat", list[1]+ "is the full", list[0]+ "is the group");
             conn.query('INSERT INTO "main"."'+list[1].toString() +"-groups"+'" (groupf) VALUES ($1)',[list[0]]);
             conn.query('INSERT INTO "main"."'+list[0].toString()+"-assigned"+'" (full) VALUES ($1)',[list[1]]);
             var date = new Date();
-            var d = Date.UTC(date)-172800000;
-            conn.query('SELECT workout,date FROM "main"."'+list[1]+'" WHERE "completed"=($2), "date">($3)',[list[1],true,d])
+            var d = Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())-172800000;
+            console.log(d);
+            conn.query('SELECT * FROM "main"."'+list[1]+'" WHERE "skip"=($1), "date">($2)',[true,d])
+            .on('error', function(){
+                console.log("assign full workout has shit itself");
+            })
             .on('data',function(row){
-                table_to_array_2(row.workout,"email",list[1],row.date,function(array,workout,a,b){
+                console.log("here we are ",row);
+                table_to_array_2(row.workout,"email",list[0],row.date,function(array,workout,a,b){
                     populate_table_init(array,workout,a,b);
                 });
             });
@@ -546,7 +562,8 @@ function get_assigned_gro(workout,callback){
 }
 function get_assigned_gro_1(workout,a,callback){
     var list = [];
-    conn.query('SELECT groupf FROM "main"."'+workout+ "-groups"+'"')
+    console.log(workout);
+    conn.query('SELECT groupf FROM "main"."'+workout+ '-groups'+'"')
     .on('data',function(row){
         var group = row.groupf
         list.push(group);
@@ -555,12 +572,14 @@ function get_assigned_gro_1(workout,a,callback){
         console.log("get_assigned_gro_1 has shit itself");
     })
     .on('end',function(){
+        console.log("get_assigned_gro_1 worked!");
         callback(list,a);
     });
 }
 function get_assigned_wo(group,callback){
     var list = [];
-    conn.query('SELECT workout FROM "main"."'+group+ "-assigned"+'"')
+    console.log(group);
+    conn.query('SELECT workout FROM "main"."'+group+ '-assigned'+'"')
     .on('data',function(row){
         list.push(row);
     })
@@ -568,6 +587,7 @@ function get_assigned_wo(group,callback){
         console.log("get_assigned_wo has shit itself");
     })
     .on('end',function(){
+        console.log("this is the list", list)
         callback(list);
     });
 }
@@ -584,7 +604,6 @@ function create_fullworkout(cyclenum,cyclelen,name){
     setTimeout(function(){
         if(x==1){
             console.log('setTimeout worked');
-            io.sockets.in("stab").emit("newFullWorkout", name);
             var full = 0;
             conn.query('SELECT * FROM workouts')
             .on('data',function(row){
@@ -595,12 +614,14 @@ function create_fullworkout(cyclenum,cyclelen,name){
                 console.log("\n",row);
                 full = row.ident;
                 console.log(full + "is the full number");
+                io.sockets.in("stab").emit("newFullWorkout", name, full);
             })
             .on('error',function(){
                 console.log("create_fullworkout has shit itself");
             })
             .on('end', function(){
                 if(full != 0){
+                    console.log("at the end");
                     conn.query('CREATE TABLE "main"."'+full.toString() + "-groups"+'" ("groupf" TEXT)');
                     create_blank_full_workout(full,cyclenum,cyclelen);
                 }
@@ -611,7 +632,8 @@ function create_fullworkout(cyclenum,cyclelen,name){
 function create_blank_full_workout(full,cyclenum,cyclelen){
     console.log("fuck yes jesus");
     var x =0;
-    conn.query('CREATE TABLE "main"."'+full+'" ("cycle" INTEGER, "day" INTEGER, "workout" TEXT, "date" INTEGER, "skip" BOOL)')
+    console.log(full);
+    conn.query('CREATE TABLE "'+full+'" ("cycle" INTEGER, "day" INTEGER, "workout" TEXT, "date" INTEGER, "skip" BOOL)')
     .on('error',function(){
         console.log("create_blank_full_workout has shit itself");
         x=1;
@@ -621,14 +643,16 @@ function create_blank_full_workout(full,cyclenum,cyclelen){
             console.log("no error");
             for(var i=0;i<cyclenum;i++){
                 for(var j=0;j<cyclelen;j++){
-                    conn.query('INSERT INTO "main"."'+full+'" (cycle,day,skip) VALUES ($1,$2,$3)',[i,j,true]);
+                    console.log("insert",i,j)
+                    conn.query('INSERT INTO "main"."'+full+'" (cycle,day,skip,date) VALUES ($1,$2,$3)',[i+1,j+1,true,0]);
                 }
             }
         }
     },1000);
 }
 function create_workout(array, date, cycle, day, full,callback){
-    create_wo_name(array, date,cycle,day,full,function(array,workout,date,cycle,day,full,callback){
+    console.log(array,date,cycle,day,full);
+    create_wo_name(array, date,cycle,day,full,function(array,date,cycle,day,full,workout,callback){
         array_to_table_init(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
             populate_table_init_2(array,workout,date,cycle,day,full,function(array,workout,date,cycle,day,full){
                 conn.query('UPDATE "main"."'+full+'" SET "date"=($1),"skip"=($2),"workout"=($3) WHERE "cycle"=($4),"day"=($5)',[date,false,workout,cycle,day]);
@@ -639,11 +663,12 @@ function create_workout(array, date, cycle, day, full,callback){
 }
 function create_wo_name(array, date,cycle,day,full,callback){
     var workout = full.toString()+'-'+(Math.floor(Math.random()*100000000)).toString();
-    conn.query('CREATE TABLE "main"."'+workout_name+'" ("email" TEXT, "name" TEXT,"date" INTEGER, "completed" BOOL, "sets" INTEGER) ')
+    conn.query('CREATE TABLE "main"."'+workout+'" ("email" TEXT, "name" TEXT,"date" INTEGER, "completed" BOOL, "sets" INTEGER) ')
     .on('error',function(){
-        create_wo_name(array, date,cycle,day,full,callback);//this is superflous we have synchrounousity problems 
+        console.log("how the fuck");
+        //create_wo_name(array, date,cycle,day,full,callback);//this is superflous we have synchrounousity problems 
     });
-    callback(array,date,cycle,day,full,callback);
+    callback(array,date,cycle,day,full,workout,callback);
 }
 function populate_table_init(array,table,full,date){
     conn.query('SELECT groupf FROM "main"."'+full.toString() + "-groups"+'"')
@@ -698,7 +723,7 @@ function delete_workout(workout){
     var full = workout.slice(0,workout.indexOf("-"));
     conn.query('UPDATE "main"."'+full+'" SET "completed"=($1) WHERE "workout"=($2)',[false,workout]);
     conn.query('DELETE FROM "main"."'+workout+'" WHERE "completed"=($1)',[false]);
-    get_assigned_gro_1(full,workout,function(list,a){
+    get_assigned_gro_1(full,workout,function(list,workout){
         for(var i=0;i<list.length;i++){
             get_group(list[i],function(list){
                 for(var j=0;j<list.length;j++){
@@ -712,6 +737,7 @@ function delete_workout(workout){
 ////////////////////////////////////////////////////DATA CONVERSION FUNCTIONS//////////////////////////////////////////////
 function array_to_table_init(array,workout,date,cycle,day,full,callback){
     var setnum = array.length;
+    var table = workout;
     for(var i=0;i<setnum;i++){
         var num = i+1
         var setnumstr = num.toString();
@@ -741,6 +767,7 @@ function array_to_table_init(array,workout,date,cycle,day,full,callback){
             }
         }
     }
+    callback(array,workout,date,cycle,day,full)
 }
 function populate_table_full(array,table,setnum,email){
     for(var i=0;i<setnum;i++){

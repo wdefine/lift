@@ -76,7 +76,7 @@
                        <select id="full_workout">
                             <option value="">Select Full</option>
                             {{#workouts}}
-                            <option value="{{workout}}">{{workout}}</option>
+                            <option value="{{ident}}">{{workout}}</option>
                             {{/workouts}}
                         </select>
                     </td>
@@ -86,10 +86,10 @@
                         </select>
                     </td>
                     <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
-                    <!--I removed this because it was bulky "<div id = "WorkoutDatePicker"></div>"-->
+                    <!--I removed this because it was bulky ""-->
                 </tr>
             </table>
-            <table id="Excercise_Forms">
+            <table id="Exercise_Forms">
                 <tr id="efr1">
                     <td class="Table_Header" colspan = "6">Workout</td>
                 </tr>
@@ -136,7 +136,7 @@
         </div>
         <div id="Create_Group_Page">
             <table id="Workout_Post_Info">
-                <tr>
+                <tr id="qwerty">
                     <td class="Table_Header" colspan = "4">Create New Group</td>
                 </tr>
                 <tr>
@@ -251,7 +251,7 @@
                         <select id="AssignWorkoutDrop">
                             <option value="">Select</option>
                             {{#workouts}}
-                            <option value="{{workout}}">{{workout}}</option>
+                            <option value="{{ident}}">{{workout}}</option>
                             {{/workouts}}
                         </select>
                     </td>
