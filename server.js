@@ -475,6 +475,7 @@ function assign_full_workout(group,full){
     });
 }
 function unassign_workout(group,full){
+    console.log(group,full);
     var str = full.toString() +"-groups";
     var str2 = group.toString()+"-assigned";
     conn.query('DELETE FROM "main"."'+str+'" WHERE "groupf"=($1)',[group]);
@@ -487,9 +488,9 @@ function unassign_workout(group,full){
         conn.query('SELECT email FROM "main"."'+w+'" WHERE "completed"=($1)',[false])
         .on('data',function(row){
             e = row.email;
-            conn.query('DELETE FROM "main"."'+e+'" WHERE "workout"=($1)',[w])
+            conn.query('DELETE FROM "main"."'+e+'" WHERE "workout"=($1), "completed"=($2)',[w,false])
             .on('end',function(){
-                conn.query('DELETE FROM "main"."'+w+'" WHERE "workout"=($1)',[e])
+                conn.query('DELETE FROM "main"."'+w+'" WHERE "workout"=($1), "completed"=($2)',[e,false])
             });
         });
     });
@@ -579,7 +580,7 @@ function get_assigned_gro_1(workout,a,callback){
 function get_assigned_wo(group,callback){
     var list = [];
     console.log(group);
-    conn.query('SELECT workout FROM "main"."'+group+ '-assigned'+'"')
+    conn.query('SELECT full FROM "main"."'+group+ '-assigned'+'"')
     .on('data',function(row){
         list.push(row);
     })
@@ -588,7 +589,18 @@ function get_assigned_wo(group,callback){
     })
     .on('end',function(){
         console.log("this is the list", list)
-        callback(list);
+        var listy= [];
+        for(var i=0;i<list.length;i++){
+            var x = list[i].full;
+            conn.query('SELECT workout FROM workouts WHERE "ident"=($1)',[list[i].full])
+            .on('data',function(row){
+                row.full =x;
+                listy.push(row);
+            })
+            .on('end',function(){
+                callback(listy);
+            })
+        }
     });
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -702,6 +714,7 @@ function populate_table_init_2(array,table,date,cycle,day,full,callback){
     });
 }
 function insert_wo_row(name,email,setnum,table,array,date){
+    console.log(name,email,setnum,table,array,date);
     conn.query('SELECT email FROM "main"."'+table+'"')
     .on('data',function(row){
         if(row.email == email){

@@ -127,6 +127,10 @@ window.addEventListener('load', function(){
 	socket.on("newGroup",function(group){
 		console.log("newGroup received");
 		addGroup(group);
+	});
+	socket.on("groupUsers",function(list){
+		console.log("group users ", list);
+		addUsers(list);
 	})
 	///////////////////////////////////
 	/////////Send 
@@ -218,6 +222,14 @@ window.addEventListener('load', function(){
 		getWorkouts();
 	});
 });
+function addUsers(list){
+	for(var i=0;i<list.length;i++){
+		var row = document.getElementById("AddMemberRow").parentNode.insertRow(5);
+		var c1 = row.insertCell(0);
+		var c2 = row.insertCell(1);
+		var c3 = row.insertCell(2);
+	}
+}
 function getFull(){
 	console.log("getFull called");
 	var full = $("#full_workout").val();
@@ -390,7 +402,7 @@ function getWorkouts(){
 }
 function addWorkouts(list){
 	for(var i=0;i<list.length;i++){
-		$('#UnAssignWorkoutDrop').append("<option value=\""+list[i].workout+"\">"+list[i].workout+"</option>");
+		$('#UnAssignWorkoutDrop').append("<option value=\""+list[i].full+"\">"+list[i].workout+"</option>");
 	}
 }
 function unAssignWorkout(){
@@ -398,7 +410,7 @@ function unAssignWorkout(){
 	var group = $("#UnAssignGroupDrop").val();//get group from dropdown
 	console.log(full + " "+ group);
 	if(full != "" && group != ""){
-		socket.emit("unAssignWorkout",full,group);
+		socket.emit("unassignWorkout",group,full);
 	}
 }
 //Deleting members from new group
@@ -442,6 +454,7 @@ function getGroup(){
 	var group = $("#AddGroupDrop").val();
 	if(group != ""){
 		$("#AddGroupDrop").val("");
+		console.log(group);
 		socket.emit("getGroupUsers",group);
 	}
 	else{
