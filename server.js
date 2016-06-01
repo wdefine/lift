@@ -674,13 +674,24 @@ function create_workout(array, date, cycle, day, full,callback){
     });
 }
 function create_wo_name(array, date,cycle,day,full,callback){
+    console.log("create_wo_name called");
     var workout = full.toString()+'-'+(Math.floor(Math.random()*100000000)).toString();
-    conn.query('CREATE TABLE "main"."'+workout+'" ("email" TEXT, "name" TEXT,"date" INTEGER, "completed" BOOL, "sets" INTEGER) ')
+    console.log(workout);
+    put_wo_in_db(array,date,cycle,day,full,workout,callback, function(array,date,cycle,day,full,workout,callback){
+        console.log(workout, "we have a name");
+        callback(array,date,cycle,day,full,workout,callback);  
+    })
+    /*
     .on('error',function(){
         console.log("how the fuck");
         //create_wo_name(array, date,cycle,day,full,callback);//this is superflous we have synchrounousity problems 
     });
-    callback(array,date,cycle,day,full,workout,callback);
+    */
+}
+function put_wo_in_db(array,date,cycle,day,full,workout,callback, clbck){
+    console.log(workout);
+    conn.query('CREATE TABLE "main"."'+workout+'" ("email" TEXT, "name" TEXT,"date" INTEGER, "completed" BOOL, "sets" INTEGER) ');
+    clbck(array,date,cycle,day,full,workout,callback);
 }
 function populate_table_init(array,table,full,date){
     conn.query('SELECT groupf FROM "main"."'+full.toString() + "-groups"+'"')
@@ -710,25 +721,30 @@ function populate_table_init_2(array,table,date,cycle,day,full,callback){
     })
     .on('end', function(){
         insert_wo_row("name","email",array.length,table,array,date);
+        console.log("we have filled in the table");
         callback(array,workout,date,cycle,day,full);
     });
 }
 function insert_wo_row(name,email,setnum,table,array,date){
     console.log(name,email,setnum,table,array,date);
+    var x =0;
     conn.query('SELECT email FROM "main"."'+table+'"')
     .on('data',function(row){
         if(row.email == email){
-            return;
+            var x =1;
         }
     })
     .on('error',function(){
         console.log("insert_wo_row has shit itself");
     })
     .on('end',function(){
-        conn.query('INSERT INTO "main"."'+table+'" (email,name,completed,sets,date) VALUES ($1,$2,$3,$4,$5)',[email,name,false,setnum,date])
-        populate_table_full(array,table,setnum,email);
-        if(email != "email"){
-            conn.query('INSERT INTO "main"."'+email+'" (workout,completed,skipped,date) VALUES ($1,$2,$3,$4)',[workout,false,false,date]);
+        console.log("i'm assigning workout to email", table, email);
+        if(x==0){
+            conn.query('INSERT INTO "main"."'+table+'" (email,name,completed,sets,date) VALUES ($1,$2,$3,$4,$5)',[email,name,false,setnum,date])
+            populate_table_full(array,table,setnum,email);
+            if(email != "email"){
+                conn.query('INSERT INTO "main"."'+email+'" (workout,completed,skipped,date) VALUES ($1,$2,$3,$4)',[workout,false,false,date]);
+            }
         }
     });
 }
@@ -750,70 +766,48 @@ function delete_workout(workout){
 ////////////////////////////////////////////////////DATA CONVERSION FUNCTIONS//////////////////////////////////////////////
 function array_to_table_init(array,workout,date,cycle,day,full,callback){
     var setnum = array.length;
+    console.log("the array is ", array);
+    console.log("the setnum is ", setnum);
     var table = workout;
     for(var i=0;i<setnum;i++){
-        var num = i+1
-        var setnumstr = num.toString();
-        create_column(table,setnumstr,"BOOL");
-        var exericses = array[i].exercises;
-        var setlen = setnumstr + "-length";
-        create_column(table,setlen,"INTEGER")
-        for(var j=0;j<exercises.length;j++){
-            var num2 = j+1;
-            var exnumstr = setnumstr + "-" + num2.toString();
-            create_column(table,exnumstr,"BOOL");
-            var name = exercises[j].name.split(' ').join('_');
-            var namestr = exnumstr + "#" + name;
-            create_column(table,namestr, "TEXT");
-            var rounds = exercises[j].rounds;
-            var roundlenstr = exnumstr + "-length";
-            create_column(table,roundlenstr,"INTEGER");
+        create_column(table,(i+1).toString(),"BOOL");
+        create_column(table,(i+1).toString() + "-length","INTEGER");
+        console.log("the exercise array is", array[i].exercises);
+        for(var j=0;j<array[i].exercises.length;j++){
+            create_column(table,(i+1).toString() + "-" + (j+1).toString(),"BOOL");
+            create_column(table,(i+1).toString() + "-" + (j+1).toString() + "#" + array[i].exercises[j].name.split(' ').join('_'), "TEXT");
+            var rounds = array[i].exercises[j].rounds;
+            console.log("the rounds are ", rounds);
+            create_column(table,(i+1).toString() + "-" + (j+1).toString() + "-length","INTEGER");
             for(var k=0;k<rounds.length;k++){
-                var num3 = k+1;
-                var repsstr = exnumstr + "-"+ num3.toString();
-                var repnum= repsstr+"-reps";
-                var weight= repstr+"-weight";
-                create_column(table,repsstr,"BOOL");
-                create_column(table,repnum,"INTEGER");
-                create_column(table,weight,"INTEGER");
+                create_column(table,(i+1).toString() + "-" + (j+1).toString() + "-"+ (k+1).toString(),"BOOL");
+                create_column(table,(i+1).toString() + "-" + (j+1).toString() + "-"+ (k+1).toString()+"-reps","INTEGER");
+                create_column(table,(i+1).toString() + "-" + (j+1).toString() + "-"+ (k+1).toString()+"-weight","INTEGER");
 
             }
         }
     }
+    console.log("we initialized the table");
     callback(array,workout,date,cycle,day,full)
 }
 function populate_table_full(array,table,setnum,email){
     for(var i=0;i<setnum;i++){
-        var s = i+1;
-        var setstr = s.toString();
-        update_col(table,setstr,true,"email",email);
-        var exercises = array[i].exercises;
-        var setlenstr = setstr+ '-length';
-        update_col(table,setlenstr,exercises.length,"email",email);
-        for(var j=0;j<exercises.length;j++){
-            var ex = j+1;
-            var exstr = setstr +"-" +ex.toString();
-            update_col(table,exstr,true,"email",email);
-            var name = exercises[j].name.split(' ').join('_');
-            var namestr = exnumstr + "#" + name;
-            update_col(table,namestr,name,"email",email);
-            var rounds = exercises[j].rounds;
-            var rls = exnumstr + "-length";
-            update_col(table,rls,rounds.length,"email",email);
-            var reparray = [];
-            for(var k=0;k<rounds.length;k++){
-                var num3 = k+1;
-                var rds = exstr + "-"+ num3.toString();
-                var rs= rds+"-reps";
-                var ws= rds+"-weight";
-                var r= rounds[k].reps;
-                var weightval = 0;
+        update_col(table,(i+1).toString(),true,"email",email);
+        update_col(table,(i+1).toString()+ '-length',array[i].exercises.length,"email",email);
+        for(var j=0;j<array[i].exercises.length;j++){
+            update_col(table,(i+1).toString() +"-" +(j+1).toString(),true,"email",email);
+            update_col(table,(i+1).toString() +"-" +(j+1).toString() + "#" + array[i].exercises[j].name.split(' ').join('_'),array[i].exercises[j].name.split(' ').join('_'),"email",email);
+            update_col(table,(i+1).toString() +"-" +(j+1).toString() + "-length",array[i].exercises[j].rounds.length,"email",email);
+            var reparray = []; //what the fuck is this???
+            for(var k=0;k<array[i].exercises[j].rounds.length;k++){
+                var r= array[i].exercises[j].rounds[k].reps;
+                var w = 0;
                 if(email != "email"){
-                    weightval= rounder(get_weight(r,(get_old_max(email,name))),5);
+                    w= rounder(get_weight(r,(get_old_max(email,array[i].exercises[j].name.split(' ').join('_')))),5);
                 }
-                update_col(table,ws,w,"email",email);
-                update_col(table,rds,true,"email",email);
-                update_col(table,rs,r,"email",email);
+                update_col(table,(i+1).toString() +"-" +(j+1).toString() + "-"+ (k+1).toString()+"-weight",w,"email",email);
+                update_col(table,(i+1).toString() +"-" +(j+1).toString() + "-"+ (k+1).toString(),true,"email",email);
+                update_col(table,(i+1).toString() +"-" +(j+1).toString() + "-"+ (k+1).toString()+"-reps",r,"email",email);
             }
         }
     }
@@ -826,36 +820,24 @@ function table_to_array(workout,email,callback){
         var values = Object.values(row);
         var sets = row.sets;
         for (var i = 1; i <= sets; i++) {
-            var exlenstr=i.toString()+"-length"; 
-            var exlen = values[keys.indexOf(exlenstr)];
             var newset = new Object();
             newset.completed == true;
-            newset.exercises == {};
-            for(var j=1;j<=exlen;j++){
-                var exstr = set.toString()+"-"+j.toString();
-                var rdlenstr = exstr+"-length";
-                var rdlen = values[keys.indexOf(rdlenstr)];
+            newset.exercises == [];
+            for(var j=1;j<=values[keys.indexOf(i.toString()+"-length")];j++){
                 var newex = new Object();
                 newex.completed = true;
-                var s = exstr+"#";
-                var len = s.length;
                 for(var k=0;k<keys.length;k++){
-                    if(keys[k].slice(0,len) == s){
-                        newex.name = keys[k].slice(len).split('_').join(' ');
+                    if(keys[k].slice(0,(i.toString()+"-"+j.toString()+"#").length) == i.toString()+"-"+j.toString()+"#"){
+                        newex.name = keys[k].slice((i.toString()+"-"+j.toString()+"#").length).split('_').join(' ');
                         break;
                     }
                 }
                 newex.rounds = {};
-                for(var l=1;l<=rdlen;l++){
+                for(var l=1;l<=values[keys.indexOf(i.toString()+"-"+j.toString()+"-length")];l++){
                     var round = new Object();
                     round.completed = true;
-                    var rdstr = exstr+"-"+l.toString();
-                    var ws = exstr + "-weight";
-                    var rs = exstr + "-reps";
-                    var w = values[keys.indexOf(ws)];
-                    var r = values[keys.indexOf(rs)];
-                    round.weight = w;
-                    round.reps = r;
+                    round.weight = values[keys.indexOf(i.toString()+"-"+j.toString()+"-"+l.toString() + "-weight")];
+                    round.reps = values[keys.indexOf(i.toString()+"-"+j.toString()+"-"+l.toString() + "-reps")];
                     newex.rounds.push(round);
                 }
                 newset.exercises.push(newex);
@@ -878,36 +860,24 @@ function table_to_array_2(workout,email,a,b,callback){
         var values = Object.values(row);
         var sets = row.sets;
         for (var i = 1; i <= sets; i++) {
-            var exlenstr=i.toString()+"-length"; 
-            var exlen = values[keys.indexOf(exlenstr)];
             var newset = new Object();
             newset.completed == true;
-            newset.exercises == {};
-            for(var j=1;j<=exlen;j++){
-                var exstr = set.toString()+"-"+j.toString();
-                var rdlenstr = exstr+"-length";
-                var rdlen = values[keys.indexOf(rdlenstr)];
+            newset.exercises == [];
+            for(var j=1;j<=values[keys.indexOf(i.toString()+"-length")];j++){
                 var newex = new Object();
                 newex.completed = true;
-                var s = exstr+"#";
-                var len = s.length;               
                 for(var k=0;k<keys.length;k++){
-                    if(keys[k].slice(0,len) == s){
-                        newex.name = keys[k].slice(len).split('_').join(' ');
+                    if(keys[k].slice(0,(i.toString()+"-"+j.toString()+"#").length) == i.toString()+"-"+j.toString()+"#"){
+                        newex.name = keys[k].slice((i.toString()+"-"+j.toString()+"#").length).split('_').join(' ');
                         break;
                     }
                 }
                 newex.rounds = {};
-                for(var l=1;l<=rdlen;l++){
+                for(var l=1;l<=values[keys.indexOf(i.toString()+"-"+j.toString()+"-length")];l++){
                     var round = new Object();
                     round.completed = true;
-                    var rdstr = exstr+"-"+l.toString();
-                    var ws = exstr + "-weight";
-                    var rs = exstr + "-reps";
-                    var w = values[keys.indexOf(ws)];
-                    var r = values[keys.indexOf(rs)];
-                    round.weight = w;
-                    round.reps = r;
+                    round.weight = values[keys.indexOf(i.toString()+"-"+j.toString()+"-"+l.toString() + "-weight")];
+                    round.reps = values[keys.indexOf(i.toString()+"-"+j.toString()+"-"+l.toString() + "-reps")];
                     newex.rounds.push(round);
                 }
                 newset.exercises.push(newex);
@@ -916,7 +886,7 @@ function table_to_array_2(workout,email,a,b,callback){
         }
     })
     .on('error',function(){
-        console.log("table_to_array_2 has shit itself");
+        console.log("table_to_array has shit itself");
     })
     .on('end',function(){
         callback(array,workout,a,b);
