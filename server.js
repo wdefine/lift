@@ -4,6 +4,8 @@
 7. Make asynchronous adjustments!!!
 7a) is get_max_from_list correct
 7b) check over everything
+line 413 getUserList() needs to be defined or substituted for something else
+updating excercise url doesnt put the info into the database. why? i don't know
 */
 
 var http = require('http'); 
@@ -115,7 +117,8 @@ io.on('connection', function(socket) {
     socket.on('submitMax',function(email,exercise,max){ //all
         update_col("users",exercise.split(' ').join('_'),max,"email",email);
     });
-    socket.on('changeWorkout',function(email,workout,str,value,completed){ //all 
+    socket.on('changeWorkout',function(email,workout,str,value,completed){ //all
+        console.log("cell value :" + value + " Cell Id: "+ str+ " completed: "+completed+" Workout name: "+workout +" email: "+email);
         update_workout(str,value,completed,email,workout);
     });
     socket.on('submitWorkout',function(email,workout,date){ //all
@@ -128,7 +131,8 @@ io.on('connection', function(socket) {
         });
     });
     socket.on('editExerciseUrl',function(name,url){ //admin
-        update_col("exercises","url",url,"name",name.split(' ').join('_'));
+        console.log("name: "+name+" url: "+url);
+        update_col("exercises","url",url,"exercise",name.split(' ').join('_'));
     });
     socket.on('createGroup',function(name,array){ //admin
         new_group(array,name,function(name){
@@ -408,7 +412,7 @@ function new_exercise(name,url,callback){
     setTimeout(function(){
         if(x==0){
             conn.query('ALTER TABLE users ADD '+name+' FLOAT');
-            var users = getUserList();
+            var users = getUserList();//needs to be defined
             for(var i=0;i<users.length;i++){
                 conn.query('ALTER TABLE "main"."'+users[i].email+'" ADD '+name+' FLOAT');
             }

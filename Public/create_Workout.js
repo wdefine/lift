@@ -11,12 +11,15 @@ window.addEventListener('load', function(){
 	document.getElementById("full_workout").selectedIndex = "0";
 	document.getElementById("AssignWorkoutDrop").selectedIndex = "0";
 	$('#Create_Full_Workout_Page').show();
+	$("#Create_Workout_Nav_Button").css("background-color", "#3a3a3a");
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
 	$("#Create_Workout_Page").hide();
-/*
+	$("#Create_Excercise_Page").hide();
+
+
 	$("#WorkoutDatePicker").datepicker({
 		autoSize:true
 	});
@@ -24,6 +27,7 @@ window.addEventListener('load', function(){
 	/////Page Navigation//////////////
 	//////////////////////////////////
 	//will clean up later
+	$("delete-ex-button").hover
 
 	$(".nav_bar_link").hover(function(){
 		$(this).css("background-color", "#b04f66");
@@ -43,51 +47,60 @@ window.addEventListener('load', function(){
 		$(this).css("background-color", "#3a3a3a");
 		$(this).attr("name", "true");
 	});
-*/
+	$("#Create_Excercise_Nav_Button").click(function(){
+		$('#Create_Full_Workout_Page').hide();
+		$("#Create_Group_Page").hide();
+		$("#Create_Account_Page").hide();
+		$("#View_Progress_Page").hide();
+		$("#Assign_Workout_Page").hide();
+		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").show();
+
+	});
 	$("#Create_Workout_Nav_Button").click(function(){
-		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").show();
+		$("#Create_Excercise_Page").hide();
 	});
 	$("#Create_Group_Nav_Button").click(function(){
-		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").show();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").hide();
 	});
 		$("#View_Progress_Nav_Button").click(function(){
-		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").show();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").hide();
 	});
 	$("#Assign_Workout_Nav_Button").click(function(){
-		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").hide();
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").show();
 		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").hide();
 	});
 	$("#Create_User_Nav_Button").click(function(){
-		console.log("hider");
 		$('#Create_Full_Workout_Page').hide();
 		$("#Create_Group_Page").hide();
 		$("#Create_Account_Page").show();
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").hide();
 	});
 	$("#Create_Full_Workout_Nav_Button").click(function(){
 		$('#Create_Full_Workout_Page').show();
@@ -96,6 +109,7 @@ window.addEventListener('load', function(){
 		$("#View_Progress_Page").hide();
 		$("#Assign_Workout_Page").hide();
 		$("#Create_Workout_Page").hide();
+		$("#Create_Excercise_Page").hide();
 	});
 
 
@@ -132,11 +146,14 @@ window.addEventListener('load', function(){
 		console.log("group users ", list);
 		addUsers(list);
 	})
+	socket.on("newExercise", function(name){
+		$(".Excercise_Drop").append('<option class="Exercise-name" value="'+name+'"">{{exercise}}</option>');
+	});
 	///////////////////////////////////
 	/////////Send 
-
-	//console.log($("#WorkoutName").val());
-	//$("#Create_Workout_Nav_Button, #Create_sub_nav_bar").mouseenter(Sub_Bar_On).mouseleave(Sub_Bar_Off);
+	$(document).on("click", "#AddToOldGroupButton",function(){
+		editGroupadd();
+	});
 
 	$(document).on("click", "#SubmitWorkoutButton",function(){
 		console.log("create workout button pressed");
@@ -144,18 +161,36 @@ window.addEventListener('load', function(){
 		createWorkout()
 	});
 	$(document).on("click", "#submit-ex-button",function(){
-		console.log("clciked");
+		console.log("Submit ex");
 		submitEx();
 	});
 	$(document).on("click", "#AssignWorkoutButton",function(){
+		console.log("Assign Workout");
 		assignWorkout();
 	});
 	$(document).on("click", "#UnAssignWorkoutButton",function(){
+		console.log("Un assign workout");
 		unAssignWorkout();
 	});
 	$(document).on("click", "#create_full_button",function(){
 		console.log("full created");
 		createFull();
+	});
+	$(document).on("click", "#SubmitExcerciseButton",function(){
+		console.log("excercise submit");
+		var excercise_Name = $("#New_Exercise_Name").val();
+		var excercise_URL = $("#New_Excercise_Url").val();
+		console.log( "excercise name: "+excercise_Name + " URl: " + excercise_URL);
+		socket.emit("createExercise", excercise_Name, excercise_URL);
+		
+	});
+	$(document).on("click", "#EditExcerciseButton",function(){
+		console.log("excercise edit");
+		var excercise_Name = $("#edit_new-exercise-name").val();
+		var excercise_URL = $("#edit_New_Excercise_Url").val();
+		console.log( "excercise name: "+excercise_Name + " URl: " + excercise_URL);
+		socket.emit("editExerciseUrl", excercise_Name, excercise_URL);
+		
 	});
 
 
@@ -197,16 +232,16 @@ window.addEventListener('load', function(){
 	});
 	//submitting new Group
 	$(document).on("click", "#SubmitGroupButton",function(){
+		console.log("Submit Group");
 		createGroup();
 	});
 	$(document).on("change", "#AddGroupDrop", function(){
+		console.log("Add group");
 		getGroup();
 	});
 	$(document).on("click", "#CreateNewUserButton", function(){
+		console.log("create new user");
 		createUser();
-	});
-	$(document).on("click", '#submit-ex-button', function(){
-		sumbitEx();
 	});
 	$(document).on("change", "#full_workout", function(){
 		getFull();
@@ -435,15 +470,18 @@ function createGroup(){
 }
 //done
 function editGroupadd(){ //adds an additional user to a preexisting group
+	console.log("edit group add");
 	var group = $("#AddGroupDrop").val();
 	var name = $("#oldgroupusername").val();
 	var email = $("#oldgroupuseremail").val();
 	var user = {name:name, email:email};
+	console.log("UserName: "+ user.name+" UserEmail: "+user.email+ "group: "+group);
 	socket.emit("editGroupadd", group, user);
 	addGroup([user]);
 }
 //done
 function editGroupdelete(_this){ //removes a user from a group
+	console.log("edit group delete");
 	var group = $("#AddGroupDrop").val();
 	var name = _this.parentNode.parentNode.find(".Name").val();
 	var email = _this.parentNode.parentNode.find(".Email").val();
@@ -466,8 +504,9 @@ function getGroup(){
 }
 function addGroup(list){
 	var start = $('#header_existing').indexOf() +1;
+	console.log("start: "+start)
 	for(var i=0;i<list.length;i++){
-		var row= document.getElementById('Group_Post_Info').insertRow(start);
+		var row = document.getElementById('Group_Post_Info').insertRow(start);
 		row.class = "Member";
 		var c1 = row.insertCell(0);
 		var c2 = row.insertCell(1);
@@ -652,34 +691,5 @@ function addGroup(group){
 		$("#UnAssignGroupDrop").append("<option value=\""+group+"\">"+group+"</option>");
 	}
 }
-/* Andy, I already did this. It's called submitEx(). It may not work perfectly but it is se
-function addWorkoutRow(){
-	console.log("called");
-	$("#AddWorkoutRowButtonRow").before('<tr><td>'+
-            	'<input type="number" id="new-set-number" min="1" max="20">'+
-            '</td>'+
-            '<td>'+
-                '<input type="number" id="new-exercise-number" min="1" max="20">'+
-            '</td>'+
-            '<td>'+
-                '<select id="new-exercise-name">'+
-                        '<option class="Exercise-name" value="">Select Exercise</option>'+
-                    '{{#exercises}}'+
-                        '<option class="Exercise-name" url="{{url}}" value="{{name}}">{{name}}</option><!--we may be able to do something with url here-->'+
-                    '{{/exercises}}'+
-                '</select>'+
-            '</td>'+
-            '<td>'+
-                '<input type="number" id="new-exercise-sets" min="1" max="20">'+
-            '</td>'+
-            '<td>'+
-                '<input type="number" id="new-exercise-reps" min="1" max="1000">'+
-            '</td>'+
-            '<td>'+
-                '<button type="button" id="submit-ex-button">Submit</button>'+
-            '</td>'+
-        '</tr>');
-}
-*/
 
 

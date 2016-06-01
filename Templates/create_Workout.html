@@ -1,6 +1,6 @@
 <!DOCTYPE html>
     <head>
-                <!-- <script src="/socket.io/socket.io.js"></script> -->
+        <script src="/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
@@ -21,6 +21,9 @@
             </li>
             <li>
                 <button id="Create_Workout_Nav_Button" class="nav_bar_link" name="false">Create Workout</button>
+            </li>
+            <li>
+                <button id="Create_Excercise_Nav_Button"  class="nav_bar_link" name="false">Create Excercise</button>
             </li>
             <li>
                 <button id="Assign_Workout_Nav_Button" class="nav_bar_link" name="false">Assign Workout</button>
@@ -109,7 +112,7 @@
                         <input type="number" id="new-exercise-number" min="1" max="20">
                     </td>
                     <td>
-                        <select id="new-exercise-name">
+                        <select class="Excercise_Drop" id="new-exercise-name">
                                 <option class="Exercise-name" value="">Select Exercise</option>
                             {{#exercises}}
                                 <option class="Exercise-name" url="{{url}}" value="{{exercise}}">{{exercise}}</option><!--we may be able to do something with url here-->
@@ -130,6 +133,57 @@
                 <tr>
                     <td colspan="6">
                         <button id="SubmitWorkoutButton" type="button">Submit Workout</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="Create_Excercise_Page">
+            <table>
+                <tr>
+                    <td class="Table_Header" colspan="3">Create New Excercise</td>
+                </tr>
+                <tr>
+                    <th>New Excercise Name</th>
+                    <th>New Excercise Demonstration Video Url</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" id="New_Exercise_Name" placeholder="Excercise Name">
+                    </td>
+                    <td>
+                        <input type="text" id="New_Excercise_Url" placeholder="URL to demonstration video">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button id="SubmitExcerciseButton" type="button">Submit Excercise</button>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td class="Table_Header" colspan="3">Edit Excercise</td>
+                </tr>
+                <tr>
+                    <th>Excercise Name</th>
+                    <th>Change Excercise Demonstration Video Url</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select class="Excercise_Drop" id="edit_new-exercise-name">
+                                <option class="Exercise-name" value="">Select Exercise</option>
+                            {{#exercises}}
+                                <option class="Exercise-name" url="{{url}}" value="{{exercise}}">{{exercise}}</option><!--we may be able to do something with url here-->
+                            {{/exercises}}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="edit_New_Excercise_Url" placeholder="New URL to demonstration video" value="{{url}}"><!-- if we want to mustache in the old url for reference-->
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button id="EditExcerciseButton" type="button">Submit Edited Excercise</button>
                     </td>
                 </tr>
             </table>
@@ -229,7 +283,7 @@
                             {{/users}}
                         </selcet>
                     </td>
-                    <td><button id="AddToOldGroupButton" onclick="editGroupadd(this)">Add</button></td>
+                    <td><button id="AddToOldGroupButton" >Add</button></td>
                 </tr>
             </table>
         </div> 
