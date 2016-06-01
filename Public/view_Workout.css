@@ -1,25 +1,47 @@
 @media only screen and (max-device-width : 768px) {
 
+@font-face {
+    font-family: SourceSansProLight;
+    src: url(../Public/Fonts/SourceSansPro-Light.otf);
+}
+@font-face {
+    font-family: SourceSansProLightBold;
+    src: url(../Public/Fonts/SourceSansPro-Semibold.otf);
+}
+
 body {
-    background-color: #737373; /*<!-- #555555 -->*/
+	background-color: #3a3a3a;
+	font-family: SourceSansProLight;
     width:100%;
     height:100%;
     margin:0;
     padding:0;
 }
-h1{
-	padding-top:1%;
-	padding-bottom:1%;
-	margin:0;
-	top:0;
+#Spacer{
 	height:7%;
-	text-align: center;
-	font-size: 100px;
-	color: white;
-	background-color: #7b3040;
-	font-family: sans-serif;
-	border-bottom:solid white 4px;
+	width:100%;
+	position: relative;
+}
+#Header{
+	width:100%;
+	height:7%;
+	top:0;
+	left:0;
+	position: fixed;
+	background-color: #843849;
 
+}
+#Logo{
+    margin-right:40%;
+    margin-left:40%;
+	height:7%;
+	min-width: 20%;
+	background-image:url("../Public/Images/WorkoutWebsiteLogo.png");
+	background-size:cover;
+	position:fixed;
+	left:0px;
+	top:0px;
+    z-index: 2;
 }
 #Hamburger_icon{
 	position:absolute;
@@ -27,92 +49,71 @@ h1{
 	height:110px;
 	margin:6px 0px 0px 10px;
 	padding:0px;
-	background-image:url("/Users/AndyWood/Desktop/Coding_Projects/Unfinished/WeightRoomManagment/Public/Images/menu-alt-512.png");
+	background-image:url("../Public/Images/menu-alt-512.png");
 	background-size:cover;
 	left:0px;
 	top:0px;
 }
 #nav_bar{
-	margin: 0;
+	z-index:10;
+	position:fixed;
+	left:0;
+	top:7%;
+	width:50%;
+	margin:0;
 	padding:0;
-	padding-top:2%;
-	padding-bottom:2%;
-	top:6%;
-	height:8%;
-	background-color: #7b3040;
-    font-size: 50px;
+	height:100%;
+	background-color: #843849;
+    font-size: 60px;
    
 }
-#nav_bar li {
-	margin:0;
-	padding:0;
-	list-style-type: none;
-	text-align: center;
-	font-family: sans-serif;
-	color:#ffffff;
-    display:inline-block;
-    width:32%;
-
-    padding-top:1%;
-	padding-bottom:1%;
-	margin:0;
-	height:auto;
-	font-size: 30px;
+#Transparent_Div{
+	z-index: 5;
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
 }
-#nav_bar li:nth-child(even) {
-	border-left: solid #bfc0c0 5px;
-	border-right: solid #bfc0c0 5px;
+#nav_bar li {
+	padding:30px;
+	list-style: none; 
+	font-family: SourceSansProLight;
+	color:#ffffff;
+	border: 2px #333 solid;
 }
 #Workout_bar{
-	margin: 0;
+	position:fixed;
+	margin:0;
 	padding:0;
 	width:100%;
-	height:110%;
-	background-color: #323333;
-  	height: 10%;
-    top:11%; 
-    margin-bottom: 3%;
+	background-color: #333;
+  	height: 60px; 
+  	left:0;
+  	top:7%;
 }
 #Workout_bar li{
 	color:#ffffff;
-	padding-top:1%;
-	padding-bottom:1%;
 	margin:0;
-	padding-left: 0;
-	padding-right: 0;
-	height:auto;
 	text-align: center;
 	font-size: 40px;
 	font-family: sans-serif;
     display:inline-block;
-    width:32%; 
 	
-}
-#Workout_bar li:nth-child(even) {
-	border-left: solid #bfc0c0 7px;
-	border-right: solid #bfc0c0 7px;
-}
-#Workout_bar li:first-child{
-	border-right: solid #bfc0c0 7px;
-}
-#Workout_bar li:last-child{
-	border-left: solid #bfc0c0 7px;
 }
 #Workouts{
 	width:90%;
 	margin-left:5%;
 	margin-right:5%;
+	margin-top:20%;
 }
 table{
-	position: relative;
-	left:5%;
-	right:5%;
-	max-width:90%;
-	top:25%;
+	text-shadow:none;
+	font-family: SourceSansProLight;
+	width:100%;
 	border:solid #7b3040 5px;
 }
 tr, td, th{
-	font-family: sans-serif;
 	border-collapse: collapse;
 	border:0px;
 	margin:0;
@@ -122,10 +123,16 @@ tr, td, th{
 }
 th{
 	color:#ffffff;
+	font-family: SourceSansProLightBold;
 	font-size: 28px;
 	background-color: #7b3040;
 }
 tr{
+	font-family: SourceSansProLight;
+	font-size: 28px;
+}
+td{
+	font-family: SourceSansProLight;
 	font-size: 28px;
 
 }
@@ -144,10 +151,14 @@ tr:nth-child(odd) input{
 }
 input{
 	font-size: 28px;
-	width:80%;
+	font-family: SourceSansProLight;
+	width:99%;
 	margin:0;
 	padding:0;
 	height:100%;
+	border:2px gray solid;
+	border-radius: 2px;
+	outline:none;
 }
 
 #Workout_Submit_Button{
@@ -162,6 +173,4 @@ input{
 	color:white;
 
 }
-
-
 }

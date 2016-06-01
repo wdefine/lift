@@ -1,10 +1,10 @@
 @font-face {
     font-family: SourceSansProLight;
-    /*src: url(../Fonts/SourceSansPro-Light.otf);*/
+    src: url(/Fonts/SourceSansPro-Light.otf);
 }
 @font-face {
     font-family: SourceSansProLightBold;
-    /*src: url(../Fonts/SourceSansPro-Semibold.otf);*/
+    src: url(/Fonts/SourceSansPro-Semibold.otf);
 }
 
 body {
@@ -31,7 +31,7 @@ body {
 	height:75px;
     margin-top:-8px;
     vertical-align:middle;
-	/*background-image:url("../Images/WorkoutWebsiteLogo.png");*/
+	background-image:url("/Images/WorkoutWebsiteLogo.png");
 	background-size:cover;
 	position:fixed;
 	left:0px;
@@ -56,9 +56,12 @@ body {
     display:inline;
 }
 #nav_bar li button {
+    border:none;
+    outline:none;
     background-color: #843849;
     height: 72px;
     font-family: SourceSansProLight;
+    font-size: 100%;
     color:#fff;
     display: inline-block;
     line-height: 72px;

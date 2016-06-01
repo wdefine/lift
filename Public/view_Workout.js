@@ -1,7 +1,10 @@
 var socket = io.connect();
 var userData = [];
+var UserEmail;
+var WorkoutName;
 $( document ).ready(function() {
-	socket.emit('getUserData',$('#UserEmail').val())
+
+		
 	//testing
 	var c = {reps:8, weight:135};
 	var g = {reps:5, weight:"none"};
@@ -16,16 +19,21 @@ $( document ).ready(function() {
 	var t = {completed:true, exercises:[a,r]};
 	var f = [e,e,t,e,t,t];//array
 
- 	var array = f
+	////////Load NextWorkout//////////
  	addWorkout(f);
+ 	//////Hamburger menu//////
+ 	$(document).on("tap", "#Hamburger_icon", function(){
+ 		console.log("hamburger");
 
-	$(document).on("swipeleft", "table", function(){
-		cycle_Tables($(this).attr('id'));
-	});
-	$(document).on("swiperight", "table", function(){
-		rev_cycle_Tables($(this).attr('id'));
-	});
-	$(document).on("tap", "#NavWorkout", function(){
+		setTimeout(function(){$("body").append("<div id='Transparent_Div'></div>")}, 50);
+		$("#nav_bar").show();
+ 	});
+ 	$(document).on("tap", "#Transparent_Div", function(){
+ 		console.log("transparent div");
+		$("#Transparent_Div").remove();
+		$("#nav_bar").hide();
+ 	});	
+ 	$(document).on("tap", "#NavWorkout", function(){
 		$("#WorkoutPage").show();
 		$("#ProgressPage").hide();
 		$("#ProfilePage").hide();
@@ -49,42 +57,50 @@ $( document ).ready(function() {
 		$(this).css("background-color", '#737373' );
 
 	});
-
-
-	show_only("table","0");//hides all tables except first
-
-	socket.on('userData',function(data){
-		userData = data;
-		//do stuff with data here (for Scott's stuff)
-	})
+ 	//////////cycleing tables//////////
+	$(document).on("swipeleft", "table", function(){
+		cycle_Tables($(this).attr('id'));
+	});
+	$(document).on("swiperight", "table", function(){
+		rev_cycle_Tables($(this).attr('id'));
+	});
 });
+
 window.addEventListener('load', function(){
-	
-	//addWorkout("_3-2-4", 3, true);
-	//////////////////////
-	////initial hides/////
-	//////////////////////
-	
-	//$(document).on("click", "table", function(){
-	//	cycle_Tables($(this).attr('id'));
-
-	//});
-	////PAGE SET UP////
-
-	//socket.emit('getNextWorkout')
+	///////Intial hides////////
+	show_only("table","0");
+	$("#nav_bar").hide();
 
 
-///////TO BE FINISHED
-	//$(document).on(tap)
+/////Setting User Info//////
+	UserEmail = $("#UserEmail").text();;
+	console.log("user email: "+UserEmail);
+	WorkoutName = $("#Workoutname").text();
+	console.log("workout name: " +WorkoutName);
+
+	///////get user data///////
+	socket.emit('getUserData',$('#UserEmail').val());
+	socket.on('userData',function(data){
+		var userData = data;
+		console.log(userData);
+		//do stuff with data here (for Scott's stuff)
+	});
+
+	var array = socket.emit("getNextWorkout", WorkoutName, UserEmail);
+	addWorkout(array);
+
     $("table").on("blur", "input", function(){
-    	console.log("works");
         var Cell_Id = $(this).attr('id');
         var Cell_Value = $(this).val();
         var completed = false;//unless we add editing old workouts
         var Workoutname = $("#Workoutname").text();//mustached in on load
         var email = $("#UserEmail").text();//mustached in on load
-        console.log("cell value :" + Cell_Value + "Cell Id: "+ Cell_Id+ "completed: "+completed+"Workout name: "+Workoutname +"email: "+email);
-        socket.emit("changeWorkout", Last_Cell_Id, Last_Cell_Value, completed, workoutname, email);
+        console.log("cell value :" + Cell_Value + " Cell Id: "+ Cell_Id+ " completed: "+completed+" Workout name: "+Workoutname +" email: "+email);
+        socket.emit("changeWorkout", email, Workoutname, Cell_Id, Cell_Value, completed);
+    });
+    $(document).on("tap","#submitWorkout", function(){
+    	socket.emit("submitWorkout", )
+
     });
 
 
@@ -101,7 +117,6 @@ window.addEventListener('load', function(){
 function show_only(elementType, elementToBeShown){
 	var elements = document.getElementsByTagName(elementType);
 	for(var i = 0; i < elements.length; i++){
-		console.log(elements[i].getAttribute('id')+ " = "+ elementToBeShown);
 		if(elements[i].getAttribute('id') == elementToBeShown){
 			$(elements[i]).show();
 		}
@@ -135,7 +150,6 @@ function rev_cycle_Tables(shownElementId){
 		elementIds.push(id);
 	}
 	var previousElementIndex = elementIds.indexOf(shownElementId) -1;
-	console.log(previousElementIndex);
 	if(previousElementIndex >= 0){
 		var previousElementId = elementIds[previousElementIndex];
 		$(shownElementId).hide();

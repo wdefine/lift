@@ -112,7 +112,8 @@ io.on('connection', function(socket) {
     socket.on('submitMax',function(email,exercise,max){ //all
         update_col("users",exercise.split(' ').join('_'),max,"email",email);
     });
-    socket.on('changeWorkout',function(email,workout,str,value,completed){ //all 
+    socket.on('changeWorkout',function(email,workout,str,value,completed){ //all
+        console.log("cell value :" + value + " Cell Id: "+ str+ " completed: "+completed+" Workout name: "+workout +" email: "+email);
         update_workout(str,value,completed,email,workout);
     });
     socket.on('submitWorkout',function(email,workout,date){ //all
