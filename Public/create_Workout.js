@@ -192,6 +192,9 @@ window.addEventListener('load', function(){
 		socket.emit("editExerciseUrl", excercise_Name, excercise_URL);
 		
 	});
+	$(document).on("click",".memberRemoveButton", function(){
+		editGroupdelete($(this));
+	});
 
 
 	//For automatically sorting through users by name/email
@@ -259,10 +262,20 @@ window.addEventListener('load', function(){
 });
 function addUsers(list){
 	for(var i=0;i<list.length;i++){
+		$("#AddMemberRow").before("<tr class='Member' id ='member_Row_"+i+"'></tr>");
+		$("#member_Row_"+i).append("<td id ='member_Row_"+i+"_Name'>"+list[i].name+"</td>");
+		$("#member_Row_"+i).append("<td id ='member_Row_"+i+"_Email'>"+list[i].email+"</td>");
+		$("#member_Row_"+i).append("<td><button class='memberRemoveButton' id='"+i+"_Remove'>Remove</button></td>");
+		$("#"+i+"_Remove").data("Email",list[i].email);
+		$("#"+i+"_Remove").data("Name",list[i].name);
+/*		
 		var row = document.getElementById("AddMemberRow").parentNode.insertRow(5);
 		var c1 = row.insertCell(0);
 		var c2 = row.insertCell(1);
 		var c3 = row.insertCell(2);
+		console.log(c1);
+		c1.text(""+list[i].name);
+	*/
 	}
 }
 function getFull(){
@@ -482,20 +495,33 @@ function editGroupadd(){ //adds an additional user to a preexisting group
 //done
 function editGroupdelete(_this){ //removes a user from a group
 	console.log("edit group delete");
+	console.log(_this);
 	var group = $("#AddGroupDrop").val();
-	var name = _this.parentNode.parentNode.find(".Name").val();
-	var email = _this.parentNode.parentNode.find(".Email").val();
+	var name = _this.data("Name");
+	var email = _this.data("Email")
+	console.log(name + "     "+email);
 	var user = {name:name, email:email};//object with email and name
+	console.log(user.email);
 	socket.emit("editGroupdelete", group, user);
+	var id = _this.attr("id");
+	var rowNum = id.charAt(0);//I know its not beautiful but it works
+	//$("#member_Row_"+rowNum).remove();//remove the row of the person removed from group
+
 }
 function getGroup(){
+	if($(".Member").length > 0){
+		$(".Member").remove();//clear table if a new group is selected
+	}
+	console.log("getGroupCalled");
 	var group = $("#AddGroupDrop").val();
 	if(group != ""){
-		$("#AddGroupDrop").val("");
+		console.log("this");
 		console.log(group);
 		socket.emit("getGroupUsers",group);
+		//$("#AddGroupDrop").val("");
 	}
 	else{
+		console.log("that");
 		var groupies = $('.Member');
 		groupies.each(function(){
 			this.parentNode.deleteRow(this.rowIndex);

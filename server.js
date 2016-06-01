@@ -5,7 +5,7 @@
 7a) is get_max_from_list correct
 7b) check over everything
 line 413 getUserList() needs to be defined or substituted for something else
-updating excercise url doesnt put the info into the database. why? i don't know
+updating excercise url doesnt put the info into the database.
 */
 
 var http = require('http'); 
@@ -143,7 +143,8 @@ io.on('connection', function(socket) {
         push_group(user,name);
     });
     socket.on('editGroupdelete',function(name,user){ //admin
-        pop_group(user.email,name);
+        console.log("user email: "+user.email+" group name: " +name);
+        pop_group(user.email,name);//name = groupname
     });
     socket.on('assignWorkout',function(group,full){ //admin
         assign_full_workout(group,full);
@@ -515,6 +516,7 @@ function push_group(user,group){
     });
 }
 function pop_group(email,group){
+    console.log("pop group");
     conn.query('DELETE FROM "main"."'+group+'" WHERE "email"=($1)',[email]);
     conn.query('SELECT full FROM "main"."'+group.toString()+"-assigned"+'" ')
     .on('data',function(row){
