@@ -147,6 +147,10 @@ table{
 
 
 }
+input{
+    width:80%;
+}
+
 #CreateForm input{
     margin: 1px;
     font-size: 15px;

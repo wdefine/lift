@@ -67,27 +67,29 @@ $( document ).ready(function() {
 });
 
 window.addEventListener('load', function(){
-	///////Intial hides////////
-	show_only("table","0");
-	$("#nav_bar").hide();
-
-
-/////Setting User Info//////
+	/////Setting User Info//////
 	UserEmail = $("#UserEmail").text();;
 	console.log("user email: "+UserEmail);
 	WorkoutName = $("#Workoutname").text();
 	console.log("workout name: " +WorkoutName);
 
+	///////Intial hides////////
+	show_only("table","0");
+	$("#nav_bar").hide();
+
 	///////get user data///////
-	socket.emit('getUserData',$('#UserEmail').val());
+	socket.emit('getUserData',UserEmail);
 	socket.on('userData',function(data){
 		var userData = data;
 		console.log(userData);
 		//do stuff with data here (for Scott's stuff)
 	});
-
-	var array = socket.emit("getNextWorkout", WorkoutName, UserEmail);
-	addWorkout(array);
+	//load in next workout//
+	socket.emit("getNextWorkout", WorkoutName, UserEmail);
+	socket.on("nextWorkout", function(array){
+		addWorkout(array);
+	});
+	
 
     $("table").on("blur", "input", function(){
         var Cell_Id = $(this).attr('id');
@@ -99,9 +101,11 @@ window.addEventListener('load', function(){
         socket.emit("changeWorkout", email, Workoutname, Cell_Id, Cell_Value, completed);
     });
     $(document).on("tap","#submitWorkout", function(){
-    	socket.emit("submitWorkout", )
+
+    	socket.emit("submitWorkout", UserEmail, Workoutname,  )
 
     });
+    
 
 
 
