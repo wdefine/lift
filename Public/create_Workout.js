@@ -147,7 +147,7 @@ window.addEventListener('load', function(){
 		addUsers(list);
 	})
 	socket.on("newExercise", function(name){
-		$(".Excercise_Drop").append('<option class="Exercise-name" value="'+name+'"">{{exercise}}</option>');
+		$(".Excercise_Drop").append('<option class="Exercise-name" value="'+name+'"">'+name+'</option>');
 	});
 	///////////////////////////////////
 	/////////Send 
@@ -305,8 +305,11 @@ function getFull(){
 	}
 }
 function sortFull(list){
+	console.log(list);
 	for(var i=0;i<list.length;i++){
+		console.log(list[i].skip);
 		if(list[i].skip == true){
+			console.log(i)
 			finished.push(list[i]);
 			$("#week-day").append("<option value=\""+list[i].cycle+"/"+list[i].day+"\">Week "+list[i].cycle+", Day "+list[i].day+"</option>");
 		}
@@ -314,6 +317,8 @@ function sortFull(list){
 			unfinished.push(list[i]);
 		}
 	}
+	console.log("finished", finished);
+	console.log("unfinished",unfinished);
 }
 function getWeekDay(){  //this is why we have fulls, if user has already created week 1 day 1 workout, 
 						//then week 2 day 1 workout will be filled in for the user
@@ -587,31 +592,32 @@ function createFullWorkout(){
 }
 
 function createWorkout(){
-	console.log("here 1");
-	var tblarr = [];
-	var array = [];
-	var tblrows = document.getElementById("Exercise_Forms").rows;
-	for(var i=3;i<tblrows.length-1;i++){ //this first for loop puts the table into a more usable array
-		var rowe = tblrows[i];
-		var cells = rowe.cells;
-		tblarr.push({
-			set:cells[0].firstChild.value,
-			exnum:cells[1].firstChild.value,
-			name:cells[2].innerHTML,
-			rounds:cells[3].firstChild.value,
-			reps:cells[4].firstChild.value
-		});
+	var full = $("#full_workout").val();
+	var val = $("#week-day").val();
+	var date = $("#workout_date").val();
+	console.log(full,val,date);
+	if(full != "" && val!="" && date != ""){
+		console.log("here 1");
+		var tblarr = [];
+		var array = [];
+		var tblrows = document.getElementById("Exercise_Forms").rows;
+		for(var i=3;i<tblrows.length-1;i++){ //this first for loop puts the table into a more usable array
+			var rowe = tblrows[i];
+			var cells = rowe.cells;
+			tblarr.push({
+				set:cells[0].firstChild.value,
+				exnum:cells[1].firstChild.value,
+				name:cells[2].innerHTML,
+				rounds:cells[3].firstChild.value,
+				reps:cells[4].firstChild.value
+			});
+		}
+		getNextSet(array,tblarr,1,true);
 	}
-	console.log("here 2");
-	getNextSet(array,tblarr,1,true);
 }
 function getNextSet(array,tblarr,sety,done){
 	if(done && killswitch){
-		console.log("bigger tblarr", tblarr)
-		console.log("starting loop 1  -do 1 loop for every set");
 		var setlist = [];
-		console.log("empty setlist: ",setlist);
-		console.log(tblarr.length);
 		for(var i=0;i<tblarr.length;){
 			if(tblarr[i].set == sety){
 				setlist.push(tblarr[i]);
@@ -621,15 +627,13 @@ function getNextSet(array,tblarr,sety,done){
 				i++;
 			}
 		}
-		console.log("smaller tblarr: ",tblarr);
-		console.log("full setlist: ",setlist);
 		orderSetlist(array,tblarr,sety,setlist,true);
 	}
 	else if(killswitch){
 		killswitch = false;
 		var tblrows = document.getElementById("Exercise_Forms").rows;
-		var date = $("#Workout_date").val();
-		var d = Date.UTC(date.substring(0,4),date.substring(5,7),date.substring(8,10));
+		var date = $("#workout_date").val();
+		var d = Date.UTC(date.substring(0,4),date.substring(5,7)-1,date.substring(8,10));
 		var full = $("#full_workout").val();
 		var val = $("#week-day").val();
 		var x = val.indexOf("/");
@@ -643,7 +647,6 @@ function getNextSet(array,tblarr,sety,done){
 		document.getElementById("new-exercise-name").selectedIndex = "0";
 		$("#new-exercise-sets").val("");
 		$("#new-exercise-reps").val("");
-		console.log("fuck yes jesus", full,array,d,week,day);
 		socket.emit("createWorkout",full,array,d,week,day);
 		document.getElementById("full_workout").selectedIndex = "0"; 
 		getFull();
@@ -655,52 +658,36 @@ function orderSetlist(array,tblarr,sety,setlist,loopy){
 		var doopy = true;
 		for(var i=1;i<setlist.length;i++){
 			if(setlist[i].exnum < setlist[i-1].exnum){
-				console.log("old setlist: ",setlist);
 				var a = setlist[i-1];
 				var b = setlist[i];
 				setlist.splice(i-1,2);
 				setlist.push(b);
 				setlist.push(a);
 				doopy = false;
-				console.log("new setlist: ",setlist);
 			}
 		}
 		if(doopy){
 			if(setlist.length != 0){
-				console.log("we have sorted a set this should appear for number of sets");
-				console.log("tblarr: ",tblarr);
-				console.log("tblarr length:", tblarr.length)
-				console.log("setlist: ",setlist);
 				var set ={};
 				var exercises = [];
-				console.log("exercises: ",exercises);
-				console.log("setlist.length: ", setlist.length);
 				for(var i=0;i<setlist.length;i++){
 					var exercise = {name:setlist[i].name}
 					var rounds = [];
-					console.log("rounds: ",rounds);
 					var rdl = setlist[i].rounds;
-					console.log("round length", rdl);
 					for(var j=0;j<rdl;j++){
 						rounds.push({reps:setlist[i].reps})
 					}
-					console.log("rounds: ",rounds);
 					exercise.rounds = rounds;
 					exercises.push(exercise);
-					console.log("exercise push", exercise);
 				}
-				console.log("exercises: ",exercises);
 				set.exercises = exercises;
-				console.log("set: ",set);
 				array.push(set);
 			}
 			if(tblarr.length == 0){
-				console.log("i should get here once");
 				loopy = false;
 				getNextSet(array,tblarr,sety+1,false);
 			}
 			else{
-				console.log("what the fuck is tblarr", tblarr, tblarr.length);
 				getNextSet(array,tblarr,sety+1,true);
 			}
 	    }
