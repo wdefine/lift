@@ -5,6 +5,10 @@
 7a) is get_max_from_list correct
 7b) check over everything
 updating excercise url doesnt put the info into the database.
+line 689 what should happen with the inputs
+what ever the fuck is happening with edit excercise url 1174
+adding someone to a team puts an object in the name of group drop down
+
 
 //////bug////////
 if you add the same person to a group they are already in then server crashes.
@@ -819,6 +823,16 @@ function populate_table_init_2(array,table,date,cycle,day,full,list,callback){
     console.log("we have filled in the table");
     insert_wo_row("name","email",array.length,table,array,date);
     callback(array,table,date,cycle,day,full);
+    })
+    .on('error',function(){
+        console.log("populate_table_init_2 has shit itself");
+    })
+    .on('end', function(){
+        console.log("ended")
+        insert_wo_row("name","email",array.length,table,array,date);
+        console.log("we have filled in the table");
+        callback(array,workout,date,cycle,day,full);
+    });
 }
 function insert_wo_row(name,email,setnum,table,array,date){
     console.log("this is called from populate_table_init_2");
@@ -1251,7 +1265,12 @@ function create_column(table,column,type){
     conn.query('ALTER TABLE "main"."'+table+'" ADD '+column+' '+type+' ');
 }
 function update_col(table,column,value,cona,conb){
+<<<<<<< HEAD
     conn.query('UPDATE "main"."'+table+'" SET ' + column +  '= ($1) WHERE "'+cona+'" = ($2)',[value,conb]);
+=======
+    console.log(table +" "+column+" "+value+" "+cona+" "+conb);
+    conn.query('UPDATE "main"."'+table+'" SET ' + column +  '= ($1) WHERE ($2) = ($3)',[value,cona,conb]);
+>>>>>>> 7d6fabb81c2b99466c868a9b927db864f738361e
 }
 function get_all_full(groups,callback){
     list = [];
@@ -1329,6 +1348,7 @@ function rounder(num,diff){
 function get_user_data(email,callback){
     array = [];
     conn.query('SELECT * FROM "main"."'+email+'" WHERE "completed"=($1) AND "skipped"=($2)',[true,false])
+    console.log("email: "+email);
     .on('data',function(row){
         array.push(row);
     })

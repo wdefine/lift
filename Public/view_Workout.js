@@ -25,7 +25,7 @@ $( document ).ready(function() {
  	$(document).on("tap", "#Hamburger_icon", function(){
  		console.log("hamburger");
 
-		setTimeout(function(){$("body").append("<div id='Transparent_Div'></div>")}, 50);
+		setTimeout(function(){$("body").append("<div id='Transparent_Div'></div>")}, 500);
 		$("#nav_bar").show();
  	});
  	$(document).on("tap", "#Transparent_Div", function(){
@@ -66,6 +66,33 @@ $( document ).ready(function() {
 	});
 });
 
+	$(function () {
+    	var mySwiper = $('.swiper-container').swiper({
+    		mode: 'horizontal',
+            watchActiveIndex: true,
+            spaceBetween: 100,
+	   		onSlideChangeStart: function (swiper) {
+                    console.log('slide change start - before');
+                    console.log(swiper);
+                    console.log(swiper.activeIndex);
+                    //before Event use it for your purpose
+            },
+            onSlideChangeEnd: function (swiper) {
+                    console.log('slide change end - after');
+                    console.log(swiper);
+                    console.log(swiper.activeIndex);
+                    //after Event use it for your purpose
+                    if (swiper.activeIndex == 1) {
+                        //First Slide is active
+                        console.log('First slide active');
+                         }
+                }
+            });
+        });
+
+
+
+
 window.addEventListener('load', function(){
 	/////Setting User Info//////
 	UserEmail = $("#UserEmail").text();;
@@ -74,7 +101,7 @@ window.addEventListener('load', function(){
 	console.log("workout name: " +WorkoutName);
 
 	///////Intial hides////////
-	show_only("table","0");
+	//show_only("table","0");
 	$("#nav_bar").hide();
 
 	///////get user data///////
@@ -85,7 +112,7 @@ window.addEventListener('load', function(){
 		//do stuff with data here (for Scott's stuff)
 	});
 	//load in next workout//
-	socket.emit("getNextWorkout", WorkoutName, UserEmail);
+	socket.emit("getNextWorkout", "Full Test", UserEmail);
 	socket.on("nextWorkout", function(array){
 		addWorkout(array);
 	});
@@ -108,19 +135,13 @@ window.addEventListener('load', function(){
 
 
 
-    var mySwiper = new Swiper('.swiper-container', {
-	    speed: 400,
-	    spaceBetween: 100
-	});	
-
-
-
 
 
 
 
 
 });
+/*
 function show_only(elementType, elementToBeShown){
 	var elements = document.getElementsByTagName(elementType);
 	for(var i = 0; i < elements.length; i++){
@@ -166,13 +187,17 @@ function rev_cycle_Tables(shownElementId){
 		show_only("table", elementIds[elementIds.length - 1]);
 	}
 }
+*/
 ////////ADDING TABLE FUNCTION///////////
+
 function addWorkout(array){
 	var letters = ["a","b","c","d","e","f","g"];
- 	for(var i=0;i<array.length;i++){//for each set of excercises
+	var i;
+ 	for(i=0;i<array.length;i++){//for each set of excercises
+ 		console.log("once");
 		var temp = i;
-		$('.swiper-wrapper').append("<div class='swiper-slide'></div>")
-		$('.swiper-slide').append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
+		$('.swiper-wrapper').append("<div id='Slide_"+i+"' class='swiper-slide'></div>")
+		$('#Slide_'+i).append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
 		$('#'+i).append("<tr><th colspan ='4'>Set "+(i +1)+"");//add table header	
 		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column headers
 		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
@@ -183,7 +208,8 @@ function addWorkout(array){
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+3)+"_reps\"><input id='"+i+"_"+j+"_"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+4)+"_weight\"><input id='"+i+"_"+j+"_"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
 		}
-	} 		
+	} 
+	$('#Slide_'+i).append("<button id='submitWorkout'>Sumbit Workout</button>");
 }
 
 function addDateToWorkoutBar(Date){
