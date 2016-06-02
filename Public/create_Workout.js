@@ -27,7 +27,6 @@ window.addEventListener('load', function(){
 	/////Page Navigation//////////////
 	//////////////////////////////////
 	//will clean up later
-	$("delete-ex-button").hover
 
 	$(".nav_bar_link").hover(function(){
 		$(this).css("background-color", "#b04f66");
@@ -594,8 +593,8 @@ function createFullWorkout(){
 function createWorkout(){
 	var full = $("#full_workout").val();
 	var val = $("#week-day").val();
-	var date = $("#workout_date").val();
-	console.log(full,val,date);
+	var date = $("#Workout_date").val();
+	console.log(full + val +date);
 	if(full != "" && val!="" && date != ""){
 		console.log("here 1");
 		var tblarr = [];

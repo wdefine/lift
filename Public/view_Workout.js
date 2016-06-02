@@ -3,9 +3,7 @@ var userData = [];
 var UserEmail;
 var WorkoutName;
 $( document ).ready(function() {
-
 		
-	//testing
 	var gt = {reps:6, weight:100};
 	var t = {reps:6, weight:150};
 	var c = {reps:8, weight:135};
@@ -13,22 +11,23 @@ $( document ).ready(function() {
 	var p = {reps:12, weight:30};
 	var d = [c,c,c,c];
 	var dp = [t,t,t];
-	var dv = [gt,gt,gt,gt];
+	var dv = [gt,gt,gt];
+	var z = [g,g,g];
+	var w = [p,p,p];
 	var a = {completed:true,_name:"Bench Press",rounds:d};
 	var at = {completed:true,_name:"Hang Clean",rounds:dv};
 	var ar = {completed:true,_name:"Box Jumps",rounds:dp};
-	var z = [g,g,g];
-	var w = [p,p,p];
 	var r = {completed:false,_name:"Push Ups",rounds:z};
 	var q = {completed:true,_name:"Tricep Extensions",rounds:w};
 	var e = {completed:true, exercises:[a,r,q]};//first round of excercises
 	var t = {completed:true, exercises:[a,r]};
-	var tc = {completed:true, exercises:[at,ar,a]};
+	var tc = {completed:true, exercises:[at,ar,q]};
 	var tv = {completed:true, exercises:[z,q,at]};
-	var f = [e,tc,t,tv,e,t];//array
+	var f = [e,d,t];//array
 
 	////////Load NextWorkout//////////
  	addWorkout(f);
+ 	
  	//////Hamburger menu//////
  	$(document).on("tap", "#Hamburger_icon", function(){
  		console.log("hamburger");
@@ -72,7 +71,6 @@ $( document ).ready(function() {
 	$(document).on("swiperight", "table", function(){
 		rev_cycle_Tables($(this).attr('id'));
 	});
-});
 
 	$(function () {
     	var mySwiper = $('.swiper-container').swiper({
@@ -93,39 +91,36 @@ $( document ).ready(function() {
                     if (swiper.activeIndex == 1) {
                         //First Slide is active
                         console.log('First slide active');
-                         }
+                    }
                 }
             });
-        });
-
+    });
+});
 
 
 
 window.addEventListener('load', function(){
-	/////Setting User Info//////
-	UserEmail = $("#UserEmail").text();;
-	console.log("user email: "+UserEmail);
-	WorkoutName = $("#Workoutname").text();
-	console.log("workout name: " +WorkoutName);
-
 	///////Intial hides////////
-	//show_only("table","0");
 	$("#nav_bar").hide();
-
 	///////get user data///////
 	socket.emit('getUserData',UserEmail);
 	socket.on('userData',function(data){
 		var userData = data;
 		console.log(userData);
-		//do stuff with data here (for Scott's stuff)
-	});
+	});	
+	UserEmail = $("#UserEmail").text();;
+	console.log("user email: "+UserEmail);
+	WorkoutName = $("#Workoutname").text();
+	console.log("workout name: " + WorkoutName);
+
 	//load in next workout//
-	socket.emit("getNextWorkout", "Full Test", UserEmail);
-	socket.on("nextWorkout", function(array){
+	/*
+	socket.emit("getNextWorkout", WorkoutName, UserEmail);
+		socket.on("nextWorkout", function(array){
 		addWorkout(array);
 	});
-	
-
+	*/
+	//load in next workout//
     $("table").on("blur", "input", function(){
         var Cell_Id = $(this).attr('id');
         var Cell_Value = $(this).val();
@@ -140,14 +135,6 @@ window.addEventListener('load', function(){
     	var date = d.getTime();
     	socket.emit("submitWorkout", UserEmail, Workoutname, date);
     });
-
-
-
-
-
-
-
-
 });
 /*
 function show_only(elementType, elementToBeShown){
@@ -199,15 +186,15 @@ function rev_cycle_Tables(shownElementId){
 ////////ADDING TABLE FUNCTION///////////
 
 function addWorkout(array){
+	console.log(array);
 	var letters = ["a","b","c","d","e","f","g"];
 	var i;
+	console.log(array.length);
  	for(i=0;i<array.length;i++){//for each set of excercises
- 		console.log("once");
-		var temp = i;
 		$('.swiper-wrapper').append("<div id='Slide_"+i+"' class='swiper-slide'></div>")
 		$('#Slide_'+i).append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
 		$('#'+i).append("<tr><th colspan ='4'>Set "+(i +1)+"");//add table header	
-		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column headers
+		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column header
 		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
 			var cellnum = 0;		
 			$('#'+i).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j]._name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
@@ -216,10 +203,8 @@ function addWorkout(array){
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+3)+"_reps\"><input id='"+i+"_"+j+"_"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+4)+"_weight\"><input id='"+i+"_"+j+"_"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
 		}
-	} 
+	}
+	console.log(i);
 	$('#Slide_'+i).append("<button id='submitWorkout'>Sumbit Workout</button>");
-}
-
-function addDateToWorkoutBar(Date){
-
+	i==0;
 }

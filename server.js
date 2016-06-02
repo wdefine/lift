@@ -109,6 +109,7 @@ io.on('connection', function(socket) {
     socket.join("stab");
     socket.on('getNextWorkout',function(workout,email){ //all
         console.log("request received");
+        console.log("email: "+email+" Workout: "+workout);
         table_to_array(workout,email, function(array){
             console.log(array);
             socket.emit('nextWorkout',array);
@@ -510,6 +511,8 @@ function assign_full_workout(group,full){
         }
         if(x==0){
             console.log("this is not a repeat", list[1]+ "is the full", list[0]+ "is the group");
+            console.log(list[1].toString());
+            console.log(list[0].toString());
             conn.query('INSERT INTO "main"."'+list[1].toString() +"_groups"+'" (groupf) VALUES ($1)',[list[0]]);
             conn.query('INSERT INTO "main"."'+list[0].toString()+"_assigned"+'" (full) VALUES ($1)',[list[1]]);
             var date = new Date();
@@ -823,7 +826,8 @@ function populate_table_init_2(array,table,date,cycle,day,full,list,callback){
     console.log("we have filled in the table");
     insert_wo_row("name","email",array.length,table,array,date);
     callback(array,table,date,cycle,day,full);
-    })
+}
+    /*
     .on('error',function(){
         console.log("populate_table_init_2 has shit itself");
     })
@@ -833,7 +837,7 @@ function populate_table_init_2(array,table,date,cycle,day,full,list,callback){
         console.log("we have filled in the table");
         callback(array,workout,date,cycle,day,full);
     });
-}
+*/
 function insert_wo_row(name,email,setnum,table,array,date){
     console.log("this is called from populate_table_init_2");
     console.log("insert_wo_row ",name,email,setnum,table,array,date);
@@ -939,7 +943,9 @@ function populate_table_full(array,table,setnum,email){
     }
 } 
 function table_to_array(workout,email,callback){
+    console.log("workout: "+workout+" email: "+email+" callbakc: "+callback);
     var array = [];
+    console.log("query");
     conn.query('SELECT * FROM "main"."'+workout+'" WHERE "email"=($1)',[email])
     .on('data',function(row){
         var keys = [];
@@ -1265,12 +1271,7 @@ function create_column(table,column,type){
     conn.query('ALTER TABLE "main"."'+table+'" ADD '+column+' '+type+' ');
 }
 function update_col(table,column,value,cona,conb){
-<<<<<<< HEAD
     conn.query('UPDATE "main"."'+table+'" SET ' + column +  '= ($1) WHERE "'+cona+'" = ($2)',[value,conb]);
-=======
-    console.log(table +" "+column+" "+value+" "+cona+" "+conb);
-    conn.query('UPDATE "main"."'+table+'" SET ' + column +  '= ($1) WHERE ($2) = ($3)',[value,cona,conb]);
->>>>>>> 7d6fabb81c2b99466c868a9b927db864f738361e
 }
 function get_all_full(groups,callback){
     list = [];
@@ -1348,7 +1349,7 @@ function rounder(num,diff){
 function get_user_data(email,callback){
     array = [];
     conn.query('SELECT * FROM "main"."'+email+'" WHERE "completed"=($1) AND "skipped"=($2)',[true,false])
-    console.log("email: "+email);
+    //console.log("email: "+email);
     .on('data',function(row){
         array.push(row);
     })
