@@ -2,7 +2,6 @@
     <head>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript" src="create_Workout.js">
@@ -61,7 +60,7 @@
                         <button id="create_full_button" type="button">Create Full Workout</button>
                     </td>
                 </tr>
-        </table>
+            </table>
         </div>
 
         <div id="Create_Workout_Page">
@@ -88,8 +87,7 @@
                             <option value="">Week x, Day y</option>
                         </select>
                     </td>
-                    <td><input type="date" id="workout_date" placeholder="yyyy-mm-dd" min="2016-01-01" max="2116-01-01"></td>
-                    <!--I removed this because it was bulky ""-->
+                    <td><input type="text" id="Workout_date" placeholder="mm-dd-yyyy" min="2016-01-01" max="2116-01-01"></td>
                 </tr>
             </table>
             <table id="Exercise_Forms">

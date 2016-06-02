@@ -8,17 +8,22 @@
         <!--Jquery Mobile-->
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+        <!--Swiper-->
+        <link rel="stylesheet" href="/Swiper-master/dist/css/swiper.min.css">
+        <script src="/Swiper-master/dist/js/swiper.min.js"></script>
         <!--Andys JS-->
         <script type="text/javascript" src="view_Workout.js">
         </script>
         <!--Andys CSS-->
         <link rel="stylesheet" media="all and (orientation:portrait)" href="view_Workout.css">
     </head>
+    
     <div id="UserIfo" display="none">
         <div id="Workoutname" display="none" value="{{workout}}">{{workout}}</div>
         <div id="UserEmail" display="none" value="{{email}}">{{email}}</div>
     </div>
 	<body id="body" email="email">
+        <div id="background"></div>
         <div id="Spacer"></div>
         <div id="Header">
             <div id="Logo"></div>
@@ -42,9 +47,24 @@
                     <li id="{{workout}}" >{{date}}</li>
                 {{/allworkouts}}
             </ul>
-            <div id="Workouts">
-                <div id="date"></div>
-                <button id="submitWorkout">Sumbit Workout</button>
-            <div/>
+            <!-- Slider main container -->
+            <div class="swiper-container">
+                <!-- Additional required wrapper -->
+                <div id="Workouts">
+                    <div id="date"></div>
+                    <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    
+                    </div>
+                <div/>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+                
+                <!-- If we need navigation buttons -->
+                <!-- If we need scrollbar -->
+                <div class="swiper-scrollbar"></div>
+            </div>
+            <button id="submitWorkout">Sumbit Workout</button>
+
         </div> 
     </body>

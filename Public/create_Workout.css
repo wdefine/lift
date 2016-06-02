@@ -14,6 +14,9 @@ body {
     padding:0;
 
 }
+#ui-datepicker-div{
+    top:15%;
+}
 #Logo_Background{
     width:20%;
     height:72px;
@@ -52,6 +55,9 @@ body {
     z-index: 2;
     
 }
+#ui-datepicker-div{
+    display:none;
+}
 #nav_bar li{
     display:inline;
 }
@@ -69,13 +75,6 @@ body {
     margin:0;
 }
 /*3a3a3a b04f66*/
-#WorkoutDatePicker{
-    text-align: middle;
-    padding-left: auto;
-    padding-right:auto;
-    margin:0;
-    padding:0;
-}
 /*//////////////////////////////////
 ///////New Workout Excercise////////
 //////////////////////////////////*/

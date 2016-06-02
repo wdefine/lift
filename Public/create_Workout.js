@@ -7,22 +7,22 @@ var unfinished = [];
 var finished = [];
 var killswitch;
 var socket = io.connect('http://localhost:8080');
+$(document).ready(function(){
+	$("#Workout_date").datepicker();
+});
+
 window.addEventListener('load', function(){
 	document.getElementById("full_workout").selectedIndex = "0";
 	document.getElementById("AssignWorkoutDrop").selectedIndex = "0";
-	$('#Create_Full_Workout_Page').show();
+	$('#Create_Full_Workout_Page').hide();
 	$("#Create_Workout_Nav_Button").css("background-color", "#3a3a3a");
 	$("#Create_Group_Page").hide();
 	$("#Create_Account_Page").hide();
 	$("#View_Progress_Page").hide();
 	$("#Assign_Workout_Page").hide();
-	$("#Create_Workout_Page").hide();
+	$("#Create_Workout_Page").show();
 	$("#Create_Excercise_Page").hide();
 
-
-	$("#WorkoutDatePicker").datepicker({
-		autoSize:true
-	});
 	///////////////////////////////////
 	/////Page Navigation//////////////
 	//////////////////////////////////
