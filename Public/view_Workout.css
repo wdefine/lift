@@ -2,11 +2,11 @@
 
 @font-face {
     font-family: SourceSansProLight;
-    src: url(../Public/Fonts/SourceSansPro-Light.otf);
+    src: url(Fonts/SourceSansPro-Light.otf);
 }
 @font-face {
     font-family: SourceSansProLightBold;
-    src: url(../Public/Fonts/SourceSansPro-Semibold.otf);
+    src: url(Fonts/SourceSansPro-Semibold.otf);
 }
 
 body {
@@ -16,6 +16,35 @@ body {
     height:100%;
     margin:0;
     padding:0;
+}
+
+ .swiper-container {
+        width: 100%;
+        height: 100%;
+    }
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: #fff;
+        /* Center slide text vertically */
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+#backgroud{
+	width:100%;
+	height:100%;
+	z-index: -10;
+	background-color:#3a3a3a;
 }
 #Spacer{
 	height:7%;
@@ -36,7 +65,7 @@ body {
     margin-left:40%;
 	height:7%;
 	min-width: 20%;
-	background-image:url("../Public/Images/WorkoutWebsiteLogo.png");
+	background-image:url("/Images/WorkoutWebsiteLogo.png");
 	background-size:cover;
 	position:fixed;
 	left:0px;
@@ -49,7 +78,7 @@ body {
 	height:110px;
 	margin:6px 0px 0px 10px;
 	padding:0px;
-	background-image:url("../Public/Images/menu-alt-512.png");
+	background-image:url("/Images/menu-alt-512.png");
 	background-size:cover;
 	left:0px;
 	top:0px;

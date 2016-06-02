@@ -101,14 +101,17 @@ window.addEventListener('load', function(){
         socket.emit("changeWorkout", email, Workoutname, Cell_Id, Cell_Value, completed);
     });
     $(document).on("tap","#submitWorkout", function(){
-
-    	socket.emit("submitWorkout", UserEmail, Workoutname,  )
-
+    	var d = new Date();
+    	var date = d.getTime();
+    	socket.emit("submitWorkout", UserEmail, Workoutname, date);
     });
-    
 
 
 
+    var mySwiper = new Swiper('.swiper-container', {
+	    speed: 400,
+	    spaceBetween: 100
+	});	
 
 
 
@@ -168,7 +171,8 @@ function addWorkout(array){
 	var letters = ["a","b","c","d","e","f","g"];
  	for(var i=0;i<array.length;i++){//for each set of excercises
 		var temp = i;
-		$('#date').append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
+		$('.swiper-wrapper').append("<div class='swiper-slide'></div>")
+		$('.swiper-slide').append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
 		$('#'+i).append("<tr><th colspan ='4'>Set "+(i +1)+"");//add table header	
 		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column headers
 		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
