@@ -147,14 +147,13 @@ window.addEventListener('load', function(){
 
 
 function addWorkout(array){
-	console.log(array);
+	console.log("array: "+array);
 	var letters = ["a","b","c","d","e","f","g"];
-	var i;
 	console.log(array.length);
- 	for(i=0;i<array.length;i++){//for each set of excercises
+ 	for(var i=0;i<array.length;i++){//for each set of excercises
  		console.log("here is new set",i);
 		
-		for(k=0;k<array[i].exercises[0].rounds.length;k++){
+		for(var k=0;k<array[i].exercises[0].rounds.length;k++){
 			console.log("here is new round", k)
 			$('.swiper-wrapper').append("<div id='Slide_"+i+"_"+k+"' class='swiper-slide'></div>")
 			$('#Slide_'+i+'_'+k).append("<table id=\""+i+"_"+k+"\" completed=\""+array[i].completed+"\"></table>");//make table
@@ -172,7 +171,5 @@ function addWorkout(array){
 			}
 		}
 	}
-	console.log(i);
-	$('#Slide_'+i).append("<button id='submitWorkout'>Sumbit Workout</button>");
-	i==0;
+	$('.swiper-wrapper').append("<div class='swiper-slide'><button id='submitWorkout'>Sumbit Workout</button></div>");
 }
