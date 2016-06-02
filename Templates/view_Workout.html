@@ -36,35 +36,22 @@
             <li id="NavProgress">Progress</li>
         </ul> 
         <div id="ProfilePage">
-            Profile
+            profile
         </div>
         <div id="ProgressPage">
             Scotts Stuff
         </div>
         <div id="WorkoutPage">
-            <ul id= "Workout_bar">
+             <ul id= "Workout_bar">
                 {{#allworkouts}}
                     <li id="{{workout}}" >{{string}}</li>
                 {{/allworkouts}}
             </ul>
-            <!-- Slider main container -->
             <div class="swiper-container">
-                <!-- Additional required wrapper -->
-                <div id="Workouts">
-                    <div id="date"></div>
-                    <div class="swiper-wrapper">
-                    <!-- Slides -->
-                    
-                    </div>
-                <div/>
-                <!-- If we need pagination -->
+                <div class="swiper-wrapper">
+            
+                </div>
                 <div class="swiper-pagination"></div>
-                
-                <!-- If we need navigation buttons -->
-                <!-- If we need scrollbar -->
-                <div class="swiper-scrollbar"></div>
             </div>
-            <button id="submitWorkout">Sumbit Workout</button>
-
         </div> 
     </body>

@@ -6,6 +6,10 @@
 7b) check over everything
 line 413 getUserList() needs to be defined or substituted for something else
 updating excercise url doesnt put the info into the database.
+line 689 what should happen with the inputs
+what ever the fuck is happening with edit excercise url 1174
+adding someone to a team puts an object in the name of group drop down
+
 
 //////bug////////
 if you add the same person to a group they are already in then server crashes.
@@ -739,10 +743,13 @@ function populate_table_init(array,table,full,date){
     });
 }
 function populate_table_init_2(array,table,date,cycle,day,full,callback){
+    console.log("populate_table_init_2");
     conn.query('SELECT groupf FROM "main"."'+full.toString() + "-groups"+'"')
     .on("data",function(row){
+        console.log("hey");
         conn.query('SELECT name,email FROM "main"."'+row.groupf+'"')
         .on('data',function(row){
+            console.log("hey hey")
             insert_wo_row(row.name,row.email,array.length,table,array,date);
         });
     })
@@ -750,6 +757,7 @@ function populate_table_init_2(array,table,date,cycle,day,full,callback){
         console.log("populate_table_init_2 has shit itself");
     })
     .on('end', function(){
+        console.log("ended")
         insert_wo_row("name","email",array.length,table,array,date);
         console.log("we have filled in the table");
         callback(array,workout,date,cycle,day,full);
@@ -1165,6 +1173,7 @@ function create_column(table,column,type){
     conn.query('ALTER TABLE "main"."'+table+'" ADD '+column+' ($1)',[type]);
 }
 function update_col(table,column,value,cona,conb){
+    console.log(table +" "+column+" "+value+" "+cona+" "+conb);
     conn.query('UPDATE "main"."'+table+'" SET ' + column +  '= ($1) WHERE ($2) = ($3)',[value,cona,conb]);
 }
 function get_all_full(groups,callback){
@@ -1240,6 +1249,7 @@ function rounder(num,diff){
 ////////////////////////////////////////////////////Check Progress Data Grabber Functions////////////////////////////
 function get_user_data(email,callback){
     array = [];
+    console.log("email: "+email);
     conn.query('SELECT * FROM "main"."'+email+'" WHERE "completed"=($1),"skipped"=($2)',[true,true])
     .on('data',function(row){
         array.push(row);

@@ -183,15 +183,19 @@ window.addEventListener('load', function(){
 		var excercise_URL = $("#New_Excercise_Url").val();
 		console.log( "excercise name: "+excercise_Name + " URl: " + excercise_URL);
 		socket.emit("createExercise", excercise_Name, excercise_URL);
-		
+		$("#New_Exercise_Name").val("");
+		$("#New_Excercise_Url").val("");
 	});
 	$(document).on("click", "#EditExcerciseButton",function(){
-		console.log("excercise edit");
+
 		var excercise_Name = $("#edit_new-exercise-name").val();
 		var excercise_URL = $("#edit_New_Excercise_Url").val();
 		console.log( "excercise name: "+excercise_Name + " URl: " + excercise_URL);
-		socket.emit("editExerciseUrl", excercise_Name, excercise_URL);
-		
+		if(excercise_Name != "" && excercise_Name != "Select Excercise" && excercise_URL != ""){
+			socket.emit("editExerciseUrl", excercise_Name, excercise_URL);
+			$("#edit_new-exercise-name").val("Select Exercise").change();
+			$("#edit_New_Excercise_Url").val("");
+		}
 	});
 	$(document).on("click",".memberRemoveButton", function(){
 		editGroupdelete($(this));
@@ -239,6 +243,8 @@ window.addEventListener('load', function(){
 	$(document).on("click", "#SubmitGroupButton",function(){
 		console.log("Submit Group");
 		createGroup();
+		$(".MemberOfNewGroup").remove();
+		$("#NewGroupName").val("");
 	});
 	$(document).on("change", "#AddGroupDrop", function(){
 		console.log("Add group");
@@ -414,6 +420,9 @@ function createFullWorkout(){
 	var cyclenum = $("#CycleNum").val();//get cyclenum from text field (make sure is a number)
 	var cyclelen = $("#CycleLenDrop").val();//get cyclelen from text field (make sure is a number)
 	socket.emit("createFullWorkout",name,cyclenum,cyclelen);
+	$("#CycleNum").val("");
+	$("#CycleLenDrop").val("");
+	$("#full_name").val("");
 }
 function getGroups(){
 	var workout = $("#AssignWorkoutDrop").val();
@@ -497,7 +506,7 @@ function editGroupadd(){ //adds an additional user to a preexisting group
 	var user = {name:name, email:email};
 	console.log("UserName: "+ user.name+" UserEmail: "+user.email+ "group: "+group);
 	socket.emit("editGroupadd", group, user);
-	addGroup([user]);
+	//addGroup([user]);
 	getGroup();//update the page
 }
 //done
@@ -619,7 +628,7 @@ function getNextSet(array,tblarr,sety,done){
 	else if(killswitch){
 		killswitch = false;
 		var tblrows = document.getElementById("Exercise_Forms").rows;
-		var date = $("#workout_date").val();
+		var date = $("#Workout_date").val();
 		var d = Date.UTC(date.substring(0,4),date.substring(5,7),date.substring(8,10));
 		var full = $("#full_workout").val();
 		var val = $("#week-day").val();
