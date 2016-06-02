@@ -147,6 +147,49 @@ window.addEventListener('load', function(){
 
 
 function addWorkout(array){
+	var letters = ["a","b","c","d","e","f","g","h","i","j"];
+ 	for(var i=0;i<array.length;i++){//for each set of excercises
+		var temp = i;
+		var rounds=0;
+		for(var j=0;j<array[i].exercises.length;j++){
+			if(array[i].exercises[0].rounds.length > rounds){
+				rounds = array[i].exercises[0].rounds.length;
+			}
+		}
+		for(var j=0;j<rounds;j++){
+			$('.swiper-wrapper').append("<div id='Slide_"+i+"_"+j+"' class='swiper-slide'></div>");
+			$('#Slide_'+i+'_'+j).append("<table id=\""+i+"_"+j+"\" completed=\""+array[i].completed+"\"></table>");
+			var tblnm = i.toString() + "_" + j.toString();
+			var trow = document.getElementById(tblnm).insertRow(0);
+			var c = trow.insertCell(0)
+			c.colspan = "4";
+			c.innerHTML = "Set: " + (i+1) + " Round: "+ (j+1);
+			var hrow = document.getElementById(tblnm).insertRow(1);
+			var c1 = hrow.insertCell(0);
+			var c2 = hrow.insertCell(1);
+			var c3 = hrow.insertCell(2);
+			var c4 = hrow.insertCell(3);
+			c1.innerHTML = "Exercise Order";
+			c2.innerHTML = "Exercise Name";
+			c3.innerHTML = "Exercise Reps";
+			c4.innerHTML = "Exercise Weight";
+			for(var k=0;k<array[i].exercises.length;k++){
+				var row = document.getElementById(tblnm).insertRow(k+2);
+				var c1 = row.insertCell(0);
+				var c2 = row.insertCell(1);
+				var c3 = row.insertCell(2);
+				var c4 = row.insertCell(3);
+				c1.innerHTML = (j+1)+letters[k];
+				c2.innerHTML = array[i].exercises[k].name;
+				c3.innerHTML = "<input type=\"text\" min=\"0\">";
+				c4.innerHTML = "<input type=\"text\" min=\"0\">";
+				c3.firstChild.value = array[i].exercises[k].rounds[j].reps;
+				c4.firstChild.value = array[i].exercises[k].rounds[j].weight;
+				c3.firstChild.id = i.toString()+"_"+k.toString()+"_"+(j).toString()+"_reps";
+				c4.firstChild.id = i.toString()+"_"+k.toString()+"_"+(j).toString()+"_weight";
+			}
+		}
+		/*
 	console.log(array);
 	var letters = ["a","b","c","d","e","f","g"];
 	var i;
@@ -156,7 +199,7 @@ function addWorkout(array){
 		
 		for(k=0;k<array[i].exercises[0].rounds.length;k++){
 			console.log("here is new round", k)
-			$('.swiper-wrapper').append("<div id='Slide_"+i+"_"+k+"' class='swiper-slide'></div>")
+			$('.swiper-wrapper').append("<div id='Slide_"+i+"_"+k+"' class='swiper-slide'></div>");
 			$('#Slide_'+i+'_'+k).append("<table id=\""+i+"_"+k+"\" completed=\""+array[i].completed+"\"></table>");//make table
 			$('#'+i+"_"+k).append("<tr><th colspan ='4'>Set "+(i +1)+"Round "+(k+1)+"");//add table header	
 			$('#'+i+"_"+k).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column header
@@ -172,7 +215,9 @@ function addWorkout(array){
 			}
 		}
 	}
+	*/
 	console.log(i);
 	$('#Slide_'+i).append("<button id='submitWorkout'>Sumbit Workout</button>");
 	i==0;
+	}
 }
