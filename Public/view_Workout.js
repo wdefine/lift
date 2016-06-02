@@ -6,18 +6,26 @@ $( document ).ready(function() {
 
 		
 	//testing
+	var gt = {reps:6, weight:100};
+	var t = {reps:6, weight:150};
 	var c = {reps:8, weight:135};
 	var g = {reps:5, weight:"none"};
 	var p = {reps:12, weight:30};
-	var d = [c,c,c,c];	
+	var d = [c,c,c,c];
+	var dp = [t,t,t];
+	var dv = [gt,gt,gt,gt];
 	var a = {completed:true,_name:"Bench Press",rounds:d};
+	var at = {completed:true,_name:"Hang Clean",rounds:dv};
+	var ar = {completed:true,_name:"Box Jumps",rounds:dp};
 	var z = [g,g,g];
 	var w = [p,p,p];
 	var r = {completed:false,_name:"Push Ups",rounds:z};
 	var q = {completed:true,_name:"Tricep Extensions",rounds:w};
 	var e = {completed:true, exercises:[a,r,q]};//first round of excercises
 	var t = {completed:true, exercises:[a,r]};
-	var f = [e,e,t,e,t,t];//array
+	var tc = {completed:true, exercises:[at,ar,a]};
+	var tv = {completed:true, exercises:[z,q,at]};
+	var f = [e,tc,t,tv,e,t];//array
 
 	////////Load NextWorkout//////////
  	addWorkout(f);
