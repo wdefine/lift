@@ -958,6 +958,7 @@ function populate_table_full(array,table,setnum,email){
     }
 } 
 function table_to_array(workout,email,callback){
+    console.log("workout, email", workout, email);
     var array = [];
     conn.query('SELECT * FROM "main"."'+workout+'" WHERE "email"=($1)',[email])
     .on('data',function(row){

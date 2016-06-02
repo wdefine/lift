@@ -112,9 +112,17 @@ window.addEventListener('load', function(){
 		//do stuff with data here (for Scott's stuff)
 	});
 	//load in next workout//
-	socket.emit("getNextWorkout", "Full Test", UserEmail);
+	socket.emit("getNextWorkout", WorkoutName, UserEmail);
 	socket.on("nextWorkout", function(array){
+		console.log(array);
+		console.log(array[0]);
+		console.log(array[0].exercises);
+		console.log(array[0].exercises[0]);
+		console.log(array[0].exercises);
+		console.log(array[0].exercises[0]);
+		console.log(array[0].exercises[0].rounds);
 		addWorkout(array);
+
 	});
 	
 
