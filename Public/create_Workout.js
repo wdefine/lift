@@ -153,6 +153,7 @@ window.addEventListener('load', function(){
 	/////////Send 
 	$(document).on("click", "#AddToOldGroupButton",function(){
 		editGroupadd();
+
 	});
 
 	$(document).on("click", "#SubmitWorkoutButton",function(){
@@ -205,6 +206,7 @@ window.addEventListener('load', function(){
 		$("#newgroupusername").val($("#newgroupuseremail").val());
 	});
 	$(document).on("change", "#oldgroupusername",function(){
+
 		$("#oldgroupuseremail").val($("#oldgroupusername").val());
 	});
 	$(document).on("change", "#oldgroupuseremail",function(){
@@ -483,14 +485,20 @@ function createGroup(){
 }
 //done
 function editGroupadd(){ //adds an additional user to a preexisting group
-	console.log("edit group add");
 	var group = $("#AddGroupDrop").val();
-	var name = $("#oldgroupusername").val();
-	var email = $("#oldgroupuseremail").val();
+	var nameval = $("#oldgroupusername").val();
+	var nameslashindex = nameval.indexOf("/");
+	var name = nameval.substring(0,nameslashindex);
+	console.log(name);
+	var emailval = $("#oldgroupuseremail").val();
+	var emailslashindex = emailval.indexOf("/");
+	var email = emailval.substring(emailslashindex+1,emailval.length);
+	console.log(email);
 	var user = {name:name, email:email};
 	console.log("UserName: "+ user.name+" UserEmail: "+user.email+ "group: "+group);
 	socket.emit("editGroupadd", group, user);
 	addGroup([user]);
+	getGroup();//update the page
 }
 //done
 function editGroupdelete(_this){ //removes a user from a group
@@ -505,6 +513,7 @@ function editGroupdelete(_this){ //removes a user from a group
 	socket.emit("editGroupdelete", group, user);
 	var id = _this.attr("id");
 	var rowNum = id.charAt(0);//I know its not beautiful but it works
+	getGroup();//update the page
 	//$("#member_Row_"+rowNum).remove();//remove the row of the person removed from group
 
 }

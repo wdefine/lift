@@ -6,6 +6,11 @@
 7b) check over everything
 line 413 getUserList() needs to be defined or substituted for something else
 updating excercise url doesnt put the info into the database.
+
+//////bug////////
+if you add the same person to a group they are already in then server crashes.
+
+
 */
 
 var http = require('http'); 
@@ -140,6 +145,7 @@ io.on('connection', function(socket) {
         });
     });
     socket.on('editGroupadd',function(name,user){ //admin
+        console.log(name + "   " +user);
         push_group(user,name);
     });
     socket.on('editGroupdelete',function(name,user){ //admin
@@ -500,7 +506,25 @@ function unassign_workout(group,full){
         });
     });
 }
+/*
+function getGroupUsers(user,group){
+    var date = new Date();
+    var d = Date.UTC(date)-172800000;
+    conn.query('INSERT INTO "main"."'+group+'" (name,email) VALUES ($1,$2)',[user.name,user.email]);
+    conn.query('SELECT full FROM "main"."'+group.toString()+"-assigned"+'" ')
+    .on('data',function(row){
+        conn.query('SELECT workout FROM "main"."'+row.full+'" WHERE "completed"=($1), "date">($2)',[true,d])
+        .on('data',function(row){
+            table_to_array_2(row.workout,email,user.name,user.email,function(array,workout,a,b){
+                var setnum = array.length;
+                insert_wo_row(a,b,setnum,row.workout,array);
+            });
+        });
+    });
+}
+*/
 function push_group(user,group){
+    console.log(user.email + "    "+ group);
     var date = new Date();
     var d = Date.UTC(date)-172800000;
     conn.query('INSERT INTO "main"."'+group+'" (name,email) VALUES ($1,$2)',[user.name,user.email]);
