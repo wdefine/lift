@@ -3,7 +3,7 @@ var userData = [];
 var UserEmail;
 var WorkoutName;
 $( document ).ready(function() {
-		
+	/*	
 	var gt = {reps:6, weight:100};
 	var t = {reps:6, weight:150};
 	var c = {reps:8, weight:135};
@@ -27,7 +27,7 @@ $( document ).ready(function() {
 
 	////////Load NextWorkout//////////
  	addWorkout(f);
- 	
+ 	*/
  	//////Hamburger menu//////
  	$(document).on("tap", "#Hamburger_icon", function(){
  		console.log("hamburger");
@@ -114,12 +114,18 @@ window.addEventListener('load', function(){
 	console.log("workout name: " + WorkoutName);
 
 	//load in next workout//
-	/*
 	socket.emit("getNextWorkout", WorkoutName, UserEmail);
-		socket.on("nextWorkout", function(array){
+	socket.on("nextWorkout", function(array){
+		console.log(array);
+		console.log(array[0]);
+		console.log(array[0].exercises);
+		console.log(array[0].exercises[0]);
+		console.log(array[0].exercises);
+		console.log(array[0].exercises[0]);
+		console.log(array[0].exercises[0].rounds);
 		addWorkout(array);
+
 	});
-	*/
 	//load in next workout//
     $("table").on("blur", "input", function(){
         var Cell_Id = $(this).attr('id');
@@ -197,9 +203,9 @@ function addWorkout(array){
 		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column header
 		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
 			var cellnum = 0;		
-			$('#'+i).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j]._name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
+			$('#'+i).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j].name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+1)+"-ExNum\">"+(i+1)+letters[j]+"</td>");// add td with excercise number
-			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+2)+"-ExName\">"+array[i].exercises[j]._name+"</td>");// add td  with excercise name
+			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+2)+"-ExName\">"+array[i].exercises[j].name+"</td>");// add td  with excercise name
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+3)+"_reps\"><input id='"+i+"_"+j+"_"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
 			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+4)+"_weight\"><input id='"+i+"_"+j+"_"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
 		}
