@@ -191,6 +191,12 @@ io.on('connection', function(socket) {
             socket.emit('fullWorkout',list);
         });
     });
+    socket.on('getUsersWorkouts', function(email) {
+        get_all_them_workouts(email, function(email, list) {
+            
+            socket.emit('viewDataForUser', email, list);
+        });
+    });
     socket.on('getBlankWorkout',function(workout){ //admin
         table_to_array(workout,"email",function(array){socket.emit('blankWorkout',array);});
     });
@@ -1387,6 +1393,15 @@ function get_user_data(email,callback){
             console.log(obj);
             callback(obj);
         });
+    });
+}
+
+function get_all_them_workouts(email, callback){
+    var array = [];
+    conn.query('SELECT * FROM [' + email + ']').on('data', function(row){
+        array.push(row);
+    }).on('end', function(){
+        callback(email, array);
     });
 }
 function get_group_data(group){
