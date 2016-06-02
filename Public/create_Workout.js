@@ -8,7 +8,7 @@ var finished = [];
 var killswitch;
 var socket = io.connect('http://localhost:8080');
 $(document).ready(function(){
-	$("#Workout_date").datepicker();
+	$("#workout_date").datepicker();
 });
 
 window.addEventListener('load', function(){
@@ -633,7 +633,8 @@ function getNextSet(array,tblarr,sety,done){
 		killswitch = false;
 		var tblrows = document.getElementById("Exercise_Forms").rows;
 		var date = $("#workout_date").val();
-		var d = Date.UTC(date.substring(0,4),date.substring(5,7)-1,date.substring(8,10));
+		//var date = $("#Workout_dat input").datepicker("getDate");
+		var d = Date.UTC(date.substring(6),date.substring(0,2)-1,date.substring(3,5));
 		var full = $("#full_workout").val();
 		var val = $("#week-day").val();
 		var x = val.indexOf("/");
