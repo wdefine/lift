@@ -160,10 +160,11 @@ tr, td, th{
 
 }
 th{
+	background-color: #843849;
 	color:#ffffff;
 	font-family: SourceSansProLightBold;
 	font-size: 28px;
-	background-color: #7b3040;
+	
 }
 tr{
 	font-family: SourceSansProLight;
