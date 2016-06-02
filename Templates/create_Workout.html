@@ -4,6 +4,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript" src="create_Workout.js">
         </script>
         <link rel="stylesheet" href="create_Workout.css">
@@ -286,8 +287,18 @@
             </table>
         </div> 
         <div id="View_Progress_Page">
-           <p>Scott Stuff
-           </p>
+             <tr>
+                    <td>
+                        <select id="AssignGroupDropForView">
+                            <option value="">Select</option>
+                            {{#workouts}}
+                            <option value="{{ident}}">{{workout}}</option>
+                            {{/workouts}}
+                        </select>
+                    </td>
+
+                </tr>
+           <div id="accordion"></div>
         </div>
         <div id="Assign_Workout_Page">
             <table id="Assign_Post_Info">

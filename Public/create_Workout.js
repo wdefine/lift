@@ -11,6 +11,70 @@ $(document).ready(function(){
 	$("#Workout_date").datepicker();
 });
 
+google.charts.load('current', {
+  callback: function () {
+
+  	var viewGroupList;
+    //json structure has keys workout, completed, date, workout 1, workout 2, etc with associated value
+   	socket.emit('getGroups');
+   	socket.on("groups",function(viewGroupList){
+	addGroupsForView(viewGroupList);
+	var groupToView = $("#AssignGroupDropForView option:selected").text();
+	socket.emit('getGroupUsers', groupToView);
+	socket.on("groupUsers",function(listOfUsers){
+		addUsers(listOfUsers);
+
+		for(var loopy = 0; loopy < listOfUsers.length; loopy++){
+
+			console.log("LOOPY " + listOfUsers[loopy]["email"]);
+			var userToView = listOfUsers[loopy]["email"];
+			socket.emit('getUsersWorkouts', userToView);
+			socket.on('viewDataForUser', function(email, data){
+				var email = email;
+				var data = data;
+			$("#accordion").append("<div id=\"accordion" + loopy + "\"><div>");
+              var wo = Object.keys(data[0]); // wo is the name of the workout. for some reason everything in whatever.json is data[0]
+                wo.shift(); // shift tosses the first object in the array, this tosses the "workout" key
+                wo.shift(); // this tosses the "completed" key
+                wo.shift(); //this tosses the "skipped" key
+                wo.shift(); // this tosses the "date" key
+
+                for(var i=0; i<wo.length;i++){ // this creates 1 graph for each workout, but this loop strangely only runs once
+        
+                    $("#accordion"+ loopy).append("<h3>" + wo[i].replace(/_/g, " ") + "</h3>");
+                    var accordionContent = document.createElement('div');
+                    $("#accordion"+ loopy).append(accordionContent);
+                    $(accordionContent).attr('id', email);
+                    var table = [["date", wo[i]]]; // this creates an array with the keys "date" and "name of workout"
+                    for(var q=0;q<data.length;q++){ // loops through the number of data entries
+                        table.push([data[q]["date"], data[q][wo[i]]]); // adds a [date, numberOfReps] pairing to the array
+                    }
+
+                    var d = new google.visualization.arrayToDataTable(table);
+                    var chart = new google.visualization.LineChart(accordionContent);
+                    var options = {
+                          title: $(accordionContent).attr('id').replace(/_/g, " "),
+                          width: $("#accordion"+ loopy).width(),
+                          curveType: 'function',
+                          legend: { position: 'none' }
+
+                        };
+                    chart.draw(d, options);
+                }
+              /*   $(function() {
+                  $( "#accordion"+ loopy ).accordion({
+                      collapsible: true
+                        });
+                  });*/   
+			});
+			}
+		});
+	});
+},
+  packages:['corechart'] 
+
+});
+
 window.addEventListener('load', function(){
 	document.getElementById("full_workout").selectedIndex = "0";
 	document.getElementById("AssignWorkoutDrop").selectedIndex = "0";
@@ -262,6 +326,9 @@ window.addEventListener('load', function(){
 		getWorkouts();
 	});
 });
+
+
+
 function addUsers(list){
 	for(var i=0;i<list.length;i++){
 		$("#AddMemberRow").before("<tr class='Member' id ='member_Row_"+i+"'></tr>");
@@ -429,6 +496,13 @@ function addGroups(list){
 	document.getElementById("AssignGroupDrop").innerHTML = "";
 	for(var i=0;i<list.length;i++){
 		$('#AssignGroupDrop').append("<option value=\""+list[i].group+"\">"+list[i].group+"</option>");
+	}
+}
+
+function addGroupsForView(list){
+	document.getElementById("AssignGroupDropForView").innerHTML = "";
+	for(var i=0;i<list.length;i++){
+		$('#AssignGroupDropForView').append("<option value=\""+list[i].group+"\">"+list[i].group+"</option>");
 	}
 }
 function assignWorkout(){
