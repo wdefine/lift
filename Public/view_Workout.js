@@ -141,55 +141,10 @@ window.addEventListener('load', function(){
     	var date = d.getTime();
     	socket.emit("submitWorkout", UserEmail, Workoutname, date);
     });
-});
-/*
-function show_only(elementType, elementToBeShown){
-	var elements = document.getElementsByTagName(elementType);
-	for(var i = 0; i < elements.length; i++){
-		if(elements[i].getAttribute('id') == elementToBeShown){
-			$(elements[i]).show();
-		}
-		else{
-			$(elements[i]).hide();
-		}
-	}
-}
-
-function cycle_Tables(shownElementId){
-	var tables = document.getElementsByTagName("table");
-	var elementIds = [];
-	for (var i = 0; i < tables.length; i++){
-		var id = tables[i].getAttribute('id')
-		elementIds.push(id);
-	};
-	var nextElementIndex = elementIds.indexOf(shownElementId) + 1;
-	var nextElementId = elementIds[nextElementIndex];
-	$(shownElementId).hide();
-	show_only("table", nextElementId);
-	if(nextElementIndex == elementIds.length){
-		show_only("table", elementIds[0]);
-	}
-   
-}
-function rev_cycle_Tables(shownElementId){
-	var tables = document.getElementsByTagName("table");
-	var elementIds = [];
-	for (var i = 0; i < tables.length; i++){
-		var id = tables[i].getAttribute('id')
-		elementIds.push(id);
-	}
-	var previousElementIndex = elementIds.indexOf(shownElementId) -1;
-	if(previousElementIndex >= 0){
-		var previousElementId = elementIds[previousElementIndex];
-		$(shownElementId).hide();
-		show_only("table", previousElementId);
-	}
-	else{
-		show_only("table", elementIds[elementIds.length - 1]);
-	}
-}
-*/
+});	  
 ////////ADDING TABLE FUNCTION///////////
+
+
 
 function addWorkout(array){
 	console.log(array);
@@ -197,17 +152,24 @@ function addWorkout(array){
 	var i;
 	console.log(array.length);
  	for(i=0;i<array.length;i++){//for each set of excercises
-		$('.swiper-wrapper').append("<div id='Slide_"+i+"' class='swiper-slide'></div>")
-		$('#Slide_'+i).append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
-		$('#'+i).append("<tr><th colspan ='4'>Set "+(i +1)+"");//add table header	
-		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column header
-		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
-			var cellnum = 0;		
-			$('#'+i).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j].name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
-			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+1)+"-ExNum\">"+(i+1)+letters[j]+"</td>");// add td with excercise number
-			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+2)+"-ExName\">"+array[i].exercises[j].name+"</td>");// add td  with excercise name
-			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+3)+"_reps\"><input id='"+i+"_"+j+"_"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
-			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+4)+"_weight\"><input id='"+i+"_"+j+"_"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
+ 		console.log("here is new set",i);
+		
+		for(k=0;k<array[i].exercises[0].rounds.length;k++){
+			console.log("here is new round", k)
+			$('.swiper-wrapper').append("<div id='Slide_"+i+"_"+k+"' class='swiper-slide'></div>")
+			$('#Slide_'+i+'_'+k).append("<table id=\""+i+"_"+k+"\" completed=\""+array[i].completed+"\"></table>");//make table
+			$('#'+i+"_"+k).append("<tr><th colspan ='4'>Set "+(i +1)+"Round "+(k+1)+"");//add table header	
+			$('#'+i+"_"+k).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column header
+			console.log(array[i].exercises.length)
+			for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
+				if(array[i].exercises[j].rounds.length > k){
+					$('#'+i+"_"+k).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j].name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j].name+"</tr>");// add new table row for excercise
+					$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(k)+"-ExNum\">"+(i+1)+letters[j]+"</td>");// add td with excercise number
+					$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(k)+"-ExName\">"+array[i].exercises[j].name+"</td>");// add td  with excercise name
+					$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(k)+"_reps\"><input id='"+i+"_"+j+"_"+k+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
+					$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(k)+"_weight\"><input id='"+i+"_"+j+"_"+k+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
+				}
+			}
 		}
 	}
 	console.log(i);
