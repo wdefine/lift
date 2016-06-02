@@ -9,10 +9,10 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
         <!--Andys JS-->
-        <script type="text/javascript" src="../Public/view_Workout.js">
+        <script type="text/javascript" src="view_Workout.js">
         </script>
         <!--Andys CSS-->
-        <link rel="stylesheet" media="all and (orientation:portrait)" href="../Public/view_Workout.css">
+        <link rel="stylesheet" media="all and (orientation:portrait)" href="view_Workout.css">
     </head>
     <div id="UserIfo" display="none">
         <div id="Workoutname" display="none" value="{{workout}}">{{workout}}</div>
@@ -39,7 +39,7 @@
         <div id="WorkoutPage">
             <ul id= "Workout_bar">
                 {{#allworkouts}}
-                    <li id="{{workout}}" >{{string}}</li>
+                    <li id="{{workout}}" >{{date}}</li>
                 {{/allworkouts}}
             </ul>
             <div id="Workouts">

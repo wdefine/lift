@@ -101,14 +101,17 @@ window.addEventListener('load', function(){
         socket.emit("changeWorkout", email, Workoutname, Cell_Id, Cell_Value, completed);
     });
     $(document).on("tap","#submitWorkout", function(){
-
-    	socket.emit("submitWorkout", UserEmail, Workoutname,  )
-
+    	var d = new Date();
+    	var date = d.getTime();
+    	socket.emit("submitWorkout", UserEmail, Workoutname, date);
     });
-    
 
 
 
+    var mySwiper = new Swiper('.swiper-container', {
+	    speed: 400,
+	    spaceBetween: 100
+	});	
 
 
 
@@ -168,16 +171,17 @@ function addWorkout(array){
 	var letters = ["a","b","c","d","e","f","g"];
  	for(var i=0;i<array.length;i++){//for each set of excercises
 		var temp = i;
-		$('#date').append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
+		$('.swiper-wrapper').append("<div class='swiper-slide'></div>")
+		$('.swiper-slide').append("<table id=\""+i+"\" completed=\""+array[i].completed+"\"></table>");//make table
 		$('#'+i).append("<tr><th colspan ='4'>Set "+(i +1)+"");//add table header	
 		$('#'+i).append("<tr><th>Exercise Number<th>Exercise Name<th>Reps<th>Weight");//column headers
 		for(var j=0;j<array[i].exercises.length;j++){//for each excercise in the set
 			var cellnum = 0;		
-			$('#'+i).append("<tr id=\""+i+"-"+j+"\" name=\""+array[i].exercises[j]._name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
-			$('#'+i+'-'+j).append("<td id=\""+i+"-"+j+"-"+(cellnum+1)+"-ExNum\">"+(i+1)+letters[j]+"</td>");// add td with excercise number
-			$('#'+i+'-'+j).append("<td id=\""+i+"-"+j+"-"+(cellnum+2)+"-ExName\">"+array[i].exercises[j]._name+"</td>");// add td  with excercise name
-			$('#'+i+'-'+j).append("<td id=\""+i+"-"+j+"-"+(cellnum+3)+"-reps\"><input id='"+i+"-"+j+"-"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
-			$('#'+i+'-'+j).append("<td id=\""+i+"-"+j+"-"+(cellnum+4)+"-weight\"><input id='"+i+"-"+j+"-"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
+			$('#'+i).append("<tr id=\""+i+"_"+j+"\" name=\""+array[i].exercises[j]._name+"\" completed=\""+array[i].exercises[j].completed+"\">"+array[i].exercises[j]._name+"</tr>");// add new table row for excercise
+			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+1)+"-ExNum\">"+(i+1)+letters[j]+"</td>");// add td with excercise number
+			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+2)+"-ExName\">"+array[i].exercises[j]._name+"</td>");// add td  with excercise name
+			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+3)+"_reps\"><input id='"+i+"_"+j+"_"+(cellnum+3)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].reps+"'</td>");// add td with reps input
+			$('#'+i+'_'+j).append("<td id=\""+i+"_"+j+"_"+(cellnum+4)+"_weight\"><input id='"+i+"_"+j+"_"+(cellnum+4)+"_Input' type='text' value='"+ array[i].exercises[j].rounds[j].weight+"'</td>");// add td with weight input
 		}
 	} 		
 }
@@ -185,4 +189,3 @@ function addWorkout(array){
 function addDateToWorkoutBar(Date){
 
 }
-

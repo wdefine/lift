@@ -19,7 +19,7 @@ conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["Deadlift"]);
 conn.query('INSERT INTO exercises (exercise) VALUES ($1)', ["RDL"]);
 
 conn.query('CREATE TABLE "main"."Rearden_Steel" ("name" TEXT, "email" TEXT UNIQUE)');
-conn.query('CREATE TABLE "main"."Rearden_Steel-assigned" ("full" TEXT)');
+conn.query('CREATE TABLE "main"."Rearden_Steel_assigned" ("full" TEXT)');
 
 
 conn.query('INSERT INTO Rearden_Steel (name,email) VALUES ($1,$2)',["Will Define","wdefine@students.stab.org"]);
